@@ -37,7 +37,7 @@ function SectionLabel({ children }) {
   );
 }
 
-// ── VISTAS (PÁGINAS) ───────────────────────────────────────────────────────
+// (PÁGINAS) 
 
 function HomeView({ nav }) {
   return (
@@ -278,10 +278,10 @@ function ContactView() {
 
     // REEMPLAZA ESTOS 3 VALORES CON LOS TUYOS DE EMAILJS
     emailjs.send(
-      'TU_SERVICE_ID',     // Ej: service_a1b2c3
-      'TU_TEMPLATE_ID',    // Ej: template_x9y8z7
+      'service_7wyueeo',     // Ej: service_a1b2c3
+      'template_p02dor7',    // Ej: template_x9y8z7
       templateParams,
-      'TU_PUBLIC_KEY'      // Ej: aBcDeFgHiJkLmNoP
+      'F6YLGfL4FxJNkVvuX'      // Ej: aBcDeFgHiJkLmNoP
     )
     .then((response) => {
       console.log('Correo enviado con éxito!', response.status, response.text);
