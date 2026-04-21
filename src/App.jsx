@@ -276,25 +276,25 @@ function ContactView() {
       message: form.message,
     };
 
-    // REEMPLAZA ESTOS 3 VALORES CON LOS TUYOS DE EMAILJS
-    emailjs.send(
-      'service_7wyueeo',     // Ej: service_a1b2c3
-      'template_p02dor7',    // Ej: template_x9y8z7
-      templateParams,
-      'F6YLGfL4FxJNkVvuX'      // Ej: aBcDeFgHiJkLmNoP
-    )
-    .then((response) => {
-      console.log('Correo enviado con éxito!', response.status, response.text);
-      setLoading(false);
-      setSent(true);
-      setForm({ name: "", email: "", service: "content", message: "" });
-      setTimeout(() => setSent(false), 6000);
-    })
-    .catch((err) => {
-      console.error('Error al enviar el correo:', err);
-      setLoading(false);
-      setError(true);
-    });
+    emailjs
+      .send(
+        "service_p0f63m9", // Tu Service ID
+        "template_8228t39", // Tu Template ID
+        templateParams,
+        "L636Sbe9_FAnZ6G9l" // Tu Public Key
+      )
+      .then((response) => {
+        console.log('Correo enviado con éxito!', response.status, response.text);
+        setLoading(false);
+        setSent(true);
+        setForm({ name: "", email: "", service: "content", message: "" });
+        setTimeout(() => setSent(false), 6000);
+      })
+      .catch((err) => {
+        console.error('Error al enviar el correo:', err);
+        setLoading(false);
+        setError(true);
+      });
   };
 
   const inputStyle = { width: "100%", background: "rgba(6,182,212,0.04)", border: "1px solid " + BORDER, color: "#fff", padding: "14px 16px", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" };
@@ -340,68 +340,7 @@ function ContactView() {
       </div>
     </div>
   );
-}
-  const handle = (e) => {
-    e.preventDefault(); 
-    setLoading(true);
-    setTimeout(() => { 
-      setLoading(false); 
-      setSent(true); 
-      setForm({ name: "", email: "", service: "content", message: "" }); 
-      setTimeout(() => setSent(false), 6000); 
-    }, 1000);
-  };
-
-  const inputStyle = { width: "100%", background: "rgba(6,182,212,0.04)", border: `1px solid ${BORDER}`, color: "#fff", padding: "14px 16px", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" };
-  const labelStyle = { fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: MUTED, display: "block", marginBottom: 8 };
-
-  return (
-    <div style={{ padding: "80px 5vw 96px" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 2, maxWidth: 960, margin: "0 auto", border: `1px solid ${BORDER}` }}>
-        <div style={{ background: ACCENT_GLOW, borderRight: `1px solid ${BORDER}`, padding: "48px 36px" }}>
-          <h1 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 52, fontWeight: 800, textTransform: "uppercase", lineHeight: 0.95, marginBottom: 40 }}>Hablemos<br /><span style={{ color: ACCENT }}>Hoy.</span></h1>
-          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-            {[{ label: "Email", val: "hola@ridersmedia.mx" }, { label: "WhatsApp", val: "+52 220 225 6586" }, { label: "Ciudad", val: "Puebla, MX" }].map(c => (
-              <div key={c.label}>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: ACCENT, marginBottom: 4 }}>{c.label}</div>
-                <div style={{ fontSize: 14, color: "#fff", fontWeight: 500 }}>{c.val}</div>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 48, padding: 20, background: SURFACE, border: `1px solid ${BORDER}` }}>
-            <p style={{ fontSize: 12, color: MUTED, lineHeight: 1.7, fontStyle: "italic" }}>Respondemos en menos de 24 horas. Sin filtros, directo al estratega.</p>
-          </div>
-        </div>
-        
-        <form onSubmit={handle} style={{ padding: "48px 40px", display: "flex", flexDirection: "column", gap: 20, background: SURFACE }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            <div>
-              <label style={labelStyle}>Nombre</label>
-              <input required style={inputStyle} value={form.name} placeholder="Tu nombre" onChange={e => setForm({ ...form, name: e.target.value })} onFocus={e => e.target.style.borderColor = ACCENT} onBlur={e => e.target.style.borderColor = BORDER} />
-            </div>
-            <div>
-              <label style={labelStyle}>Email</label>
-              <input required type="email" style={inputStyle} value={form.email} placeholder="tu@email.com" onChange={e => setForm({ ...form, email: e.target.value })} onFocus={e => e.target.style.borderColor = ACCENT} onBlur={e => e.target.style.borderColor = BORDER} />
-            </div>
-          </div>
-          <div>
-            <label style={labelStyle}>Servicio</label>
-            <select style={{ ...inputStyle, appearance: "none" }} value={form.service} onChange={e => setForm({ ...form, service: e.target.value })} onFocus={e => e.target.style.borderColor = ACCENT} onBlur={e => e.target.style.borderColor = BORDER}>
-              {CATALOG.map(s => <option key={s.id} value={s.id} style={{ background: BG }}>{s.name} — {s.price} MXN</option>)}
-            </select>
-          </div>
-          <div>
-            <label style={labelStyle}>Tu reto principal</label>
-            <textarea required rows={5} style={{ ...inputStyle, resize: "vertical" }} value={form.message} placeholder="Cuéntanos en qué estás trabajando..." onChange={e => setForm({ ...form, message: e.target.value })} onFocus={e => e.target.style.borderColor = ACCENT} onBlur={e => e.target.style.borderColor = BORDER} />
-          </div>
-          <button type="submit" disabled={loading} style={{ background: loading ? "rgba(6,182,212,0.4)" : ACCENT, color: "#000", border: "none", padding: 18, fontWeight: 800, fontSize: 13, letterSpacing: "0.12em", textTransform: "uppercase", cursor: loading ? "wait" : "pointer", clipPath: "polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))" }}>
-            {loading ? "Enviando..." : "Enviar Solicitud →"}
-          </button>
-          {sent && <div style={{ padding: "16px 20px", background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.25)", color: "#34D399", fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", gap: 10 }}>✓ Mensaje recibido. Te contactamos pronto.</div>}
-        </form>
-      </div>
-    </div>
-  );
+};
 
 // ── APP RAÍZ ───────────────────────────────────────────────────────────────
 
