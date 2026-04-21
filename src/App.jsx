@@ -276,25 +276,27 @@ function ContactView() {
       message: form.message,
     };
 
-    emailjs
+  emailjs
       .send(
-        "service_p0f63m9", // Tu Service ID
-        "template_8228t39", // Tu Template ID
-        templateParams,
-        "L636Sbe9_FAnZ6G9l" // Tu Public Key
-      )
-      .then((response) => {
-        console.log('Correo enviado con éxito!', response.status, response.text);
+      "service_p0f63m9", 
+      "template_8228t39", 
+      templateParams,
+      "L636Sbe9_FAnZ6G9l"
+    )
+    .then(
+      () => {
+        console.log("¡MENSAJE ENVIADO CON ÉXITO!");
         setLoading(false);
         setSent(true);
         setForm({ name: "", email: "", service: "content", message: "" });
         setTimeout(() => setSent(false), 6000);
-      })
-      .catch((err) => {
-        console.error('Error al enviar el correo:', err);
+      },
+      (error) => {
+        console.log("ERROR AL ENVIAR:", error.text);
         setLoading(false);
         setError(true);
-      });
+      }
+    );
   };
 
   const inputStyle = { width: "100%", background: "rgba(6,182,212,0.04)", border: "1px solid " + BORDER, color: "#fff", padding: "14px 16px", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" };
@@ -340,7 +342,7 @@ function ContactView() {
       </div>
     </div>
   );
-};
+}
 
 // ── APP RAÍZ ───────────────────────────────────────────────────────────────
 
