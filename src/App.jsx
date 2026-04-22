@@ -278,10 +278,10 @@ function ContactView() {
 
   emailjs
       .send(
-      "service_p0f63m9", 
-      "template_8228t39", 
+      "service_ko9wm6r", 
+      "template_p02dor7", 
       templateParams,
-      "L636Sbe9_FAnZ6G9l"
+      "LF6YLGfL4FxJNkVvuX"
     )
     .then(
       () => {
