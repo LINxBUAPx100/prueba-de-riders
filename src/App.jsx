@@ -1,24 +1,25 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import emailjs from '@emailjs/browser';
-import { COLORS, CATALOG, CASES, PILLARS } from "./data";
+import { COLORS, CATALOG, CASES, PILLARS, CASES_CSV_URL, SHEET_CSV_URL } from "./data";
 import "./index.css";
 
-const { ACCENT, ACCENT_DIM, ACCENT_GLOW, ACCENT_BORDER, MUTED, BG, SURFACE, BORDER } = COLORS;
+const { BG, BG2, SURFACE, INK, INK2, INK3, ACCENT, ACCENT2, BORDER, RIDERS, SUCCESS, WARNING, INFO, MUTED_RED, MUTED_TEAL, TERRA } = COLORS;
 
-// ── COMPONENTES UI REUTILIZABLES ───────────────────────────────────────────
+// ── COMPONENTES UI ───────────────────────────────────────────────────────
 
-function Chip({ children, accent }) {
+function Chip({ children, outline, accent }) {
+  const isAccent = accent || !outline;
   return (
     <span style={{ 
       display: "inline-block", 
-      background: accent ? ACCENT : ACCENT_GLOW, 
-      color: accent ? "#000" : ACCENT, 
-      border: accent ? "none" : `1px solid ${ACCENT_BORDER}`, 
-      padding: "3px 10px", 
-      borderRadius: 4, 
-      fontSize: 11, 
+      background: isAccent ? ACCENT : "transparent", 
+      color: isAccent ? "#fff" : ACCENT, 
+      border: `1px solid ${ACCENT}`, 
+      padding: "4px 12px", 
+      borderRadius: "20px", 
+      fontSize: 10, 
       fontWeight: 700, 
-      letterSpacing: "0.08em", 
+      letterSpacing: "0.05em", 
       textTransform: "uppercase" 
     }}>
       {children}
@@ -28,165 +29,216 @@ function Chip({ children, accent }) {
 
 function SectionLabel({ children }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-      <span style={{ display: "inline-block", width: 28, height: 1, background: ACCENT }} />
-      <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: ACCENT }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+      <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: ACCENT }}>
         {children}
       </span>
+      <span style={{ flex: 1, height: 1, background: BORDER }} />
     </div>
   );
 }
 
-// (PÁGINAS) 
+// ── VISTAS ───────────────────────────────────────────────────────────────
 
 function HomeView({ nav }) {
   return (
-    <div>
-      <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", padding: "120px 5vw 80px", position: "relative" }}>
-        <div style={{ position: "absolute", inset: 0, backgroundImage: `linear-gradient(${ACCENT}04 1px, transparent 1px), linear-gradient(90deg, ${ACCENT}04 1px, transparent 1px)`, backgroundSize: "60px 60px", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", top: "10%", right: "-5%", width: 600, height: 600, borderRadius: "50%", background: ACCENT, filter: "blur(180px)", opacity: 0.07, pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: "5%", left: "-10%", width: 400, height: 400, borderRadius: "50%", background: "#818CF8", filter: "blur(160px)", opacity: 0.06, pointerEvents: "none" }} />
+    <div style={{ background: BG }}>
+      {/* 1. HERO EXPANDIDO Y ESPACIADO */}
+      <section style={{ padding: "100px 8vw 160px", position: "relative", overflow: "hidden", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "60px", minHeight: "100vh" }}>
         
-        <div style={{ position: "relative", maxWidth: 900 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 32 }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: ACCENT, boxShadow: `0 0 14px ${ACCENT}`, animation: "pulse 2s infinite" }} />
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: ACCENT }}>Agencia de Soluciones Digitales · Puebla, MX</span>
+        <div style={{ flex: "1 1 520px", position: "relative", zIndex: 2 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+            <div style={{ width: 12, height: 12, borderRadius: "50%", background: ACCENT, boxShadow: `0 0 14px ${ACCENT}` }} />
+            <span style={{ fontSize: 12, fontWeight: 700, color: INK2, letterSpacing: "0.1em", textTransform: "uppercase" }}>UNIDAD DE RESPUESTA RÁPIDA · PUEBLA, MX</span>
           </div>
           
-          <h1 style={{ fontSize: "clamp(52px,9vw,110px)", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, lineHeight: 0.9, letterSpacing: "-0.02em", textTransform: "uppercase", marginBottom: 32 }}>
-            RIDERS<br />
-            <span style={{ WebkitTextStroke: `2px ${ACCENT}`, color: "transparent" }}>MEDIA</span>
+          <h1 style={{ fontSize: "clamp(52px, 8vw, 110px)", color: INK, fontWeight: 900, lineHeight: 0.9, marginBottom: 32, fontFamily: "'Barlow Condensed', sans-serif", textTransform: "uppercase" }}>
+            Creatividad <br /><span style={{ color: ACCENT }}>Eficaz</span> Para <br />Tu Negocio.
           </h1>
           
-          <p style={{ fontSize: "clamp(16px,2vw,20px)", color: MUTED, maxWidth: 560, lineHeight: 1.65, marginBottom: 48 }}>
-            No somos una agencia convencional. Somos una <em style={{ color: "#fff", fontStyle: "normal", fontWeight: 600 }}>unidad de respuesta rápida</em> para PyMEs que necesitan velocidad, claridad y resultados medibles.
+          <p style={{ fontSize: "clamp(18px, 1.5vw, 22px)", color: INK2, maxWidth: 520, lineHeight: 1.6, marginBottom: 48 }}>
+            No somos una agencia convencional. Somos un equipo táctico para PyMEs que necesitan <strong>velocidad, claridad y resultados medibles</strong> sin presupuestos inflados.
           </p>
           
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
-            <button onClick={() => nav("catalogo")} style={{ background: ACCENT, color: "#000", border: "none", padding: "16px 36px", fontWeight: 800, fontSize: 13, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", clipPath: "polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))" }}>
+          <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 80 }}>
+            <button onClick={() => nav("catalogo")} style={{ background: INK, color: "#fff", border: "none", padding: "20px 45px", fontWeight: 700, borderRadius: "4px", cursor: "pointer", fontSize: 14, letterSpacing: "0.05em", transition: "transform 0.2s" }} onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"} onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
               Ver Catálogo 2026 →
             </button>
-            <button onClick={() => nav("contacto")} style={{ background: "transparent", color: "#fff", border: "1px solid rgba(255,255,255,0.15)", padding: "16px 36px", fontWeight: 700, fontSize: 13, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
-              Contactar
+            <button onClick={() => nav("contacto")} style={{ background: "transparent", color: INK, border: `2px solid ${INK}`, padding: "20px 45px", fontWeight: 700, borderRadius: "4px", cursor: "pointer", fontSize: 14, letterSpacing: "0.05em", transition: "background 0.2s" }} onMouseEnter={e => {e.currentTarget.style.background = INK; e.currentTarget.style.color = "#fff"}} onMouseLeave={e => {e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = INK}}>
+              Agendar Llamada
             </button>
           </div>
         </div>
 
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, borderTop: `1px solid ${BORDER}`, height: 22, display: "flex", alignItems: "center" }}>
-          <div style={{ display: "flex", gap: 48, animation: "ticker 60s linear infinite", whiteSpace: "nowrap" }}>
-            {["Edición de Video", "Motion Graphics", "Google Ads", "Landing Pages", "Social Media", "SEO Local", "Branding en Movimiento,Edición de Video",].map((t, i) => (
-              <span key={i} style={{ fontSize: 15, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: i % 3 === 0 ? ACCENT : MUTED }}>{t} ·</span>
+        {/* ELEMENTO VISUAL HERO */}
+        <div style={{ flex: "1 1 400px", minHeight: "500px", background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: "8px", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+          <div style={{ position: "absolute", inset: 0, backgroundImage: `linear-gradient(${BORDER} 1px, transparent 1px), linear-gradient(90deg, ${BORDER} 1px, transparent 1px)`, backgroundSize: "40px 40px", opacity: 0.5 }} />
+          
+          <div style={{ textAlign: "center", zIndex: 2 }}>
+            <div style={{ width: 80, height: 80, borderRadius: "50%", background: ACCENT, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 24, cursor: "pointer", boxShadow: `0 10px 30px ${ACCENT}40`, transition: "transform 0.2s" }} onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"} onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}>
+              ▶
+            </div>
+            <span style={{ fontSize: 14, fontWeight: 800, color: INK, letterSpacing: "0.1em", textTransform: "uppercase" }}>Ver Showreel</span>
+          </div>
+        </div>
+
+        {/* TICKER INFERIOR (LISTÓN ANIMADO) */}
+        <style>{`
+          @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+        `}</style>
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, borderTop: `1px solid ${BORDER}`, padding: "15px 0", background: SURFACE, zIndex: 3, overflow: "hidden" }}>
+           <div className="ticker-wrapper" style={{ display: "flex", width: "max-content", gap: 50, animation: "ticker 60s linear infinite" }}>
+              {CATALOG.concat(CATALOG).map((s, i) => (
+                <span key={i} style={{ color: i % 2 === 0 ? ACCENT : INK3, fontWeight: 800, fontSize: 14, textTransform: "uppercase", letterSpacing: "0.1em", whiteSpace: "nowrap" }}>
+                  {s.name} •
+                </span>
+              ))}
+           </div>
+        </div>
+      </section>
+
+      {/* 2. PROBLEMA VS SOLUCIÓN */}
+      <section style={{ padding: "120px 8vw", background: BG }}>
+        <SectionLabel>El Estándar Riders</SectionLabel>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 80, marginTop: 40 }}>
+          <div>
+            <h2 style={{ fontSize: "clamp(36px, 5vw, 52px)", color: INK, fontWeight: 900, lineHeight: 1, marginBottom: 24, fontFamily: "'Barlow Condensed', sans-serif", textTransform: "uppercase" }}>
+              La industria digital es <span style={{ color: INK3 }}>lenta y confusa.</span>
+            </h2>
+            <p style={{ color: INK2, fontSize: 18, lineHeight: 1.7, marginBottom: 32 }}>
+              Las agencias tradicionales te atrapan en juntas interminables, contratos ocultos y meses de espera para lanzar una campaña básica. Tu negocio necesita moverse al ritmo del mercado.
+            </p>
+            <button onClick={() => nav("valor")} style={{ background: "none", border: `none`, color: ACCENT, fontWeight: 800, cursor: "pointer", fontSize: 14, letterSpacing: "0.05em", textTransform: "uppercase", padding: 0 }}>
+              Conoce cómo trabajamos →
+            </button>
+          </div>
+          
+          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            {[
+              { icon: "V", title: "Velocidad Táctica", desc: "Sistemas estructurados para entregar proyectos en días, no en meses." },
+              { icon: "F", title: "Foco en Conversión", desc: "Un diseño bonito que no vende es arte. Nosotros hacemos negocios." },
+              { icon: "T", title: "Transparencia Radical", desc: "Catálogo público. Sabes exactamente qué incluye y cuánto cuesta." }
+            ].map((item, i) => (
+              <div key={i} style={{ display: "flex", gap: 24, background: SURFACE, padding: "32px", borderRadius: "8px", border: `1px solid ${BORDER}` }}>
+                <div style={{ fontSize: 32 }}>{item.icon}</div>
+                <div>
+                  <h4 style={{ fontSize: 18, fontWeight: 800, color: INK, marginBottom: 8 }}>{item.title}</h4>
+                  <p style={{ fontSize: 15, color: INK2, lineHeight: 1.6 }}>{item.desc}</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section style={{ borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}`, padding: "48px 5vw", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 32 }}>
-
-
-
-
-        {[{ val: "48h", label: "Entrega promedio" }, { val: "100%", label: "Transparencia total" }, { val: CATALOG.length, label: "Servicios en catálogo"}, { val: "PyMEs", label: "Nuestro enfoque" }].map((s, i) => (
-          <div key={i}>
-            <div style={{ fontSize: "clamp(36px,5vw,52px)", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, color: i % 2 === 0 ? ACCENT : "#fff", lineHeight: 1 }}>{s.val}</div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: MUTED, marginTop: 6 }}>{s.label}</div>
-          </div>
-        ))}
+      {/* 3. MÉTRICAS DE IMPACTO */}
+      <section style={{ padding: "12px 8vw", background: INK, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 32, borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}` }}>
+          {[
+            { val: "48h", lab: "Tiempo de Respuesta" },
+            { val: "100%", lab: "Transparencia de Costos" },
+            { val: CATALOG.length, lab: "Servicios Activos" },
+            { val: "B2B", lab: "Enfoque Principal" }
+          ].map((m, i) => (
+            <div key={i} style={{ textAlign: "center" }}>
+              <div style={{ fontSize: "clamp(40px, 5vw, 56px)", fontWeight: 900, color: BG, fontFamily: "'Barlow Condensed', sans-serif" }}>{m.val}</div>
+              <div style={{ fontSize: "12px", fontWeight: 700, color: ACCENT, textTransform: "uppercase", marginTop: 4, letterSpacing: "0.1em" }}>{m.lab}</div>
+            </div>
+          ))}
       </section>
 
-      <section style={{ padding: "96px 5vw" }}>
+     {/* 4. FILOSOFÍA */}
+      <section style={{ padding: "120px 8vw", background: SURFACE }}>
         <SectionLabel>Filosofía</SectionLabel>
-        <h2 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: "clamp(36px,5vw,56px)", fontWeight: 800, textTransform: "uppercase", lineHeight: 1, marginBottom: 56 }}>
-          Eficacia y Transparencia<br /><span style={{ color: ACCENT }}>en Movimiento.</span>
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 2 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 32, marginTop: 40 }}>
           {PILLARS.map(p => (
-            <div key={p.num} style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "40px 32px", transition: "all 0.3s" }}
-              onMouseEnter={e => { e.currentTarget.style.background = ACCENT_GLOW; e.currentTarget.style.borderColor = ACCENT_BORDER; }}
-              onMouseLeave={e => { e.currentTarget.style.background = SURFACE; e.currentTarget.style.borderColor = BORDER; }}>
-              <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 72, fontWeight: 800, color: "rgba(6,182,212,0.08)", lineHeight: 1, marginBottom: 16 }}>{p.num}</div>
-              <h3 style={{ fontSize: 18, fontWeight: 800, letterSpacing: "0.05em", textTransform: "uppercase", color: "#fff", marginBottom: 10 }}>{p.title}</h3>
-              <p style={{ color: MUTED, fontSize: 14, lineHeight: 1.7 }}>{p.body}</p>
+            <div key={p.num} style={{ background: BG, padding: "40px", border: `1px solid ${BORDER}`, borderRadius: "8px", transition: "all 0.3s" }}
+                 onMouseEnter={e => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.transform = "translateY(-4px)" }}
+                 onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.transform = "translateY(0)" }}>
+              
+              {/* NÚMERO GIGANTE */}
+              <div style={{ fontSize: 72, fontWeight: 900, color: p.numColor || BORDER, marginBottom: 16, fontFamily: "'Barlow Condensed', sans-serif", opacity: 0.6 }}>
+                {p.num}
+              </div>
+              
+              {/* TÍTULO */}
+              <h3 style={{ fontSize: 24, color: p.titleColor || INK, marginBottom: 12, fontWeight: 800, textTransform: "uppercase" }}>
+                {p.title}
+              </h3>
+              
+              {/* TEXTO DESCRIPTIVO */}
+              <p style={{ color: p.bodyColor || INK2, lineHeight: 1.7 }}>
+                {p.body}
+              </p>
+
             </div>
           ))}
         </div>
       </section>
 
-      <section style={{ padding: "0 5vw 96px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 40, flexWrap: "wrap", gap: 16 }}>
-          <div>
-            <SectionLabel>Resultados</SectionLabel>
-            <h2 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: "clamp(32px,4vw,48px)", fontWeight: 800, textTransform: "uppercase" }}>Casos Reales</h2>
+      {/* 5. CTA DE CIERRE */}
+      <section style={{ padding: "140px 8vw", background: BG, borderBottom: `1px solid ${BORDER}`, textAlign: "center" }}>
+        <div style={{ maxWidth: 700, margin: "0 auto" }}>
+          <div style={{ width: 64, height: 64, background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 32px", color: ACCENT }}>
+            E
           </div>
-          <button onClick={() => nav("casos")} style={{ background: "none", border: "1px solid rgba(255,255,255,0.12)", color: "#fff", fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", padding: "10px 20px", cursor: "pointer" }}>Ver todos →</button>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 2 }}>
-          {CASES.map((c, i) => (
-            <div key={i} style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "36px 28px", position: "relative", transition: "transform 0.3s" }}
-              onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"}
-              onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
-              <div style={{ position: "absolute", top: 0, left: 0, height: 2, width: "100%", background: c.color }} />
-              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: c.color, marginBottom: 12 }}>{c.cat}</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 8 }}>{c.client}</div>
-              <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 28, fontWeight: 800, color: "#fff", lineHeight: 1.1 }}>{c.result}</div>
-            </div>
-          ))}
+          <h2 style={{ fontSize: "clamp(42px, 6vw, 64px)", color: INK, fontWeight: 900, lineHeight: 1, marginBottom: 24, fontFamily: "'Barlow Condensed', sans-serif", textTransform: "uppercase" }}>
+            ¿Listo para acelerar tu crecimiento?
+          </h2>
+          <p style={{ color: INK2, fontSize: 18, lineHeight: 1.6, marginBottom: 48 }}>
+            Deja de perder tiempo y dinero con soluciones genéricas. Habla directamente con nosotros y pongamos a trabajar tu marca.
+          </p>
+          <button onClick={() => nav("contacto")} style={{ background: ACCENT, color: "#fff", border: "none", padding: "20px 50px", fontWeight: 800, borderRadius: "4px", cursor: "pointer", fontSize: 15, letterSpacing: "0.08em", textTransform: "uppercase", boxShadow: `0 10px 20px ${ACCENT}30`, transition: "transform 0.2s" }} onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"} onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
+            Cotizar Mi Proyecto
+          </button>
         </div>
       </section>
 
-      <section style={{ background: `linear-gradient(135deg, ${ACCENT_DIM}, #0E7490)`, padding: "72px 5vw", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
-        <div>
-          <h2 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: "clamp(32px,4vw,52px)", fontWeight: 800, color: "#fff", textTransform: "uppercase", lineHeight: 1 }}>¿Tu contenido se ve igual al<br />de todos los demás?</h2>
-          <p style={{ color: "rgba(255,255,255,0.65)", marginTop: 12, fontSize: 15, fontWeight: 600 }}>Estás perdiendo dinero. Hablemos hoy.</p>
+      {/* SOCIAL PROOF */}
+      <section style={{ padding: "10px 8vw", background: BG2, borderBottom: `1px solid ${BORDER}`, textAlign: "center" }}>
+        <p style={{ fontSize: 12, fontWeight: 800, color: INK3, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 32 }}>Marcas que confían en nosotros</p>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "clamp(20px, 8vw, 100px)", opacity: 0.5, filter: "grayscale(59%)" }}>
+          {["MotoShop GDL", "Clínica Vita", "Tacos El Rancho", "Ropa Urbana MX"].map((brand, i) => (
+            <span key={i} style={{ fontSize: 24, fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", color: INK }}>{brand}</span>
+          ))}
         </div>
-        <button onClick={() => nav("contacto")} style={{ background: "#fff", color: ACCENT_DIM, border: "none", padding: "18px 40px", fontWeight: 800, fontSize: 13, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", clipPath: "polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))" }}>Contactar Ahora →</button>
       </section>
     </div>
   );
 }
 
-// revisar este pedo hay error:
-
 function CatalogView({ nav }) {
-  // Usamos .toLowerCase() para que la comparación sea segura
   const monthly = CATALOG.filter(s => s.tag.toLowerCase() === "mensual");
   const oneTime = CATALOG.filter(s => s.tag.toLowerCase() === "pago único");
   const perPiece = CATALOG.filter(s => s.tag.toLowerCase() === "por pieza");
 
   function Section({ title, items }) {
-    // Si una sección no tiene items, no la renderizamos
     if (items.length === 0) return null;
-
     return (
       <div style={{ marginBottom: 64 }}>
         <SectionLabel>{title}</SectionLabel>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 2 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 24 }}>
           {items.map(s => (
             <div key={s.id} style={{ 
-              background: s.highlight ? ACCENT_GLOW : SURFACE, 
-              border: `1px solid ${s.highlight ? ACCENT_BORDER : BORDER}`, 
-              padding: "32px 28px", 
-              position: "relative", 
-              transition: "transform 0.2s,border-color 0.2s" 
+              background: s.highlight ? BG2 : "transparent", 
+              border: `1px solid ${s.highlight ? ACCENT : BORDER}`, 
+              padding: "40px", 
+              borderRadius: "8px",
+              position: "relative",
+              transition: "transform 0.2s, border-color 0.2s"
             }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; if (!s.highlight) e.currentTarget.style.borderColor = ACCENT_BORDER; }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; if (!s.highlight) e.currentTarget.style.borderColor = ACCENT; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; if (!s.highlight) e.currentTarget.style.borderColor = BORDER; }}>
-              
-              {s.highlight && <div style={{ position: "absolute", top: 12, right: 12, background: ACCENT, color: "#000", fontSize: 9, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", padding: "3px 8px" }}>Popular</div>}
-              
-              <Chip>{s.tag}</Chip>
-              
-              <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 52, fontWeight: 800, color: "#fff", lineHeight: 1, marginTop: 16, letterSpacing: "-0.02em" }}>
-                {s.price}
-                <span style={{ fontSize: 16, fontWeight: 600, color: MUTED }}> MXN</span>
+              {s.highlight && <div style={{ position: "absolute", top: 16, right: 16, background: ACCENT, color: "#fff", fontSize: 10, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 10px", borderRadius: "20px" }}>Popular</div>}
+              <Chip outline={!s.highlight}>{s.tag}</Chip>
+              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 48, fontWeight: 900, color: INK, marginTop: 24, marginBottom: 8, letterSpacing: "-0.02em" }}>
+                {s.price} <span style={{ fontSize: 16, fontWeight: 600, color: INK3 }}>MXN</span>
               </div>
-              
-              <h3 style={{ fontSize: 17, fontWeight: 800, color: "#fff", marginTop: 16, marginBottom: 8 }}>{s.name}</h3>
-              <p style={{ fontSize: 13, color: MUTED, lineHeight: 1.6 }}>{s.desc}</p>
-              
-              <button onClick={() => nav("contacto")} style={{ marginTop: 24, background: "none", border: `1px solid ${ACCENT_BORDER}`, color: ACCENT, fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", padding: "9px 18px", cursor: "pointer", width: "100%", transition: "all 0.2s" }}
-                onMouseEnter={e => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.color = "#000"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = ACCENT; }}>
+              <h3 style={{ fontSize: 22, color: INK, margin: "0 0 12px", fontWeight: 800 }}>{s.name}</h3>
+              <p style={{ color: INK2, fontSize: 14, minHeight: 60, marginBottom: 24, lineHeight: 1.6 }}>{s.desc}</p>
+              <button onClick={() => nav("contacto")} style={{ width: "100%", padding: "14px", background: s.highlight ? INK : "transparent", color: s.highlight ? "#fff" : INK, border: `2px solid ${INK}`, borderRadius: "4px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>
                 Cotizar este servicio →
               </button>
             </div>
@@ -197,18 +249,12 @@ function CatalogView({ nav }) {
   }
 
   return (
-    <div style={{ padding: "80px 5vw 96px" }}>
-      <div style={{ maxWidth: 640, marginBottom: 72 }}>
-        <Chip accent>Catálogo 2026</Chip>
-        <h1 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: "clamp(48px,7vw,80px)", fontWeight: 800, textTransform: "uppercase", lineHeight: 0.95, marginTop: 20, marginBottom: 20 }}>
-          Servicios &<br /><span style={{ color: ACCENT }}>Precios</span>
-        </h1>
-        <p style={{ color: MUTED, fontSize: 15, lineHeight: 1.7 }}>
-          Sin letra chica. Sin sorpresas. Todos los precios son desde — cotizamos según tu proyecto.
-        </p>
+    <div style={{ padding: "120px 8vw", background: BG }}>
+      <div style={{ maxWidth: 700, marginBottom: 80 }}>
+        <Chip accent>Tarifas Transparentes</Chip>
+        <h1 style={{ fontSize: "clamp(48px, 7vw, 64px)", color: INK, marginTop: 24, marginBottom: 24, fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", textTransform: "uppercase" }}>Servicios & Precios</h1>
+        <p style={{ color: INK2, fontSize: 18, lineHeight: 1.7 }}>Sin letra chica. Sin sorpresas. Todos los precios son desde — cotizamos según tu proyecto.</p>
       </div>
-      
-      {/* Asegúrate de llamar a las secciones con el nombre exacto que quieres mostrar */}
       <Section title="Por pieza" items={perPiece} />
       <Section title="Pago único" items={oneTime} />
       <Section title="Paquetes mensuales" items={monthly} />
@@ -216,21 +262,86 @@ function CatalogView({ nav }) {
   );
 }
 
-function CasesView() {
+function ValorView({ stats }) {
   return (
-    <div style={{ padding: "80px 5vw 96px" }}>
-      <SectionLabel>Resultados</SectionLabel>
-      <h1 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: "clamp(48px,7vw,80px)", fontWeight: 800, textTransform: "uppercase", lineHeight: 0.95, marginBottom: 64 }}>
-        Casos de<br /><span style={{ color: ACCENT }}>Éxito</span>
+    <div style={{ padding: "120px 8vw", background: COLORS.BG, minHeight: "100vh" }}>
+      <SectionLabel>Análisis de Mercado</SectionLabel>
+      <h1 style={{ fontSize: "clamp(32px, 5vw, 48px)", fontWeight: 900, marginBottom: 80, fontFamily: "'Barlow Condensed'", textTransform: "uppercase" }}>
+        ¿POR QUÉ RIDERS ES LA <span style={{ color: COLORS.ACCENT }}>OPCIÓN LÓGICA?</span>
       </h1>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 2 }}>
-        {CASES.map((c, i) => (
-          <div key={i} style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "48px 32px", position: "relative" }}>
-            <div style={{ position: "absolute", top: 0, left: 0, height: 3, width: "100%", background: c.color }} />
-            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: c.color, marginBottom: 16 }}>{c.cat}</div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 16 }}>{c.client}</div>
-            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 38, fontWeight: 800, color: "#fff", lineHeight: 1 }}>{c.result}</div>
-          </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "40px" }}>
+        {stats && stats.length > 0 ? stats.map((stat, i) => {
+          const maxVal = Math.max(stat.freelance, stat.agencias, stat.riders);
+          const safeMax = maxVal === 0 ? 1 : maxVal;
+          const fHeight = Math.max((stat.freelance / safeMax) * 100, 5);
+          const aHeight = Math.max((stat.agencias / safeMax) * 100, 5);
+          const rHeight = Math.max((stat.riders / safeMax) * 100, 5);
+          const isMoney = maxVal > 100;
+          const formatNumber = (num) => isMoney ? `$${num.toLocaleString()}` : `${num}%`;
+
+          return (
+            <div key={i} style={{ background: COLORS.SURFACE, padding: "40px", borderRadius: "12px", border: `1px solid ${COLORS.BORDER}`, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+              <div>
+                <h3 style={{ fontSize: "18px", fontWeight: 800, marginBottom: "40px", textAlign: "center", textTransform: "uppercase" }}>{stat.label}</h3>
+                <div style={{ display: "flex", alignItems: "flex-end", height: "200px", gap: "20px", borderBottom: `1px solid ${COLORS.BORDER}`, paddingBottom: "15px" }}>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
+                    <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
+                      <div style={{ height: `${fHeight}%`, width: "100%", background: COLORS.INK3, borderRadius: "4px 4px 0 0", transition: "height 1s cubic-bezier(0.4, 0, 0.2, 1)" }} />
+                    </div>
+                    <span style={{ fontSize: "12px", fontWeight: 800, marginTop: "10px", color: COLORS.INK }}>{formatNumber(stat.freelance)}</span>
+                    <span style={{ fontSize: "10px", fontWeight: 700, marginTop: "4px", color: COLORS.INK2 }}>FREELANCE</span>
+                  </div>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
+                    <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
+                      <div style={{ height: `${aHeight}%`, width: "100%", background: COLORS.INK2, borderRadius: "4px 4px 0 0", transition: "height 1s cubic-bezier(0.4, 0, 0.2, 1)" }} />
+                    </div>
+                    <span style={{ fontSize: "12px", fontWeight: 800, marginTop: "10px", color: COLORS.INK }}>{formatNumber(stat.agencias)}</span>
+                    <span style={{ fontSize: "10px", fontWeight: 700, marginTop: "4px", color: COLORS.INK2 }}>AGENCIAS</span>
+                  </div>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
+                    <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
+                      <div style={{ height: `${rHeight}%`, width: "100%", background: COLORS.ACCENT, borderRadius: "4px 4px 0 0", boxShadow: `0 -5px 15px ${COLORS.ACCENT}33`, transition: "height 1s cubic-bezier(0.4, 0, 0.2, 1)" }} />
+                    </div>
+                    <span style={{ fontSize: "14px", fontWeight: 900, marginTop: "10px", color: COLORS.ACCENT }}>{formatNumber(stat.riders)}</span>
+                    <span style={{ fontSize: "11px", fontWeight: 900, marginTop: "4px", color: COLORS.ACCENT }}>RIDERS</span>
+                  </div>
+                </div>
+              </div>
+              <p style={{ fontSize: "13px", color: COLORS.INK2, marginTop: "25px", lineHeight: "1.6", textAlign: "center" }}>{stat.description}</p>
+            </div>
+          );
+        }) : <p style={{ fontWeight: 700, color: COLORS.INK2 }}>Cargando análisis de mercado...</p>}
+      </div>
+    </div>
+  );
+}
+
+function CasesView({ casesData }) {
+  const [hovered, setHovered] = useState(null);
+  const safeCases = casesData && casesData.length > 0 ? casesData : [];
+  return (
+    <div style={{ padding: "120px 8vw", background: BG }}>
+      <div style={{ marginBottom: 64, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 32 }}>
+        <div>
+          <SectionLabel>Evidencia</SectionLabel>
+          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(48px, 6vw, 64px)", fontWeight: 900, textTransform: "uppercase", color: INK, lineHeight: 1, margin: 0 }}>Impacto <span style={{ color: ACCENT }}>Real.</span></h1>
+        </div>
+        <p style={{ fontSize: "16px", color: INK2, lineHeight: 1.6, maxWidth: 480, margin: 0, paddingBottom: 8 }}>No vendemos humo ni métricas de vanidad. Diseñamos sistemas que se traducen directamente en crecimiento medible.</p>
+      </div>
+      <div style={{ borderTop: `2px solid ${INK}` }}>
+        {safeCases.map((c, i) => (
+          <a key={i} href={c.link || "#"} target="_blank" rel="noopener noreferrer" onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)}
+            style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", padding: "32px 0", borderBottom: `1px solid ${BORDER}`, position: "relative", cursor: "pointer", textDecoration: "none", transition: "all 0.3s ease" }}>
+            <div style={{ position: "absolute", inset: 0, background: SURFACE, zIndex: 0, opacity: hovered === i ? 1 : 0, transition: "opacity 0.2s ease", left: "-2vw", right: "-2vw", borderRadius: "8px" }} />
+            <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: hovered === i ? c.color : INK3, transition: "color 0.3s ease" }}>{c.cat}</div>
+              <div style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800, color: INK, letterSpacing: "-0.01em" }}>{c.client}</div>
+            </div>
+            <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 24 }}>
+              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(36px, 5vw, 56px)", fontWeight: 900, color: hovered === i ? c.color : INK, lineHeight: 1, letterSpacing: "-0.02em", transition: "color 0.3s ease" }}>{c.result}</div>
+              <div style={{ fontSize: 24, color: hovered === i ? c.color : BORDER, fontWeight: 400, transform: hovered === i ? "translateX(4px)" : "translateX(0)", transition: "all 0.3s ease" }}>→</div>
+            </div>
+          </a>
         ))}
       </div>
     </div>
@@ -239,240 +350,278 @@ function CasesView() {
 
 function AboutView() {
   return (
-    <div style={{ padding: "80px 5vw 96px" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 64, alignItems: "start", marginBottom: 96 }}>
-        <div>
-          <SectionLabel>Quiénes somos</SectionLabel>
-          <h1 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: "clamp(48px,6vw,72px)", fontWeight: 800, textTransform: "uppercase", lineHeight: 0.95, marginBottom: 32 }}>
-            Unidad de<br />Respuesta<br /><span style={{ color: ACCENT }}>Rápida.</span>
-          </h1>
-          <div style={{ color: MUTED, fontSize: 15, lineHeight: 1.8, display: "flex", flexDirection: "column", gap: 20 }}>
-            <p>Riders Media fusiona la <strong style={{ color: "#fff" }}>precisión técnica con la creatividad disruptiva.</strong> No somos una agencia de marketing convencional.</p>
-            <p>Resolvemos el problema de la lentitud digital y la falta de transparencia en la industria. Somos eficaces en la entrega y 100% transparentes en el proceso.</p>
-            <blockquote style={{ borderLeft: `3px solid ${ACCENT}`, paddingLeft: 20, color: "#fff", fontStyle: "italic", fontWeight: 500, fontSize: 15, lineHeight: 1.65, margin: "8px 0" }}>
-              "Construimos los activos digitales más rápidos de la región. Combinamos programación web con producción audiovisual premium para que tu negocio sea recordado."
-            </blockquote>
-          </div>
-        </div>
-        <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: 48, display: "flex", flexDirection: "column", gap: 40 }}>
-          {[{ label: "Misión", body: "Impulsar el crecimiento de PyMEs mediante la construcción de infraestructuras web superiores y contenido visual que captura la atención en segundos." }, { label: "Compromiso", body: "Velocidad de entrega, transparencia total en costos y resultados que puedes medir. Sin excusas, sin letra chica." }].map((item, i) => (
-            <div key={i} style={i > 0 ? { borderTop: `1px solid ${BORDER}`, paddingTop: 40 } : {}}>
-              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: ACCENT, marginBottom: 12 }}>{item.label}</div>
-              <p style={{ color: MUTED, fontSize: 14, lineHeight: 1.7 }}>{item.body}</p>
-            </div>
-          ))}
+    <div style={{ padding: "120px 8vw", background: BG }}>
+      <div style={{ maxWidth: 800, marginBottom: 80 }}>
+        <SectionLabel>Sobre la Agencia</SectionLabel>
+        <h1 style={{ fontSize: "clamp(48px, 6vw, 64px)", color: INK, fontWeight: 900, marginBottom: 40, fontFamily: "'Barlow Condensed', sans-serif", textTransform: "uppercase" }}>Unidad de<br />Respuesta Rápida.</h1>
+        <div style={{ color: INK2, fontSize: 18, lineHeight: 1.8 }}>
+          <p style={{ marginBottom: 24 }}>Riders Media fusiona la <strong style={{ color: INK }}>precisión técnica con la creatividad disruptiva.</strong> No somos una agencia de marketing convencional.</p>
+          <p style={{ marginBottom: 24 }}>Resolvemos el problema de la lentitud digital y la falta de transparencia en la industria. Somos eficaces en la entrega y 100% transparentes en el proceso.</p>
+          <blockquote style={{ borderLeft: `4px solid ${ACCENT}`, paddingLeft: 24, fontStyle: "italic", color: INK, background: SURFACE, padding: "24px", borderRadius: "0 8px 8px 0" }}>"Construimos los activos digitales más rápidos de la región. Combinamos programación web con producción audiovisual premium para que tu negocio sea recordado."</blockquote>
         </div>
       </div>
-      <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 80 }}>
-        <h2 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: "clamp(32px,4vw,48px)", fontWeight: 800, textTransform: "uppercase", marginBottom: 48, textAlign: "center" }}>
-          Nuestros <span style={{ color: ACCENT }}>Pilares</span>
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 2 }}>
-          {PILLARS.map(p => (
-            <div key={p.num} style={{ background: SURFACE, border: `1px solid ${BORDER}`, padding: "40px 32px" }}>
-              <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 80, fontWeight: 800, color: "rgba(6,182,212,0.06)", lineHeight: 1 }}>{p.num}</div>
-              <h3 style={{ fontSize: 17, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.04em", color: "#fff", marginBottom: 10 }}>{p.title}</h3>
-              <p style={{ color: MUTED, fontSize: 13, lineHeight: 1.7 }}>{p.body}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 40, borderTop: `1px solid ${BORDER}`, paddingTop: 80 }}>
+         {[{ label: "Misión", body: "Impulsar el crecimiento de PyMEs mediante la construcción de infraestructuras web superiores y contenido visual que captura la atención en segundos." }, { label: "Compromiso", body: "Velocidad de entrega, transparencia total en costos y resultados que puedes medir. Sin excusas, sin letra chica." }].map((item, i) => (
+            <div key={i} style={{ background: SURFACE, padding: "40px", border: `1px solid ${BORDER}`, borderRadius: "8px" }}>
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: ACCENT, marginBottom: 16 }}>{item.label}</div>
+              <p style={{ color: INK2, fontSize: 16, lineHeight: 1.7 }}>{item.body}</p>
             </div>
-          ))}
-        </div>
+         ))}
       </div>
     </div>
   );
 }
 
 function ContactView() {
-  const [form, setForm] = useState({ name: "", email: "", service: "content", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", service: "content", message: "" });
   const [sent, setSent] = useState(false);
-  const [error, setError] = useState(false); // Para manejar errores
+  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   
-
   const handle = (e) => {
-    e.preventDefault(); 
-    setLoading(true);
-    setError(false);
-
-    // Buscamos el nombre real del servicio para que el correo sea legible
+    e.preventDefault(); setLoading(true); setError(false);
     const selectedService = CATALOG.find(s => s.id === form.service);
     const serviceName = selectedService ? `${selectedService.name} (${selectedService.price})` : form.service;
-
-    // Estos parámetros deben coincidir con las {{variables}} de tu template en EmailJS
-    const templateParams = {
-      name: form.name,
-      email: form.email,
-      service_requested: serviceName,
-      message: form.message,
-      phone: form.phone,
-    };
-
-  emailjs
-      .send(
-      "service_ko9wm6r", 
-      "template_p02dor7", 
-      templateParams,
-      "1b2HC5hu9s5FV_mHd"
-    )
-    .then(
-      () => {
-        console.log("¡MENSAJE ENVIADO CON ÉXITO!");
-        setLoading(false);
-        setSent(true);
-
-
-
-
-        setForm({ name: "", email: "",phone: "", service: "content", message: "" });
-        setTimeout(() => setSent(false), 6000);
-      },
-      (error) => {
-        console.log("ERROR AL ENVIAR:", error.text);
-        setLoading(false);
-        setError(true);
-      }
-    );
+    const templateParams = { name: form.name, email: form.email, service_requested: serviceName, message: form.message, phone: form.phone };
+    emailjs.send("service_ko9wm6r", "template_p02dor7", templateParams, "1b2HC5hu9s5FV_mHd")
+    .then(() => { setLoading(false); setSent(true); setForm({ name: "", email: "", phone: "", service: "content", message: "" }); setTimeout(() => setSent(false), 6000); }, () => { setLoading(false); setError(true); });
   };
 
-  const inputStyle = { width: "100%", background: "rgba(6,182,212,0.04)", border: "1px solid " + BORDER, color: "#fff", padding: "14px 16px", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" };
-  const labelStyle = { fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: MUTED, display: "block", marginBottom: 8 };
+  const inputStyle = { width: "100%", background: BG, border: `1px solid ${BORDER}`, padding: "16px", borderRadius: "4px", color: INK, fontSize: 15, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s", fontFamily: "inherit" };
+  const labelStyle = { fontSize: 12, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: INK2, display: "block", marginBottom: 8 };
 
   return (
-    <div style={{ padding: "80px 5vw 96px" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 2, maxWidth: 960, margin: "0 auto", border: "1px solid " + BORDER }}>
-        <div style={{ background: ACCENT_GLOW, borderRight: "1px solid " + BORDER, padding: "48px 36px" }}>
-          <h1 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 52, fontWeight: 800, textTransform: "uppercase", lineHeight: 0.95, marginBottom: 40 }}>Hablemos<br /><span style={{ color: ACCENT }}>Hoy.</span></h1>
-          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-            {[
-              { label: "Email", val: "contacto@riders.media" }, 
-              { label: "WhatsApp", val: "+52 220 225 6586", href: "https://api.whatsapp.com/send/?phone=522202256586&text=Quiero+saber+m%C3%A1s+de+sus+servicios&type=phone_number&app_absent=0" }, 
-              { label: "Ciudad", val: "Puebla, MX" }
-
-
-
-
-            ].map(c => (
-              <div key={c.label}>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: ACCENT, marginBottom: 4 }}>{c.label}</div>
-                <div style={{ fontSize: 14, color: "#fff", fontWeight: 500 }}>
-                  {c.href ? (
-                    <a href={c.href} target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>
-                      {c.val}
-                    </a>
-                  ) : (
-                    c.val
-                  )}
-
-
-
+    <div style={{ padding: "120px 8vw", background: BG }}>
+      <div style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: 0, border: `1px solid ${BORDER}`, borderRadius: "8px", overflow: "hidden" }}>
+        <div style={{ background: BG2, padding: "60px 40px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div>
+            <h1 style={{ fontSize: "clamp(36px, 4vw, 48px)", fontWeight: 900, color: INK, marginBottom: 40, fontFamily: "'Barlow Condensed', sans-serif", textTransform: "uppercase", lineHeight: 1 }}>Hablemos<br /><span style={{ color: ACCENT }}>Hoy.</span></h1>
+            <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+              {[
+                { label: "Email", val: "contacto@riders.media" }, 
+                { label: "WhatsApp", val: "+52 220 225 6586", href: "https://api.whatsapp.com/send/?phone=522202256586" }, 
+                { label: "Ciudad", val: "Puebla, MX" }
+              ].map(c => (
+                <div key={c.label}>
+                  <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: ACCENT, marginBottom: 6 }}>{c.label}</div>
+                  <div style={{ fontSize: 16, color: INK, fontWeight: 600 }}>
+                    {c.href ? <a href={c.href} target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>{c.val}</a> : c.val}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 48, padding: 20, background: SURFACE, border: "1px solid " + BORDER }}>
-            <p style={{ fontSize: 12, color: MUTED, lineHeight: 1.7, fontStyle: "italic" }}>Respondemos en menos de 24 horas. Sin filtros, directo al estratega.</p>
+              ))}
+            </div>
           </div>
         </div>
-        <form onSubmit={handle} style={{ padding: "48px 40px", display: "flex", flexDirection: "column", gap: 20, background: SURFACE }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            <div><label style={labelStyle}>Nombre</label><input required style={inputStyle} value={form.name} placeholder="Tu nombre" onChange={e => setForm({ ...form, name: e.target.value })} onFocus={e => e.target.style.borderColor = ACCENT} onBlur={e => e.target.style.borderColor = BORDER} /></div>
-            <div><label style={labelStyle}>Email</label><input required type="email" style={inputStyle} value={form.email} placeholder="tu@email.com" onChange={e => setForm({ ...form, email: e.target.value })} onFocus={e => e.target.style.borderColor = ACCENT} onBlur={e => e.target.style.borderColor = BORDER} /></div>
+
+        <form onSubmit={handle} style={{ padding: "60px 40px", display: "flex", flexDirection: "column", gap: 24, background: SURFACE }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+            <div>
+              <label style={labelStyle}>Nombre</label>
+              <input required style={inputStyle} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            </div>
+            <div>
+              <label style={labelStyle}>Email</label>
+              <input required type="email" style={inputStyle} value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+            </div>
           </div>
-          
-          {/* Campo de Teléfono */}
           <div>
             <label style={labelStyle}>Teléfono</label>
-            <input required type="tel" style={inputStyle} value={form.phone} placeholder="Tu número a 10 dígitos" onChange={e => setForm({ ...form, phone: e.target.value })} onFocus={e => e.target.style.borderColor = ACCENT} onBlur={e => e.target.style.borderColor = BORDER} />
+            <input required type="tel" style={inputStyle} value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
           </div>
-
-
-
-
           <div>
             <label style={labelStyle}>Servicio</label>
-            <select style={{ ...inputStyle, appearance: "none" }} value={form.service} onChange={e => setForm({ ...form, service: e.target.value })} onFocus={e => e.target.style.borderColor = ACCENT} onBlur={e => e.target.style.borderColor = BORDER}>
-              {CATALOG.map(s => <option key={s.id} value={s.id} style={{ background: BG }}>{s.name} — {s.price} MXN</option>)}
+            <select style={inputStyle} value={form.service} onChange={e => setForm({ ...form, service: e.target.value })}>
+              {CATALOG.map(s => <option key={s.id} value={s.id}>{s.name} — {s.price} MXN</option>)}
             </select>
           </div>
-          <div><label style={labelStyle}>Tu reto principal</label><textarea required rows={5} style={{ ...inputStyle, resize: "vertical" }} value={form.message} placeholder="Cuéntanos en qué estás trabajando..." onChange={e => setForm({ ...form, message: e.target.value })} onFocus={e => e.target.style.borderColor = ACCENT} onBlur={e => e.target.style.borderColor = BORDER} /></div>
-          
-
-
-
-          {error && <div style={{ color: "#EF4444", fontSize: 13, fontWeight: 600 }}>Hubo un error al enviar. Por favor, inténtalo de nuevo.</div>}
-          
-          <button type="submit" disabled={loading} style={{ background: loading ? "rgba(6,182,212,0.4)" : ACCENT, color: "#000", border: "none", padding: 18, fontWeight: 800, fontSize: 13, letterSpacing: "0.12em", textTransform: "uppercase", cursor: loading ? "wait" : "pointer", fontFamily: "inherit", clipPath: "polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))" }}>
+          <div>
+            <label style={labelStyle}>Mensaje</label>
+            <textarea required rows={5} style={inputStyle} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} />
+          </div>
+          <button type="submit" disabled={loading} style={{ background: loading ? INK3 : INK, color: "#fff", border: "none", padding: "18px", borderRadius: "4px", fontWeight: 800, cursor: loading ? "wait" : "pointer" }}>
             {loading ? "Enviando..." : "Enviar Solicitud →"}
           </button>
-          {sent && <div style={{ padding: "16px 20px", background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.25)", color: "#34D399", fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", gap: 10 }}>✓ Mensaje recibido. Te contactamos pronto.</div>}
+          {sent && <div style={{ color: ACCENT, fontWeight: 700 }}>✓ Mensaje recibido.</div>}
         </form>
       </div>
     </div>
-
-
-
-
-);
+  );
 }
-// ── APP RAÍZ ───────────────────────────────────────────────────────────────
+
+// --- COPIAR DESDE AQUÍ ---
+function SocialFloat() {
+  const socialLinks = [
+    { name: "WA", color: "#25D366", url: "https://api.whatsapp.com/send/?phone=522202256586" },
+    { name: "FB", color: "#1877F2", url: "https://facebook.com/riders.media" },
+    { name: "IG", color: "#E4405F", url: "https://instagram.com/riders.media" }
+  ];
+
+  return (
+    <div style={{ position: "fixed", bottom: "30px", right: "30px", display: "flex", flexDirection: "column", gap: "12px", zIndex: 2000 }}>
+      {socialLinks.map((link) => (
+        <a 
+          key={link.name}
+          href={link.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            width: "50px", height: "50px", borderRadius: "50%", background: link.color,
+            color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
+            textDecoration: "none", fontWeight: "900", fontSize: "14px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)", transition: "transform 0.3s ease"
+          }}
+          onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1) translateY(-5px)"}
+          onMouseLeave={e => e.currentTarget.style.transform = "scale(1) translateY(0)"}
+        >
+          {link.name}
+        </a>
+      ))}
+    </div>
+  );
+}
+
 
 export default function App() {
   const [page, setPage] = useState("inicio");
-
-  const nav = (p) => {
-    setPage(p);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const [marketStats, setMarketStats] = useState([]);
+  const [casesList, setCasesList] = useState(CASES || []);
+  
+  const nav = (p) => { 
+    setPage(p); 
+    window.scrollTo({ top: 0, behavior: "smooth" }); 
   };
+
+  // 1. Fetch de Estadísticas (Maquinaria de Gráficas)
+  useEffect(() => {
+    if (!SHEET_CSV_URL || SHEET_CSV_URL === "" || SHEET_CSV_URL.includes("sharing")) return;
+    
+    fetch(`${SHEET_CSV_URL}&t=${Date.now()}`)
+      .then(res => res.text())
+      .then(csvText => {
+        if (csvText.trim().startsWith('<')) return;
+        const rows = csvText.split('\n').slice(1); 
+        const parsed = rows.map(row => {
+          const cols = row.replace(/\r/g, '').split(','); 
+          if (cols.length >= 4) {
+             const freelanceVal = parseFloat(cols[1]); 
+             if (isNaN(freelanceVal)) return null;
+             return { 
+               label: cols[0], 
+               freelance: freelanceVal || 0, 
+               agencias: parseFloat(cols[2]) || 0, 
+               riders: parseFloat(cols[3]) || 0, 
+               description: cols.slice(4).join(',') 
+             };
+          }
+          return null;
+        }).filter(item => item && item.label);
+        
+        if(parsed.length > 0) setMarketStats(parsed);
+      })
+      .catch(err => console.error("Error al cargar estadísticas:", err));
+  }, []);
+
+  // 2. Fetch de Casos (Maquinaria de Portafolio)
+  useEffect(() => {
+    if (!CASES_CSV_URL || CASES_CSV_URL === "" || CASES_CSV_URL.includes("sharing")) return;
+    
+    fetch(`${CASES_CSV_URL}&t=${Date.now()}`)
+      .then(res => res.text())
+      .then(csvText => {
+        if (csvText.trim().startsWith('<')) return;
+        const rows = csvText.split('\n').slice(1); 
+        const parsed = rows.map(row => {
+          const cols = row.replace(/\r/g, '').split(','); 
+          if (cols.length >= 4) {
+             return { 
+               cat: cols[0], 
+               client: cols[1], 
+               result: cols[2], 
+               color: cols[3] || ACCENT, 
+               link: cols[4] || "#" 
+             };
+          }
+          return null;
+        }).filter(item => item && item.client);
+        
+        if(parsed.length > 0) setCasesList(parsed);
+      })
+      .catch(err => console.error("Error al cargar casos:", err));
+  }, []);
 
   const PAGES = [
     { id: "inicio", label: "Inicio" },
     { id: "catalogo", label: "Catálogo" },
+    { id: "valor", label: "Accesibilidad" },
     { id: "casos", label: "Casos" },
     { id: "agencia", label: "Agencia" },
     { id: "contacto", label: "Contacto" },
   ];
 
   return (
-    <>
-      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: "rgba(7,11,16,0.92)", backdropFilter: "blur(16px)", borderBottom: `1px solid ${BORDER}`, height: 64, display: "flex", alignItems: "center", padding: "0 5vw", justifyContent: "space-between" }}>
-        <button onClick={() => nav("inicio")} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 22, color: "#fff", letterSpacing: "0.04em", textTransform: "uppercase" }}>
-          <span style={{ background: ACCENT, color: "#000", padding: "2px 8px", clipPath: "polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))", fontSize: 14, fontWeight: 900 }}>R</span>
-          IDERS MEDIA
-        </button>
-        <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
+    <div style={{ minHeight: "100vh", background: BG, color: INK, fontFamily: "system-ui, sans-serif" }}>
+      {/* Botones Sociales Flotantes */}
+      <div style={{ position: "fixed", bottom: "30px", right: "30px", display: "flex", flexDirection: "column", gap: "12px", zIndex: 2000 }}>
+        {[
+          { name: "WA", color: "#25D366", url: "https://api.whatsapp.com/send/?phone=522202256586" },
+          { name: "FB", color: "#1877F2", url: "https://www.facebook.com/profile.php?id=61579283677547" },
+          { name: "IG", color: "#E4405F", url: "https://www.instagram.com/riders_media.mk/" }
+        ].map(link => (
+          <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer"
+             style={{ width: "50px", height: "50px", borderRadius: "50%", background: link.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", fontWeight: "900", fontSize: "14px", boxShadow: "0 4px 12px rgba(0,0,0,0.2)", transition: "transform 0.3s ease" }}
+             onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1) translateY(-5px)"}
+             onMouseLeave={e => e.currentTarget.style.transform = "scale(1) translateY(0)"}>
+            {link.name}
+          </a>
+        ))}
+      </div>
+
+      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: `${BG}ee`, backdropFilter: "blur(12px)", borderBottom: `1px solid ${BORDER}`, height: "80px", display: "flex", alignItems: "center", padding: "0 5vw", justifyContent: "space-between" }}>
+        <div onClick={() => nav("inicio")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 32, height: 32, background: RIDERS, borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900 }}>R</div>
+          <span style={{ fontWeight: 900, fontSize: "20px", letterSpacing: "0.02em" }}>RIDERS MEDIA</span>
+        </div>
+        
+        <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
           {PAGES.map(p => (
-            <button key={p.id} onClick={() => nav(p.id)} style={{ background: "none", border: "none", cursor: "pointer", color: page === p.id ? ACCENT : MUTED, fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", padding: "4px 0", borderBottom: page === p.id ? `2px solid ${ACCENT}` : "2px solid transparent", transition: "color 0.2s" }}>
+            <button key={p.id} onClick={() => nav(p.id)} style={{ background: "none", border: "none", cursor: "pointer", color: page === p.id ? ACCENT : INK2, fontSize: "12px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", padding: "8px 0", borderBottom: page === p.id ? `2px solid ${ACCENT}` : "2px solid transparent", transition: "all 0.2s" }}>
               {p.label}
             </button>
           ))}
         </div>
-        <button onClick={() => nav("contacto")} style={{ background: ACCENT, color: "#000", border: "none", padding: "9px 20px", fontWeight: 800, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", cursor: "pointer", clipPath: "polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))" }}>
+        
+        <button onClick={() => nav("contacto")} style={{ background: INK, color: "#fff", border: "none", padding: "12px 28px", borderRadius: "4px", fontWeight: 800, cursor: "pointer", textTransform: "uppercase", fontSize: 12, letterSpacing: "0.05em" }}>
           Cotizar
         </button>
       </nav>
 
-      <main style={{ paddingTop: 64 }}>
+      <main style={{ paddingTop: "80px" }}>
         {page === "inicio" && <HomeView nav={nav} />}
         {page === "catalogo" && <CatalogView nav={nav} />}
-        {page === "casos" && <CasesView />}
+        {page === "valor" && <ValorView stats={marketStats} />}
+        {page === "casos" && <CasesView casesData={casesList} />}
         {page === "agencia" && <AboutView />}
         {page === "contacto" && <ContactView />}
       </main>
 
-      <footer style={{ borderTop: `1px solid ${BORDER}`, padding: "48px 5vw", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
-        <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: 18, letterSpacing: "0.04em", textTransform: "uppercase" }}>
-          <span style={{ background: ACCENT, color: "#000", padding: "1px 6px", fontSize: 12, fontWeight: 900, marginRight: 4, clipPath: "polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))" }}>R</span>
-          IDERS MEDIA
+      <footer style={{ padding: "20px 5vw", borderTop: `1px solid ${BORDER}`, background: BG2 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+             <div style={{ width: 24, height: 24, background: INK, borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: 12 }}>R</div>
+             <span style={{ fontWeight: 900, color: INK, letterSpacing: "0.05em" }}>RIDERS MEDIA</span>
+          </div>
+          
+          <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+            {PAGES.map(p => (
+              <button key={p.id} onClick={() => nav(p.id)} style={{ background: "none", border: "none", color: INK2, fontSize: 12, fontWeight: 700, textTransform: "uppercase", cursor: "pointer" }}>
+                {p.label}
+              </button>
+            ))}
+          </div>
+          
+          <span style={{ color: INK3, fontSize: 13, fontWeight: 600 }}>© {new Date().getFullYear()} Puebla, MX.</span>
         </div>
-        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
-          {PAGES.map(p => (
-            <button key={p.id} onClick={() => nav(p.id)} style={{ background: "none", border: "none", color: MUTED, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}
-              onMouseEnter={e => e.target.style.color = ACCENT} onMouseLeave={e => e.target.style.color = MUTED}>
-              {p.label}
-            </button>
-          ))}
-        </div>
-        <div style={{ fontSize: 11, color: MUTED }}>© {new Date().getFullYear()} Riders Media. Puebla, MX.</div>
       </footer>
-    </>
+    </div>
   );
 }
