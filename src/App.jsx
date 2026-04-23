@@ -70,17 +70,6 @@ function HomeView({ nav }) {
           </div>
         </div>
 
-        {/* ELEMENTO VISUAL HERO */}
-        <div style={{ flex: "1 1 400px", minHeight: "500px", background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: "8px", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-          <div style={{ position: "absolute", inset: 0, backgroundImage: `linear-gradient(${BORDER} 1px, transparent 1px), linear-gradient(90deg, ${BORDER} 1px, transparent 1px)`, backgroundSize: "40px 40px", opacity: 0.5 }} />
-          
-          <div style={{ textAlign: "center", zIndex: 2 }}>
-            <div style={{ width: 80, height: 80, borderRadius: "50%", background: ACCENT, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 24, cursor: "pointer", boxShadow: `0 10px 30px ${ACCENT}40`, transition: "transform 0.2s" }} onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"} onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}>
-              ▶
-            </div>
-            <span style={{ fontSize: 14, fontWeight: 800, color: INK, letterSpacing: "0.1em", textTransform: "uppercase" }}>Ver Showreel</span>
-          </div>
-        </div>
 
         {/* TICKER INFERIOR (LISTÓN ANIMADO) */}
         <style>{`
