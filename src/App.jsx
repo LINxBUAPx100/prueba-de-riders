@@ -106,7 +106,7 @@ function HomeView({ nav }) {
               src="https://vimeo.com/524209915?share=copy&fl=cl&fe=ci#t=0.683" 
               allow="autoplay; fullscreen; picture-in-picture" 
               allowFullScreen
-              title="Showreel Riders Media"
+              title="Showreel Riders.Media"
             ></iframe>
           )}
         </div>
