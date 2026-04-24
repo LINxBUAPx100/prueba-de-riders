@@ -38,6 +38,7 @@ export const COLORS = {
 // ── CATÁLOGO DE SERVICIOS ────────────────────────────────────────────────
 export const CATALOG = [
   { id: "reel", tag: "Por pieza", price: "$800", name: "Edición Reel / TikTok", desc: "Edición dinámica con Motion Graphics sobre material del cliente.", highlight: false },
+  { id: "Aseso", tag: "Por pieza", price: "500", name: "Asesoria", desc: "Asesoría especializada para tu proyecto.", highlight: false },
   { id: "Logo", tag: "Por pieza", price: "$650", name: "Diseñamos tu logo", desc: "Diseño profesional de logotipo para tu marca.", highlight: true },
   { id: "gmb", tag: "Pago único", price: "$2,500", name: "Turbo Google Business", desc: "Optimización de ficha en Maps para aparecer en búsquedas locales.", highlight: false },
   { id: "flash", tag: "Mensual", price: "$3,500", name: "Gestión Campañas Flash", desc: "Configuración y monitoreo de Ads para ventas rápidas (+ inversión).", highlight: false },
