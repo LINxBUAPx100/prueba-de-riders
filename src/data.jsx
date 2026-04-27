@@ -1,9 +1,10 @@
-//la magia de las celdas y el excel jajaja
-
 export const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1kVC51dSFgoc_7V9ERyOLNlIzJnlm_JjrHcHgpCPTqCw/export?format=csv"; 
 
-// PEGA AQUÍ TU SEGUNDO LINK DE GOOGLE SHEETS PARA LOS CASOS
 export const CASES_CSV_URL = "https://docs.google.com/spreadsheets/d/12IrAFWs8rO2Tu3Rrei2MhTGMWGAMV0PWIakYK9aJmnM/export?format=csv";
+
+export const CATALOGO_CSV_URL = "https://docs.google.com/spreadsheets/d/1SEdPIwc1FuocKanHMBKVc2aPkwiftMrYYQT-O17GX2E/export?format=csv";
+
+// Y aquí sigues teniendo tus colores, etc.
 
 // ── PALETA DE COLORES (ESTÉTICA PROFESIONAL) ─────────────────────────────
 export const COLORS = {
