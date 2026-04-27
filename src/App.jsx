@@ -173,7 +173,7 @@ function HomeView({ nav }) {
           ].map((m, i) => (
             <div key={i} style={{ textAlign: "center" }}>
               <div style={{ fontSize: "clamp(40px, 5vw, 56px)", fontWeight: 900, color: BG, fontFamily: "'Barlow Condensed', sans-serif" }}>{m.val}</div>
-              <div style={{ fontSize: "12px", fontWeight: 700, color: ACCENT, textTransform: "uppercase", marginTop: 4, letterSpacing: "0.1em" }}>{m.lab}</div>
+              <div style={{ fontSize: "12px", fontWeight: 700, color: SURFACE, textTransform: "uppercase", marginTop: 4, letterSpacing: "0.1em" }}>{m.lab}</div>
             </div>
           ))}
       </section>
@@ -220,10 +220,10 @@ function HomeView({ nav }) {
       </section>
 
       {/* SOCIAL PROOF */}
-      <section style={{ padding: "40px 8vw", background: BG2, borderBottom: `1px solid ${BORDER}`, textAlign: "center" }}>
-        <p style={{ fontSize: 12, fontWeight: 800, color: INK3, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 32 }}>Marcas que confían en nosotros</p>
+      <section style={{ padding: "15px 8vw", background: MUTED_TEAL, borderBottom: `1px solid ${BG}`, textAlign: "center" }}>
+        <p style={{ fontSize: 15, fontWeight: 800, color: INK2, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 15 }}>-Marcas que confían en nosotros-</p>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "clamp(20px, 6vw, 100px)", opacity: 0.5, filter: "grayscale(100%)" }}>
-          {["MotoShop GDL", "Clínica Vita", "Tacos El Rancho", "Ropa Urbana MX"].map((brand, i) => (
+          {["Garra Grafica", "Anzus y Thurizas", "Tortas la wera"].map((brand, i) => (
             <span key={i} style={{ fontSize: "clamp(18px, 3vw, 24px)", fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", color: INK }}>{brand}</span>
           ))}
         </div>
@@ -579,9 +579,9 @@ export default function App() {
       <SocialFloat isMobile={isMobile} />
 
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: `${BG}ee`, backdropFilter: "blur(12px)", borderBottom: `1px solid ${BORDER}`, height: "80px", display: "flex", alignItems: "center", padding: "0 5vw", justifyContent: "space-between" }}>
-        <div onClick={() => nav("inicio")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}>
+        <div onClick={() => nav("inicio")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 3.5 }}>
           <div style={{ width: 32, height: 32, background: RIDERS, borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900 }}>R</div>
-          <span style={{ fontWeight: 900, fontSize: "20px", letterSpacing: "0.02em" }}>RIDERS MEDIA</span>
+          <span style={{ fontWeight: 900, fontSize: "20px", letterSpacing: "0.01em" }}>IDERS MEDIA</span>
         </div>
         
         {/* NAVEGACIÓN RESPONSIVE */}
@@ -630,9 +630,9 @@ export default function App() {
 
       <footer style={{ padding: "20px 5vw", borderTop: `1px solid ${BORDER}`, background: BG2 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-             <div style={{ width: 24, height: 24, background: INK, borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: 12 }}>R</div>
-             <span style={{ fontWeight: 900, color: INK, letterSpacing: "0.05em" }}>RIDERS MEDIA</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+             <div style={{ width: 24, height: 24, background: RIDERS, borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: 12 }}>R</div>
+             <span style={{ fontWeight: 900, color: INK, letterSpacing: "0.05em" }}>IDERS MEDIA</span>
           </div>
           
           <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
