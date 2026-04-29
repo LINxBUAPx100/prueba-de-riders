@@ -220,7 +220,7 @@ function HomeView({ nav }) {
           ))}
       </section>
 
-     {/* 4. FILOSOFÍA */}
+    {/* 4. FILOSOFÍA */}
       <section style={{ padding: "120px 8vw", background: SURFACE, position: "relative", overflow: "hidden" }}>
         
         {/* CAPA DE PATRÓN GIGANTE Y OSCURO */}
@@ -259,7 +259,7 @@ function HomeView({ nav }) {
           </div>
         </div>
       </section>
-
+      
       {/* 5. CTA DE CIERRE */}
       <section style={{ padding: "140px 8vw", background: BG, borderBottom: `1px solid ${BORDER}`, textAlign: "center" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
