@@ -38,6 +38,14 @@ function Chip({ children, outline, accent }) {
   );
 }
 
+function LogoIcon({ size = 32 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#c68c53" d="M787.11,0h-494.22C131.13,0,0,131.13,0,292.89v494.22c0,161.76,131.13,292.89,292.89,292.89h494.22c161.76,0,292.89-131.13,292.89-292.89v-494.22C1080,131.13,948.87,0,787.11,0ZM807.56,539.99h-52.57c-40.5,0-73.34-32.84-73.34-73.34v-52.65c0-21.19-17.18-38.38-38.38-38.38h-201.35l365.64,365.64-89.03,89.02-320.18-320.17v194.27c0,34.75-14.08,66.23-36.88,89.02-22.79,22.8-54.27,36.88-89.03,36.88V249.72h405.8c71.42,0,129.32,57.89,129.32,129.31v160.96Z"/>
+    </svg>
+  );
+}
+
 function SectionLabel({ children }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
@@ -50,9 +58,34 @@ function SectionLabel({ children }) {
 }
 
 // ── VISTAS ───────────────────────────────────────────────────────────────
-
 function HomeView({ nav }) {
   const [playVideo, setPlayVideo] = useState(false);
+  const [tickerData, setTickerData] = useState(CATALOG); // Usamos el catálogo estático como respaldo inicial
+
+  // Efecto para leer el Excel e inyectar los títulos reales en el listón
+  useEffect(() => {
+    if (!window.Papa || !CATALOGO_CSV_URL) return;
+    fetch(`${CATALOGO_CSV_URL}&t=${Date.now()}`)
+      .then(res => res.text())
+      .then(csvText => {
+        if (csvText.trim().startsWith('<')) return;
+        window.Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          transformHeader: h => h.trim(),
+          complete: (results) => {
+            const sheetServices = results.data
+              .filter(row => row["Servicio"] && row["Servicio"].trim() !== "")
+              .map(row => ({ name: row["Servicio"].trim() }));
+            
+            // Si encontró servicios en tu Excel, actualiza el listón animado
+            if (sheetServices.length > 0) {
+              setTickerData(sheetServices);
+            }
+          }
+        });
+      }).catch(err => console.error("Error cargando listón:", err));
+  }, []);
 
   return (
     <div style={{ background: BG }}>
@@ -101,27 +134,36 @@ function HomeView({ nav }) {
               </div>
             </>
           ) : (
-    <iframe 
-      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
-      src="https://player.vimeo.com/video/201106279?autoplay=1&title=0&byline=0&portrait=0" 
-      allow="autoplay; fullscreen; picture-in-picture" 
-      allowFullScreen
-      title="Showreel Riders.Media"
-    ></iframe>
-  )}
-</div>
+            <iframe 
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
+              src="https://player.vimeo.com/video/201106279?autoplay=1&title=0&byline=0&portrait=0" 
+              allow="autoplay; fullscreen; picture-in-picture" 
+              allowFullScreen
+              title="Showreel Riders.Media"
+            ></iframe>
+          )}
+        </div>
 
-        {/* TICKER INFERIOR (LISTÓN ANIMADO) */}
+        {/* TICKER INFERIOR (LISTÓN ANIMADO REPARADO) */}
         <style>{`
-          @keyframes ticker {
+          @keyframes scrollTicker {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
           }
+          .ticker-track {
+            display: flex;
+            width: max-content;
+            animation: scrollTicker 40s linear infinite;
+          }
+          .ticker-track:hover {
+            animation-play-state: paused;
+          }
         `}</style>
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, borderTop: `1px solid ${BORDER}`, padding: "15px 0", background: SURFACE, zIndex: 3, overflow: "hidden" }}>
-           <div className="ticker-wrapper" style={{ display: "flex", width: "max-content", gap: 50, animation: "ticker 60s linear infinite" }}>
-              {CATALOG.concat(CATALOG).map((s, i) => (
-                <span key={i} style={{ color: i % 2 === 0 ? ACCENT : INK3, fontWeight: 800, fontSize: 14, textTransform: "uppercase", letterSpacing: "0.1em", whiteSpace: "nowrap" }}>
+           <div className="ticker-track">
+              {/* Aquí inyectamos el tickerData que ya leyó de Google Sheets */}
+              {[...tickerData, ...tickerData, ...tickerData, ...tickerData].map((s, i) => (
+                <span key={i} style={{ color: i % 2 === 0 ? ACCENT : INK3, fontWeight: 800, fontSize: 14, textTransform: "uppercase", letterSpacing: "0.1em", whiteSpace: "nowrap", paddingRight: "50px" }}>
                   {s.name} •
                 </span>
               ))}
@@ -179,25 +221,42 @@ function HomeView({ nav }) {
       </section>
 
      {/* 4. FILOSOFÍA */}
-      <section style={{ padding: "120px 8vw", background: SURFACE }}>
-        <SectionLabel>Filosofía</SectionLabel>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 32, marginTop: 40 }}>
-          {PILLARS.map(p => (
-            <div key={p.num} style={{ background: BG, padding: "40px", border: `1px solid ${BORDER}`, borderRadius: "8px", transition: "all 0.3s" }}
-                 onMouseEnter={e => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.transform = "translateY(-4px)" }}
-                 onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.transform = "translateY(0)" }}>
-              
-              <div style={{ fontSize: 72, fontWeight: 900, color: p.numColor || BORDER, marginBottom: 16, fontFamily: "'Barlow Condensed', sans-serif", opacity: 0.6 }}>
-                {p.num}
+      <section style={{ padding: "120px 8vw", background: SURFACE, position: "relative", overflow: "hidden" }}>
+        
+        {/* CAPA DE PATRÓN GIGANTE Y OSCURO */}
+        <div style={{ 
+          position: "absolute", 
+          inset: 0, 
+          backgroundImage: "url('/patron.svg')", 
+          backgroundRepeat: "repeat", 
+          backgroundSize: "800px", /* Tamaño MUUUUY grande */
+          opacity: 0.03, /* Ajusta este valor si lo quieres más o menos marcado (ej. 0.05) */
+          filter: "invert(1)", /* Truco táctico: convierte tu SVG blanco en oscuro */
+          pointerEvents: "none", 
+          zIndex: 0 
+        }} />
+
+        {/* CONTENEDOR DE LA SECCIÓN (Aseguramos que el texto y cajas estén por encima del patrón) */}
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <SectionLabel>Filosofía</SectionLabel>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 32, marginTop: 40 }}>
+            {PILLARS.map(p => (
+              <div key={p.num} style={{ background: BG, padding: "40px", border: `1px solid ${BORDER}`, borderRadius: "8px", transition: "all 0.3s" }}
+                   onMouseEnter={e => { e.currentTarget.style.borderColor = ACCENT; e.currentTarget.style.transform = "translateY(-4px)" }}
+                   onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.transform = "translateY(0)" }}>
+                
+                <div style={{ fontSize: 72, fontWeight: 900, color: p.numColor || BORDER, marginBottom: 16, fontFamily: "'Barlow Condensed', sans-serif", opacity: 0.6 }}>
+                  {p.num}
+                </div>
+                <h3 style={{ fontSize: 24, color: p.titleColor || INK, marginBottom: 12, fontWeight: 800, textTransform: "uppercase" }}>
+                  {p.title}
+                </h3>
+                <p style={{ color: p.bodyColor || INK2, lineHeight: 1.7 }}>
+                  {p.body}
+                </p>
               </div>
-              <h3 style={{ fontSize: 24, color: p.titleColor || INK, marginBottom: 12, fontWeight: 800, textTransform: "uppercase" }}>
-                {p.title}
-              </h3>
-              <p style={{ color: p.bodyColor || INK2, lineHeight: 1.7 }}>
-                {p.body}
-              </p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
@@ -717,7 +776,7 @@ export default function App() {
 
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: `${BG}ee`, backdropFilter: "blur(12px)", borderBottom: `1px solid ${BORDER}`, height: "80px", display: "flex", alignItems: "center", padding: "0 5vw", justifyContent: "space-between" }}>
         <div onClick={() => nav("inicio")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 3.5 }}>
-          <div style={{ width: 32, height: 32, background: RIDERS, borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900 }}>R</div>
+          <LogoIcon size={32} />
           <span style={{ fontWeight: 900, fontSize: "20px", letterSpacing: "0.01em" }}>IDERS MEDIA</span>
         </div>
         
@@ -768,7 +827,7 @@ export default function App() {
       <footer style={{ padding: "20px 5vw", borderTop: `1px solid ${BORDER}`, background: BG2 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-             <div style={{ width: 24, height: 24, background: RIDERS, borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: 12 }}>R</div>
+             <LogoIcon size={24} />
              <span style={{ fontWeight: 900, color: INK, letterSpacing: "0.05em" }}>IDERS MEDIA</span>
           </div>
           

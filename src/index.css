@@ -11,8 +11,10 @@ body {
   color: #fff;
   font-family: 'DM Sans', sans-serif;
   overflow-x: hidden;
+  position: relative; /* Asegura que la capa del patrón se fije bien */
 }
 
+/* --- ANIMACIONES --- */
 @keyframes ticker {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -23,29 +25,57 @@ body {
   50% { opacity: 0.3; }
 }
 
+/* --- SCROLLBAR --- */
 ::-webkit-scrollbar {
   width: 6px;
 }
-
 ::-webkit-scrollbar-track {
   background: #070B10;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: rgba(6,182,212,0.3);
+  background: rgba(198, 140, 83, 0.3); /* Color dorado del logo */
   border-radius: 3px;
 }
 
 ::selection {
-  background: rgba(6,182,212,0.2);
+  background: rgba(198, 140, 83, 0.2);
   color: #fff;
-}
-
-@keyframes ticker {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
 }
 
 .ticker-wrapper {
   animation: ticker 40s linear infinite;
+}
+
+/* --- CONTENEDOR PRINCIPAL --- */
+.main-container {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: #070B10; 
+}
+
+/* --- PATRÓN DE FONDO INFINITO --- */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  
+  /* AQUÍ CARGA TU IMAGEN */
+  background-image: url('/patron.svg'); 
+  
+  /* ESTO HACE LA MAGIA DEL TAPIZ INFINITO */
+  background-repeat: repeat; 
+  background-size: 150px; /* Cambia este número si quieres las "M" más grandes o chicas */
+  
+  /* OPACIDAD TÁCTICA PARA QUE NO CANSE LA VISTA */
+  opacity: 0.04; 
+  
+  /* SEGURIDAD: Deja que los clics pasen hacia tus botones */
+  pointer-events: none; 
+  
+  /* Lo pone por encima de todos tus fondos para que siempre se vea */
+  z-index: 9999; 
 }
