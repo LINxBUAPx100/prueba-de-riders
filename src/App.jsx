@@ -229,14 +229,14 @@ function HomeView({ nav }) {
           inset: 0, 
           backgroundImage: "url('/patron.svg')", 
           backgroundRepeat: "repeat", 
-          backgroundSize: "800px", /* Tamaño MUUUUY grande */
-          opacity: 0.03, /* Ajusta este valor si lo quieres más o menos marcado (ej. 0.05) */
-          filter: "invert(1)", /* Truco táctico: convierte tu SVG blanco en oscuro */
+          backgroundSize: "1200px", /* Tamaño MUUUUY grande */
+          opacity: 0.05, /* Opacidad baja para que se vea como marca de agua sutil */
+          filter: "invert(1)", /* Convierte tu patrón blanco a color oscuro */
           pointerEvents: "none", 
           zIndex: 0 
         }} />
 
-        {/* CONTENEDOR DE LA SECCIÓN (Aseguramos que el texto y cajas estén por encima del patrón) */}
+        {/* CONTENEDOR DE LA SECCIÓN (Texto por encima del patrón) */}
         <div style={{ position: "relative", zIndex: 1 }}>
           <SectionLabel>Filosofía</SectionLabel>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 32, marginTop: 40 }}>
@@ -259,7 +259,7 @@ function HomeView({ nav }) {
           </div>
         </div>
       </section>
-      
+
       {/* 5. CTA DE CIERRE */}
       <section style={{ padding: "140px 8vw", background: BG, borderBottom: `1px solid ${BORDER}`, textAlign: "center" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
