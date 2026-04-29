@@ -63,7 +63,7 @@ body::after {
   width: 100vw;
   height: 100vh;
   
-  /* AQUÍ CARGA TU IMAGEN */
+  /* AQUÍ CARGA TU IMAGEN (RUTA CORREGIDA) */
   background-image: url('/patron.svg'); 
   
   /* ESTO HACE LA MAGIA DEL TAPIZ INFINITO */
