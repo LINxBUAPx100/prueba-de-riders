@@ -297,29 +297,25 @@ function CatalogView({ nav }) {
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    // 1. Verificamos si PapaParse existe. Si no, te avisamos en pantalla.
     if (!window.Papa) {
       setErrorMsg("⚠️ Error: El script de PapaParse no se ha cargado en el index.html.");
       setIsLoading(false);
       return;
     }
 
-    // 2. Usamos fetch para asegurar que el caché no nos juegue chueco
     fetch(`${CATALOGO_CSV_URL}&t=${Date.now()}`)
       .then(res => res.text())
       .then(csvText => {
-        // 3. Verificamos si Google nos manda la página de iniciar sesión
         if (csvText.trim().startsWith('<')) {
           setErrorMsg("⚠️ El Google Sheet está privado. Cambia a 'Cualquier persona con el enlace'.");
           setIsLoading(false);
           return;
         }
 
-        // 4. Analizamos el texto con PapaParse
         window.Papa.parse(csvText, {
           header: true,
           skipEmptyLines: true,
-          transformHeader: h => h.trim(), // 🪄 MAGIA: Borra espacios invisibles en los títulos de tu Excel
+          transformHeader: h => h.trim(),
           complete: (results) => {
             const fetchedData = results.data
               .filter(row => row["Servicio"] && row["Servicio"].trim() !== "") 
@@ -332,7 +328,6 @@ function CatalogView({ nav }) {
                 highlight: row["¿hightlight?"]?.trim().toUpperCase() === "TRUE" 
               }));
 
-            // Si se leyó el excel pero el arreglo está vacío, los nombres de las columnas están mal.
             if (fetchedData.length === 0) {
               setErrorMsg("⚠️ El Excel conectó, pero las columnas no se llaman exactamente 'Servicio', 'Tipo de Pago', etc.");
             }
@@ -361,23 +356,52 @@ function CatalogView({ nav }) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 24 }}>
           {items.map(s => (
             <div key={s.id} style={{ 
-              background: s.highlight ? BG2 : "transparent", 
+              background: s.highlight ? BG2 : SURFACE, /* Fondo 100% Sólido */
+              boxShadow: "0 10px 30px rgba(0,0,0,0.06)", /* Sombra Premium */
               border: `1px solid ${s.highlight ? ACCENT : BORDER}`, 
               padding: "40px", 
               borderRadius: "8px",
               position: "relative",
-              transition: "transform 0.2s, border-color 0.2s"
+              display: "flex", /* Táctica Flexbox para alinear botones */
+              flexDirection: "column",
+              transition: "transform 0.2s, border-color 0.2s, box-shadow 0.2s"
             }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; if (!s.highlight) e.currentTarget.style.borderColor = ACCENT; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; if (!s.highlight) e.currentTarget.style.borderColor = BORDER; }}>
+              onMouseEnter={e => { 
+                e.currentTarget.style.transform = "translateY(-4px)"; 
+                e.currentTarget.style.boxShadow = "0 15px 40px rgba(0,0,0,0.1)";
+                if (!s.highlight) e.currentTarget.style.borderColor = ACCENT; 
+              }}
+              onMouseLeave={e => { 
+                e.currentTarget.style.transform = "translateY(0)"; 
+                e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,0.06)";
+                if (!s.highlight) e.currentTarget.style.borderColor = BORDER; 
+              }}>
+              
               {s.highlight && <div style={{ position: "absolute", top: 16, right: 16, background: ACCENT, color: "#fff", fontSize: 10, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 10px", borderRadius: "20px" }}>Popular</div>}
-              <Chip outline={!s.highlight}>{s.tag}</Chip>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 48, fontWeight: 900, color: INK, marginTop: 24, marginBottom: 8, letterSpacing: "-0.02em" }}>
-                {s.price} <span style={{ fontSize: 16, fontWeight: 600, color: INK3 }}>MXN</span>
+              
+              <div>
+                <Chip outline={!s.highlight}>{s.tag}</Chip>
+                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 48, fontWeight: 900, color: INK, marginTop: 24, marginBottom: 8, letterSpacing: "-0.02em" }}>
+                  {s.price} <span style={{ fontSize: 16, fontWeight: 600, color: INK3 }}>MXN</span>
+                </div>
+                <h3 style={{ fontSize: 22, color: INK, margin: "0 0 12px", fontWeight: 800 }}>{s.name}</h3>
               </div>
-              <h3 style={{ fontSize: 22, color: INK, margin: "0 0 12px", fontWeight: 800 }}>{s.name}</h3>
-              <p style={{ color: INK2, fontSize: 14, minHeight: 60, marginBottom: 24, lineHeight: 1.6 }}>{s.desc}</p>
-              <button onClick={() => nav("contacto")} style={{ width: "100%", padding: "14px", background: s.highlight ? INK : "transparent", color: s.highlight ? "#fff" : INK, border: `2px solid ${INK}`, borderRadius: "4px", fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}>
+              
+              {/* flexGrow: 1 obliga a este texto a empujar el botón hasta abajo */}
+              <p style={{ color: INK2, fontSize: 14, minHeight: 60, marginBottom: 24, lineHeight: 1.6, flexGrow: 1 }}>{s.desc}</p>
+              
+              {/* BOTÓN LIMPIO (SIN PATRÓN) */}
+              <button onClick={() => nav("contacto")} style={{ 
+                width: "100%", 
+                padding: "14px", 
+                background: s.highlight ? INK : "transparent", 
+                color: s.highlight ? "#fff" : INK, 
+                border: `2px solid ${INK}`, 
+                borderRadius: "4px", 
+                fontWeight: 700, 
+                cursor: "pointer", 
+                transition: "all 0.2s"
+              }}>
                 Cotizar este servicio →
               </button>
             </div>
@@ -387,85 +411,185 @@ function CatalogView({ nav }) {
     );
   }
 
-  if (isLoading) {
+if (isLoading) {
     return (
-      <div style={{ padding: "120px 8vw", background: BG, minHeight: "50vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <h2 style={{ color: INK, fontFamily: "'Barlow Condensed', sans-serif" }}>Cargando catálogo...</h2>
+      <div style={{ padding: "120px 8vw", background: BG, minHeight: "50vh", display: "flex", justifyContent: "center", alignItems: "center", position: "relative", overflow: "hidden" }}>
+        
+        {/* ANIMACIÓN DE ONDA GIGANTE (Más lenta y sutil) */}
+        <style>{`
+          @keyframes giantWave {
+            0% { opacity: 0.01; transform: scale(1); }
+            50% { opacity: 0.05; transform: scale(1.03); } /* Opacidad baja para tamaño grande, zoom micro */
+            100% { opacity: 0.01; transform: scale(1); }
+          }
+          .giant-wave-pattern {
+            animation: giantWave 4s ease-in-out infinite; /* Animación más lenta para un patrón más grande */
+          }
+        `}</style>
+
+        {/* CAPA DEL PATRÓN GIGANTE */}
+        <div className="giant-wave-pattern" style={{
+          position: "absolute",
+          top: "-10%", /* Más margen para el micro-zoom de la animación */
+          left: "-10%",
+          width: "120%",
+          height: "120%",
+          backgroundImage: "url('/patron.svg')",
+          backgroundRepeat: "repeat",
+          backgroundSize: "1200px", /* <--- TAMAÑO GIGANTE AJUSTADO AQUÍ */
+          backgroundPosition: "center",
+          filter: "invert(1)", /* Estética oscura */
+          pointerEvents: "none",
+          zIndex: 0,
+        }} />
+
+        {/* TEXTO DE CARGA POR ENCIMA */}
+        <h2 style={{ 
+          position: "relative", 
+          zIndex: 1, 
+          color: INK, 
+          fontFamily: "'Barlow Condensed', sans-serif", 
+          fontSize: "clamp(24px, 4vw, 36px)", 
+          letterSpacing: "0.15em", /* Un poco más de espacio entre letras para elegancia */
+          textTransform: "uppercase" 
+        }}>
+          Cargando catálogo...
+        </h2>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: "120px 8vw", background: BG }}>
-      <div style={{ maxWidth: 700, marginBottom: 80 }}>
-        <Chip accent>Tarifas Transparentes</Chip>
-        <h1 style={{ fontSize: "clamp(48px, 7vw, 64px)", color: INK, marginTop: 24, marginBottom: 24, fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", textTransform: "uppercase" }}>Servicios & Precios</h1>
-        <p style={{ color: INK2, fontSize: 18, lineHeight: 1.7 }}>Sin letra chica. Sin sorpresas. Todos los precios son desde — cotizamos según tu proyecto.</p>
-        
-        {/* REPORTE DE ERRORES EN PANTALLA */}
-        {errorMsg && (
-          <div style={{ marginTop: 24, padding: "20px", background: MUTED_RED, color: INK, border: `2px solid ${ACCENT}`, borderRadius: "8px", fontWeight: 800 }}>
-            {errorMsg}
-          </div>
-        )}
-      </div>
+    <div style={{ padding: "120px 8vw", background: BG, position: "relative", overflow: "hidden" }}>
+      
+      {/* CAPA DEL PATRÓN DE FONDO (Marca de agua degradada general) */}
+      <div style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundImage: "url('/patron.svg')",
+        backgroundRepeat: "repeat",
+        backgroundSize: "1200px", 
+        backgroundPosition: "top center",
+        opacity: 0.02, 
+        filter: "invert(1)", 
+        maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+        WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+        pointerEvents: "none", 
+        zIndex: 0,
+      }} />
 
-      <Section title="Por pieza" items={perPiece} />
-      <Section title="Pago único" items={oneTime} />
-      <Section title="Paquetes mensuales" items={monthly} />
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <div style={{ maxWidth: 700, marginBottom: 80 }}>
+          <Chip accent>Tarifas Transparentes</Chip>
+          <h1 style={{ fontSize: "clamp(48px, 7vw, 64px)", color: INK, marginTop: 24, marginBottom: 24, fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", textTransform: "uppercase" }}>Servicios & Precios</h1>
+          <p style={{ color: INK2, fontSize: 18, lineHeight: 1.7 }}>Sin letra chica. Sin sorpresas. Todos los precios son desde — cotizamos según tu proyecto.</p>
+          
+          {errorMsg && (
+            <div style={{ marginTop: 24, padding: "20px", background: MUTED_RED, color: INK, border: `2px solid ${ACCENT}`, borderRadius: "8px", fontWeight: 800 }}>
+              {errorMsg}
+            </div>
+          )}
+        </div>
+
+        <Section title="Por pieza" items={perPiece} />
+        <Section title="Pago único" items={oneTime} />
+        <Section title="Paquetes mensuales" items={monthly} />
+      </div>
+      
     </div>
   );
 }
 
-function ValorView({ stats }) {
-  return (
-    <div style={{ padding: "120px 8vw", background: COLORS.BG, minHeight: "100vh" }}>
-      <SectionLabel>Análisis de Mercado</SectionLabel>
-      <h1 style={{ fontSize: "clamp(32px, 5vw, 48px)", fontWeight: 900, marginBottom: 80, fontFamily: "'Barlow Condensed'", textTransform: "uppercase" }}>
-        ¿POR QUÉ RIDERS ES LA <span style={{ color: COLORS.ACCENT }}>OPCIÓN LÓGICA?</span>
-      </h1>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "40px" }}>
-        {stats && stats.length > 0 ? stats.map((stat, i) => {
-          const maxVal = Math.max(stat.freelance, stat.agencias, stat.riders);
-          const safeMax = maxVal === 0 ? 1 : maxVal;
-          const fHeight = Math.max((stat.freelance / safeMax) * 100, 5);
-          const aHeight = Math.max((stat.agencias / safeMax) * 100, 5);
-          const rHeight = Math.max((stat.riders / safeMax) * 100, 5);
-          const isMoney = maxVal > 100;
-          const formatNumber = (num) => isMoney ? `$${num.toLocaleString()}` : `${num}%`;
+// Asume que la imagen del patrón está en tu carpeta public como 'patron.svg'
+// o importada como PATRON_IMAGE si la tienes en src.
 
-          return (
-            <div key={i} style={{ background: COLORS.SURFACE, padding: "40px", borderRadius: "12px", border: `1px solid ${COLORS.BORDER}`, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <div>
-                <h3 style={{ fontSize: "18px", fontWeight: 800, marginBottom: "40px", textAlign: "center", textTransform: "uppercase" }}>{stat.label}</h3>
-                <div style={{ display: "flex", alignItems: "flex-end", height: "200px", gap: "10px", borderBottom: `1px solid ${COLORS.BORDER}`, paddingBottom: "15px" }}>
-                  <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
-                    <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
-                      <div style={{ height: `${fHeight}%`, width: "100%", background: COLORS.INK3, borderRadius: "4px 4px 0 0", transition: "height 1s cubic-bezier(0.4, 0, 0.2, 1)" }} />
+function ValorView({ stats }) {
+  // CONFIGURACIÓN TÁCTICA DEL PATRÓN
+  const PATRON_URL = '/patron.svg'; // Asegúrate que el archivo de imagen 14 se llame así en tu carpeta 'public'
+
+  return (
+    // 1. Agregamos position: relative y overflow: hidden al contenedor principal
+    <div style={{ padding: "120px 8vw", background: COLORS.BG, minHeight: "100vh", position: "relative", overflow: "hidden" }}>
+      
+      {/* 2. CAPA DEL PATRÓN DE FONDO (Marca de agua degradada) */}
+      <div style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundImage: `url(${PATRON_URL})`,
+        backgroundRepeat: "repeat",
+        
+        // GRANDE: Tamaño masivo para que sea poco invasivo
+        backgroundSize: "1200px", 
+        backgroundPosition: "top center",
+        
+        // POCO INVASIVO Y OSCURO: Opacidad bajísima y filtro invertido
+        // (esto vuelve oscuras las formas blancas de la imagen 14)
+        opacity: 0.02, 
+        filter: "invert(1)", 
+        
+        // DEGRADADO HACIA ABAJO: Usamos CSS mask-image
+        maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+        WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+        
+        pointerEvents: "none", // No interfiere con los clics
+        zIndex: 0,
+      }} />
+
+      {/* 3. Envolvemos el contenido existente en un div con zIndex: 1 para estar SOBRE el patrón */}
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <SectionLabel>Análisis de Mercado</SectionLabel>
+        <h1 style={{ fontSize: "clamp(32px, 5vw, 48px)", fontWeight: 900, marginBottom: 80, fontFamily: "'Barlow Condensed'", textTransform: "uppercase", color: COLORS.INK }}>
+          ¿POR QUÉ RIDERS ES LA <span style={{ color: COLORS.ACCENT }}>OPCIÓN LÓGICA?</span>
+        </h1>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "40px" }}>
+          {stats && stats.length > 0 ? stats.map((stat, i) => {
+            const maxVal = Math.max(stat.freelance, stat.agencias, stat.riders);
+            const safeMax = maxVal === 0 ? 1 : maxVal;
+            const fHeight = Math.max((stat.freelance / safeMax) * 100, 5);
+            const aHeight = Math.max((stat.agencias / safeMax) * 100, 5);
+            const rHeight = Math.max((stat.riders / safeMax) * 100, 5);
+            const isMoney = maxVal > 100;
+            const formatNumber = (num) => isMoney ? `$${num.toLocaleString()}` : `${num}%`;
+
+            return (
+              <div key={i} style={{ background: COLORS.SURFACE, padding: "40px", borderRadius: "12px", border: `1px solid ${COLORS.BORDER}`, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                <div>
+                  <h3 style={{ fontSize: "18px", fontWeight: 800, marginBottom: "40px", textAlign: "center", textTransform: "uppercase", color: COLORS.INK }}>{stat.label}</h3>
+                  <div style={{ display: "flex", alignItems: "flex-end", height: "200px", gap: "10px", borderBottom: `1px solid ${COLORS.BORDER}`, paddingBottom: "15px" }}>
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
+                      <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
+                        <div style={{ height: `${fHeight}%`, width: "100%", background: COLORS.INK3, borderRadius: "4px 4px 0 0", transition: "height 1s cubic-bezier(0.4, 0, 0.2, 1)" }} />
+                      </div>
+                      <span style={{ fontSize: "12px", fontWeight: 800, marginTop: "10px", color: COLORS.INK }}>{formatNumber(stat.freelance)}</span>
+                      <span style={{ fontSize: "10px", fontWeight: 700, marginTop: "4px", color: COLORS.INK2 }}>FREELANCE</span>
                     </div>
-                    <span style={{ fontSize: "12px", fontWeight: 800, marginTop: "10px", color: COLORS.INK }}>{formatNumber(stat.freelance)}</span>
-                    <span style={{ fontSize: "10px", fontWeight: 700, marginTop: "4px", color: COLORS.INK2 }}>FREELANCE</span>
-                  </div>
-                  <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
-                    <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
-                      <div style={{ height: `${aHeight}%`, width: "100%", background: COLORS.INK2, borderRadius: "4px 4px 0 0", transition: "height 1s cubic-bezier(0.4, 0, 0.2, 1)" }} />
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
+                      <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
+                        <div style={{ height: `${aHeight}%`, width: "100%", background: COLORS.INK2, borderRadius: "4px 4px 0 0", transition: "height 1s cubic-bezier(0.4, 0, 0.2, 1)" }} />
+                      </div>
+                      <span style={{ fontSize: "12px", fontWeight: 800, marginTop: "10px", color: COLORS.INK }}>{formatNumber(stat.agencias)}</span>
+                      <span style={{ fontSize: "10px", fontWeight: 700, marginTop: "4px", color: COLORS.INK2 }}>AGENCIAS</span>
                     </div>
-                    <span style={{ fontSize: "12px", fontWeight: 800, marginTop: "10px", color: COLORS.INK }}>{formatNumber(stat.agencias)}</span>
-                    <span style={{ fontSize: "10px", fontWeight: 700, marginTop: "4px", color: COLORS.INK2 }}>AGENCIAS</span>
-                  </div>
-                  <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
-                    <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
-                      <div style={{ height: `${rHeight}%`, width: "100%", background: COLORS.ACCENT, borderRadius: "4px 4px 0 0", boxShadow: `0 -5px 15px ${COLORS.ACCENT}33`, transition: "height 1s cubic-bezier(0.4, 0, 0.2, 1)" }} />
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
+                      <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
+                        <div style={{ height: `${rHeight}%`, width: "100%", background: COLORS.ACCENT, borderRadius: "4px 4px 0 0", boxShadow: `0 -5px 15px ${COLORS.ACCENT}33`, transition: "height 1s cubic-bezier(0.4, 0, 0.2, 1)" }} />
+                      </div>
+                      <span style={{ fontSize: "14px", fontWeight: 900, marginTop: "10px", color: COLORS.ACCENT }}>{formatNumber(stat.riders)}</span>
+                      <span style={{ fontSize: "11px", fontWeight: 900, marginTop: "4px", color: COLORS.ACCENT }}>RIDERS</span>
                     </div>
-                    <span style={{ fontSize: "14px", fontWeight: 900, marginTop: "10px", color: COLORS.ACCENT }}>{formatNumber(stat.riders)}</span>
-                    <span style={{ fontSize: "11px", fontWeight: 900, marginTop: "4px", color: COLORS.ACCENT }}>RIDERS</span>
                   </div>
                 </div>
+                <p style={{ fontSize: "13px", color: COLORS.INK2, marginTop: "25px", lineHeight: "1.6", textAlign: "center" }}>{stat.description}</p>
               </div>
-              <p style={{ fontSize: "13px", color: COLORS.INK2, marginTop: "25px", lineHeight: "1.6", textAlign: "center" }}>{stat.description}</p>
-            </div>
-          );
-        }) : <p style={{ fontWeight: 700, color: COLORS.INK2 }}>Cargando análisis de mercado...</p>}
+            );
+          }) : <p style={{ fontWeight: 700, color: COLORS.INK2 }}>Cargando análisis de mercado...</p>}
+        </div>
       </div>
     </div>
   );
@@ -474,55 +598,118 @@ function ValorView({ stats }) {
 function CasesView({ casesData }) {
   const [hovered, setHovered] = useState(null);
   const safeCases = casesData && casesData.length > 0 ? casesData : [];
+  
   return (
-    <div style={{ padding: "120px 8vw", background: BG }}>
-      <div style={{ marginBottom: 64, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 32 }}>
-        <div>
-          <SectionLabel>Evidencia</SectionLabel>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(48px, 6vw, 64px)", fontWeight: 900, textTransform: "uppercase", color: INK, lineHeight: 1, margin: 0 }}>Impacto <span style={{ color: ACCENT }}>Real.</span></h1>
+    // 1. Agregamos position relative y overflow hidden al contenedor principal
+    <div style={{ padding: "120px 8vw", background: BG, position: "relative", overflow: "hidden" }}>
+      
+      {/* 2. CAPA DEL PATRÓN DE FONDO (Marca de agua degradada) */}
+      <div style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundImage: "url('/patron.svg')",
+        backgroundRepeat: "repeat",
+        backgroundSize: "1200px", /* Tamaño gigante y poco invasivo */
+        backgroundPosition: "top center",
+        opacity: 0.02, /* Opacidad súper sutil */
+        filter: "invert(1)", /* Oscurece el SVG */
+        
+        // DEGRADADO HACIA ABAJO
+        maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+        WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+        
+        pointerEvents: "none", // Vital para no bloquear los clics de tus casos
+        zIndex: 0,
+      }} />
+
+      {/* 3. CONTENIDO PRINCIPAL (Enuelto para estar por encima del patrón) */}
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <div style={{ marginBottom: 64, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 32 }}>
+          <div>
+            <SectionLabel>Evidencia</SectionLabel>
+            <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(48px, 6vw, 64px)", fontWeight: 900, textTransform: "uppercase", color: INK, lineHeight: 1, margin: 0 }}>Impacto <span style={{ color: ACCENT }}>Real.</span></h1>
+          </div>
+          <p style={{ fontSize: "16px", color: INK2, lineHeight: 1.6, maxWidth: 480, margin: 0, paddingBottom: 8 }}>No vendemos humo ni métricas de vanidad. Diseñamos sistemas que se traducen directamente en crecimiento medible.</p>
         </div>
-        <p style={{ fontSize: "16px", color: INK2, lineHeight: 1.6, maxWidth: 480, margin: 0, paddingBottom: 8 }}>No vendemos humo ni métricas de vanidad. Diseñamos sistemas que se traducen directamente en crecimiento medible.</p>
+        
+        <div style={{ borderTop: `2px solid ${INK}` }}>
+          {safeCases.map((c, i) => (
+            <a key={i} href={c.link || "#"} target="_blank" rel="noopener noreferrer" onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)}
+              style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", padding: "32px 0", borderBottom: `1px solid ${BORDER}`, position: "relative", cursor: "pointer", textDecoration: "none", transition: "all 0.3s ease" }}>
+              
+              {/* Fondo del hover (superficie que aparece al pasar el ratón) */}
+              <div style={{ position: "absolute", inset: 0, background: SURFACE, zIndex: 0, opacity: hovered === i ? 1 : 0, transition: "opacity 0.2s ease", left: "-2vw", right: "-2vw", borderRadius: "8px" }} />
+              
+              <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: hovered === i ? c.color : INK3, transition: "color 0.3s ease" }}>{c.cat}</div>
+                <div style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800, color: INK, letterSpacing: "-0.01em" }}>{c.client}</div>
+              </div>
+              
+              <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 24 }}>
+                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(36px, 5vw, 56px)", fontWeight: 900, color: hovered === i ? c.color : INK, lineHeight: 1, letterSpacing: "-0.02em", transition: "color 0.3s ease" }}>{c.result}</div>
+                <div style={{ fontSize: 24, color: hovered === i ? c.color : BORDER, fontWeight: 400, transform: hovered === i ? "translateX(4px)" : "translateX(0)", transition: "all 0.3s ease" }}>→</div>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
-      <div style={{ borderTop: `2px solid ${INK}` }}>
-        {safeCases.map((c, i) => (
-          <a key={i} href={c.link || "#"} target="_blank" rel="noopener noreferrer" onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)}
-            style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", padding: "32px 0", borderBottom: `1px solid ${BORDER}`, position: "relative", cursor: "pointer", textDecoration: "none", transition: "all 0.3s ease" }}>
-            <div style={{ position: "absolute", inset: 0, background: SURFACE, zIndex: 0, opacity: hovered === i ? 1 : 0, transition: "opacity 0.2s ease", left: "-2vw", right: "-2vw", borderRadius: "8px" }} />
-            <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
-              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: hovered === i ? c.color : INK3, transition: "color 0.3s ease" }}>{c.cat}</div>
-              <div style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 800, color: INK, letterSpacing: "-0.01em" }}>{c.client}</div>
-            </div>
-            <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 24 }}>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(36px, 5vw, 56px)", fontWeight: 900, color: hovered === i ? c.color : INK, lineHeight: 1, letterSpacing: "-0.02em", transition: "color 0.3s ease" }}>{c.result}</div>
-              <div style={{ fontSize: 24, color: hovered === i ? c.color : BORDER, fontWeight: 400, transform: hovered === i ? "translateX(4px)" : "translateX(0)", transition: "all 0.3s ease" }}>→</div>
-            </div>
-          </a>
-        ))}
-      </div>
+      
     </div>
   );
 }
 
 function AboutView() {
   return (
-    <div style={{ padding: "120px 8vw", background: BG }}>
-      <div style={{ maxWidth: 800, marginBottom: 80 }}>
-        <SectionLabel>Sobre la Agencia</SectionLabel>
-        <h1 style={{ fontSize: "clamp(48px, 6vw, 64px)", color: INK, fontWeight: 900, marginBottom: 40, fontFamily: "'Barlow Condensed', sans-serif", textTransform: "uppercase" }}>Unidad de<br />Respuesta Rápida.</h1>
-        <div style={{ color: INK2, fontSize: 18, lineHeight: 1.8 }}>
-          <p style={{ marginBottom: 24 }}>Riders Media fusiona la <strong style={{ color: INK }}>precisión técnica con la creatividad disruptiva.</strong> No somos una agencia de marketing convencional.</p>
-          <p style={{ marginBottom: 24 }}>Resolvemos el problema de la lentitud digital y la falta de transparencia en la industria. Somos eficaces en la entrega y 100% transparentes en el proceso.</p>
-          <blockquote style={{ borderLeft: `4px solid ${ACCENT}`, paddingLeft: 24, fontStyle: "italic", color: INK, background: SURFACE, padding: "24px", borderRadius: "0 8px 8px 0" }}>"Construimos los activos digitales más rápidos de la región. Combinamos programación web con producción audiovisual premium para que tu negocio sea recordado."</blockquote>
+    // 1. Contenedor principal preparado para contener el patrón absoluto
+    <div style={{ padding: "120px 8vw", background: BG, position: "relative", overflow: "hidden" }}>
+      
+      {/* 2. CAPA DEL PATRÓN DE FONDO (Marca de agua degradada) */}
+      <div style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundImage: "url('/patron.svg')",
+        backgroundRepeat: "repeat",
+        backgroundSize: "1200px", /* Mantiene el tamaño masivo */
+        backgroundPosition: "top center",
+        opacity: 0.02, /* Opacidad súper sutil */
+        filter: "invert(1)", /* Oscurece el SVG blanco */
+        
+        // DEGRADADO HACIA ABAJO
+        maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+        WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+        
+        pointerEvents: "none", 
+        zIndex: 0,
+      }} />
+
+      {/* 3. CONTENIDO PRINCIPAL (Envuelto para estar por encima del patrón) */}
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <div style={{ maxWidth: 800, marginBottom: 80 }}>
+          <SectionLabel>Sobre la Agencia</SectionLabel>
+          <h1 style={{ fontSize: "clamp(48px, 6vw, 64px)", color: INK, fontWeight: 900, marginBottom: 40, fontFamily: "'Barlow Condensed', sans-serif", textTransform: "uppercase" }}>Unidad de<br />Respuesta Rápida.</h1>
+          <div style={{ color: INK2, fontSize: 18, lineHeight: 1.8 }}>
+            <p style={{ marginBottom: 24 }}>Riders Media fusiona la <strong style={{ color: INK }}>precisión técnica con la creatividad disruptiva.</strong> No somos una agencia de marketing convencional.</p>
+            <p style={{ marginBottom: 24 }}>Resolvemos el problema de la lentitud digital y la falta de transparencia en la industria. Somos eficaces en la entrega y 100% transparentes en el proceso.</p>
+            <blockquote style={{ borderLeft: `4px solid ${ACCENT}`, paddingLeft: 24, fontStyle: "italic", color: INK, background: SURFACE, padding: "24px", borderRadius: "0 8px 8px 0" }}>"Construimos los activos digitales más rápidos de la región. Combinamos programación web con producción audiovisual premium para que tu negocio sea recordado."</blockquote>
+          </div>
+        </div>
+        
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 40, borderTop: `1px solid ${BORDER}`, paddingTop: 80 }}>
+           {[{ label: "Misión", body: "Impulsar el crecimiento de PyMEs mediante la construcción de infraestructuras web superiores y contenido visual que captura la atención en segundos." }, { label: "Compromiso", body: "Velocidad de entrega, transparencia total en costos y resultados que puedes medir. Sin excusas, sin letra chica." }].map((item, i) => (
+              <div key={i} style={{ background: SURFACE, padding: "40px", border: `1px solid ${BORDER}`, borderRadius: "8px" }}>
+                <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: ACCENT, marginBottom: 16 }}>{item.label}</div>
+                <p style={{ color: INK2, fontSize: 16, lineHeight: 1.7 }}>{item.body}</p>
+              </div>
+           ))}
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 40, borderTop: `1px solid ${BORDER}`, paddingTop: 80 }}>
-         {[{ label: "Misión", body: "Impulsar el crecimiento de PyMEs mediante la construcción de infraestructuras web superiores y contenido visual que captura la atención en segundos." }, { label: "Compromiso", body: "Velocidad de entrega, transparencia total en costos y resultados que puedes medir. Sin excusas, sin letra chica." }].map((item, i) => (
-            <div key={i} style={{ background: SURFACE, padding: "40px", border: `1px solid ${BORDER}`, borderRadius: "8px" }}>
-              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: ACCENT, marginBottom: 16 }}>{item.label}</div>
-              <p style={{ color: INK2, fontSize: 16, lineHeight: 1.7 }}>{item.body}</p>
-            </div>
-         ))}
-      </div>
+      
     </div>
   );
 }
@@ -550,8 +737,24 @@ function ContactView({ isMobile }) {
       {/* AQUÍ ESTÁ EL AJUSTE RESPONSIVE DE COLUMNAS DE CONTACTO */}
       <div style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1.5fr", gap: 0, border: `1px solid ${BORDER}`, borderRadius: "8px", overflow: "hidden" }}>
         
-        <div style={{ background: BG2, padding: "60px 40px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-          <div>
+        {/* ZONA GRIS CON EL PATRÓN INYECTADO */}
+        <div style={{ background: BG2, padding: "60px 40px", display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative", overflow: "hidden" }}>
+          
+          {/* CAPA DEL PATRÓN (MARCA DE AGUA) */}
+          <div style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: "url('/patron.svg')",
+            backgroundRepeat: "repeat",
+            backgroundSize: "300px", /* Ajusta el tamaño de la 'M' aquí */
+            opacity: 0.04, /* Opacidad súper baja para que sea una sombra sutil */
+            filter: "invert(1)", /* Oscurece el SVG blanco original */
+            pointerEvents: "none",
+            zIndex: 0
+          }} />
+
+          {/* TEXTOS Y DATOS (Con zIndex: 1 para estar encima del patrón) */}
+          <div style={{ position: "relative", zIndex: 1 }}>
             <h1 style={{ fontSize: "clamp(36px, 4vw, 48px)", fontWeight: 900, color: INK, marginBottom: 40, fontFamily: "'Barlow Condensed', sans-serif", textTransform: "uppercase", lineHeight: 1 }}>Hablemos<br /><span style={{ color: ACCENT }}>Hoy.</span></h1>
             <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
               {[
@@ -571,13 +774,14 @@ function ContactView({ isMobile }) {
             </div>
           </div>
           
-          <div style={{ marginTop: 60, padding: 24, background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: "4px" }}>
+          {/* CAJA INFERIOR BLANCA (Con zIndex: 1 para estar encima del patrón) */}
+          <div style={{ marginTop: 60, padding: 24, background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: "4px", position: "relative", zIndex: 1 }}>
             <p style={{ fontSize: 13, color: INK2, lineHeight: 1.6, fontStyle: "italic", margin: 0 }}>Respondemos en menos de 24 horas. Sin filtros, directo a la estrategia.</p>
           </div>
         </div>
 
+        {/* COLUMNA DEL FORMULARIO */}
         <form onSubmit={handle} style={{ padding: "60px 40px", display: "flex", flexDirection: "column", gap: 24, background: SURFACE }}>
-          {/* AJUSTE RESPONSIVE DENTRO DEL FORMULARIO */}
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 20 }}>
             <div>
               <label style={labelStyle}>Nombre</label>
