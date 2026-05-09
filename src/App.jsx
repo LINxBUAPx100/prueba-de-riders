@@ -323,6 +323,8 @@ function CatalogView({ nav }) {
                 id: `sheet-item-${index}`,
                 name: row["Servicio"]?.trim() || "",
                 tag: row["Tipo de Pago"]?.trim() || "",
+                // NUEVO: Capturamos la columna "Precio real"
+                realPrice: row["Precio real"] ? row["Precio real"].toString().trim() : "",
                 price: row["Inversión (Desde)"] ? row["Inversión (Desde)"].toString().trim() : "",
                 desc: row["Descripción"]?.trim() || "",
                 highlight: row["¿hightlight?"]?.trim().toUpperCase() === "TRUE" 
@@ -356,13 +358,13 @@ function CatalogView({ nav }) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 24 }}>
           {items.map(s => (
             <div key={s.id} style={{ 
-              background: s.highlight ? BG2 : SURFACE, /* Fondo 100% Sólido */
-              boxShadow: "0 10px 30px rgba(0,0,0,0.06)", /* Sombra Premium */
+              background: s.highlight ? BG2 : SURFACE, 
+              boxShadow: "0 10px 30px rgba(0,0,0,0.06)", 
               border: `1px solid ${s.highlight ? ACCENT : BORDER}`, 
               padding: "40px", 
               borderRadius: "8px",
               position: "relative",
-              display: "flex", /* Táctica Flexbox para alinear botones */
+              display: "flex", 
               flexDirection: "column",
               transition: "transform 0.2s, border-color 0.2s, box-shadow 0.2s"
             }}
@@ -381,16 +383,36 @@ function CatalogView({ nav }) {
               
               <div>
                 <Chip outline={!s.highlight}>{s.tag}</Chip>
-                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 48, fontWeight: 900, color: INK, marginTop: 24, marginBottom: 8, letterSpacing: "-0.02em" }}>
-                  {s.price} <span style={{ fontSize: 16, fontWeight: 600, color: INK3 }}>MXN</span>
+                
+                {/* NUEVO: Contenedor para ambos precios */}
+                <div style={{ marginTop: 24, marginBottom: 8 }}>
+                  
+                  {/* Si existe un precio real, lo mostramos tachado */}
+                  {s.realPrice && (
+                    <div style={{ 
+                      fontFamily: "'Barlow Condensed', sans-serif", 
+                      fontSize: 22, 
+                      color: INK3 || "#888", // Un color grisáceo suave
+                      textDecoration: "line-through", 
+                      marginBottom: -4, // Acerca el precio tachado al precio de promoción
+                      fontWeight: 600
+                    }}>
+                      {s.realPrice}
+                    </div>
+                  )}
+
+                  {/* Precio de promoción o normal */}
+                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 48, fontWeight: 900, color: INK, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+                    {s.price} <span style={{ fontSize: 16, fontWeight: 600, color: INK3 }}>MXN</span>
+                  </div>
+
                 </div>
+
                 <h3 style={{ fontSize: 22, color: INK, margin: "0 0 12px", fontWeight: 800 }}>{s.name}</h3>
               </div>
               
-              {/* flexGrow: 1 obliga a este texto a empujar el botón hasta abajo */}
               <p style={{ color: INK2, fontSize: 14, minHeight: 60, marginBottom: 24, lineHeight: 1.6, flexGrow: 1 }}>{s.desc}</p>
               
-              {/* BOTÓN LIMPIO (SIN PATRÓN) */}
               <button onClick={() => nav("contacto")} style={{ 
                 width: "100%", 
                 padding: "14px", 
@@ -415,42 +437,39 @@ if (isLoading) {
     return (
       <div style={{ padding: "120px 8vw", background: BG, minHeight: "50vh", display: "flex", justifyContent: "center", alignItems: "center", position: "relative", overflow: "hidden" }}>
         
-        {/* ANIMACIÓN DE ONDA GIGANTE (Más lenta y sutil) */}
         <style>{`
           @keyframes giantWave {
             0% { opacity: 0.01; transform: scale(1); }
-            50% { opacity: 0.05; transform: scale(1.03); } /* Opacidad baja para tamaño grande, zoom micro */
+            50% { opacity: 0.05; transform: scale(1.03); } 
             100% { opacity: 0.01; transform: scale(1); }
           }
           .giant-wave-pattern {
-            animation: giantWave 4s ease-in-out infinite; /* Animación más lenta para un patrón más grande */
+            animation: giantWave 4s ease-in-out infinite; 
           }
         `}</style>
 
-        {/* CAPA DEL PATRÓN GIGANTE */}
         <div className="giant-wave-pattern" style={{
           position: "absolute",
-          top: "-10%", /* Más margen para el micro-zoom de la animación */
+          top: "-10%",
           left: "-10%",
           width: "100%",
           height: "100%",
           backgroundImage: "url('/patron.svg')",
           backgroundRepeat: "repeat",
-          backgroundSize: "1200px", /* <--- TAMAÑO GIGANTE AJUSTADO AQUÍ */
+          backgroundSize: "1200px", 
           backgroundPosition: "center",
-          filter: "invert(1)", /* Estética oscura */
+          filter: "invert(1)", 
           pointerEvents: "none",
           zIndex: 0,
         }} />
 
-        {/* TEXTO DE CARGA POR ENCIMA */}
         <h2 style={{ 
           position: "relative", 
           zIndex: 1, 
           color: INK, 
           fontFamily: "'Barlow Condensed', sans-serif", 
           fontSize: "clamp(24px, 4vw, 36px)", 
-          letterSpacing: "0.15em", /* Un poco más de espacio entre letras para elegancia */
+          letterSpacing: "0.15em", 
           textTransform: "uppercase" 
         }}>
           Cargando catálogo...
@@ -462,7 +481,6 @@ if (isLoading) {
   return (
     <div style={{ padding: "120px 8vw", background: BG, position: "relative", overflow: "hidden" }}>
       
-      {/* CAPA DEL PATRÓN DE FONDO (Marca de agua degradada general) */}
       <div style={{
         position: "absolute",
         top: 0,
@@ -502,9 +520,6 @@ if (isLoading) {
     </div>
   );
 }
-
-// Asume que la imagen del patrón está en tu carpeta public como 'patron.svg'
-// o importada como PATRON_IMAGE si la tienes en src.
 
 function ValorView({ stats }) {
   // CONFIGURACIÓN TÁCTICA DEL PATRÓN
