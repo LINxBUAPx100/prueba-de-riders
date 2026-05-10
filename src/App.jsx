@@ -58,11 +58,11 @@ function SectionLabel({ children }) {
 }
 
 // ── VISTAS ───────────────────────────────────────────────────────────────
-function HomeView({ nav }) {
+// Recibimos 'casesList' como prop, por defecto un arreglo vacío para evitar errores
+function HomeView({ nav, casesList = [] }) {
   const [playVideo, setPlayVideo] = useState(false);
-  const [tickerData, setTickerData] = useState(CATALOG); // Usamos el catálogo estático como respaldo inicial
+  const [tickerData, setTickerData] = useState(CATALOG);
 
-  // Efecto para leer el Excel e inyectar los títulos reales en el listón
   useEffect(() => {
     if (!window.Papa || !CATALOGO_CSV_URL) return;
     fetch(`${CATALOGO_CSV_URL}&t=${Date.now()}`)
@@ -78,7 +78,6 @@ function HomeView({ nav }) {
               .filter(row => row["Servicio"] && row["Servicio"].trim() !== "")
               .map(row => ({ name: row["Servicio"].trim() }));
             
-            // Si encontró servicios en tu Excel, actualiza el listón animado
             if (sheetServices.length > 0) {
               setTickerData(sheetServices);
             }
@@ -86,6 +85,18 @@ function HomeView({ nav }) {
         });
       }).catch(err => console.error("Error cargando listón:", err));
   }, []);
+
+  // ── LÓGICA DEL SOCIAL PROOF CON GOOGLE SHEETS ──
+  // Extraemos los clientes de la prop 'casesList' que nos mandó la App
+  const clients = casesList.map(c => c.client);
+  
+  // Condición: solo se anima si hay 3 o más clientes
+  const shouldAnimate = clients.length >= 3;
+  
+  // Si se anima, cuadruplicamos la lista para que el loop no tenga cortes
+  const displayClients = shouldAnimate 
+    ? [...clients, ...clients, ...clients, ...clients] 
+    : clients;
 
   return (
     <div style={{ background: BG }}>
@@ -144,7 +155,7 @@ function HomeView({ nav }) {
           )}
         </div>
 
-        {/* TICKER INFERIOR (LISTÓN ANIMADO REPARADO) */}
+        {/* TICKER INFERIOR */}
         <style>{`
           @keyframes scrollTicker {
             0% { transform: translateX(0); }
@@ -161,7 +172,6 @@ function HomeView({ nav }) {
         `}</style>
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, borderTop: `1px solid ${BORDER}`, padding: "15px 0", background: SURFACE, zIndex: 3, overflow: "hidden" }}>
            <div className="ticker-track">
-              {/* Aquí inyectamos el tickerData que ya leyó de Google Sheets */}
               {[...tickerData, ...tickerData, ...tickerData, ...tickerData].map((s, i) => (
                 <span key={i} style={{ color: i % 2 === 0 ? ACCENT : INK3, fontWeight: 800, fontSize: 14, textTransform: "uppercase", letterSpacing: "0.1em", whiteSpace: "nowrap", paddingRight: "50px" }}>
                   {s.name} •
@@ -220,23 +230,20 @@ function HomeView({ nav }) {
           ))}
       </section>
 
-    {/* 4. FILOSOFÍA */}
+      {/* 4. FILOSOFÍA */}
       <section style={{ padding: "120px 8vw", background: SURFACE, position: "relative", overflow: "hidden" }}>
-        
-        {/* CAPA DE PATRÓN GIGANTE Y OSCURO */}
         <div style={{ 
           position: "absolute", 
           inset: 0, 
           backgroundImage: "url('/patron.svg')", 
           backgroundRepeat: "repeat", 
-          backgroundSize: "1200px", /* Tamaño MUUUUY grande */
-          opacity: 0.05, /* Opacidad baja para que se vea como marca de agua sutil */
-          filter: "invert(1)", /* Convierte tu patrón blanco a color oscuro */
+          backgroundSize: "1200px", 
+          opacity: 0.05, 
+          filter: "invert(1)", 
           pointerEvents: "none", 
           zIndex: 0 
         }} />
 
-        {/* CONTENEDOR DE LA SECCIÓN (Texto por encima del patrón) */}
         <div style={{ position: "relative", zIndex: 1 }}>
           <SectionLabel>Filosofía</SectionLabel>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 32, marginTop: 40 }}>
@@ -278,14 +285,61 @@ function HomeView({ nav }) {
         </div>
       </section>
 
-      {/* SOCIAL PROOF */}
-      <section style={{ padding: "15px 8vw", background: MUTED_TEAL, borderBottom: `1px solid ${BG}`, textAlign: "center" }}>
-        <p style={{ fontSize: 15, fontWeight: 800, color: INK2, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 15 }}>-Marcas que confían en nosotros-</p>
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "clamp(20px, 6vw, 100px)", opacity: 0.5, filter: "grayscale(100%)" }}>
-          {["Garra Grafica", "Anzus y Thurizas", "Tortas la wera"].map((brand, i) => (
-            <span key={i} style={{ fontSize: "clamp(18px, 3vw, 24px)", fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", color: INK }}>{brand}</span>
-          ))}
-        </div>
+    {/* 6. SOCIAL PROOF ANIMADO */}
+      <style>{`
+        @keyframes scrollSocialProof {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .social-proof-track {
+          display: flex;
+          width: max-content;
+        }
+        .social-proof-animated {
+          animation: scrollSocialProof 40s linear infinite;
+        }
+        /* Esta regla le quita el padding derecho al último elemento SOLO si la lista no está animada, permitiendo un centrado perfecto */
+        .social-proof-track:not(.social-proof-animated) span:last-child {
+          padding-right: 0 !important;
+        }
+      `}</style>
+
+      <section style={{ padding: "15px 0", background: MUTED_TEAL, borderBottom: `1px solid ${BG}`, textAlign: "center", overflow: "hidden" }}>
+        <p style={{ fontSize: 15, fontWeight: 800, color: INK2, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 15 }}>
+          -Marcas que confían en nosotros-
+        </p>
+        
+        {/* Mostramos "Podrías ser el primero" si la base de datos está vacía */}
+        {clients.length === 0 ? (
+          <div style={{ fontSize: "clamp(18px, 3vw, 24px)", fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", color: INK, opacity: 0.5 }}>
+            Podrías ser el primero
+          </div>
+        ) : (
+          <div style={{ 
+            display: "flex", 
+            justifyContent: shouldAnimate ? "flex-start" : "center", 
+            opacity: 0.5, 
+            filter: "grayscale(100%)" 
+          }}>
+            <div className={`social-proof-track ${shouldAnimate ? "social-proof-animated" : ""}`}>
+              {displayClients.map((clientName, i) => (
+                <span 
+                  key={i} 
+                  style={{ 
+                    fontSize: "clamp(18px, 3vw, 24px)", 
+                    fontWeight: 900, 
+                    fontFamily: "'Barlow Condensed', sans-serif", 
+                    color: INK, 
+                    whiteSpace: "nowrap",
+                    paddingRight: "clamp(40px, 8vw, 100px)" 
+                  }}
+                >
+                  {clientName}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );
@@ -1035,7 +1089,8 @@ export default function App() {
       )}
 
       <main style={{ flex: 1, paddingTop: "80px" }}>
-        {page === "inicio" && <HomeView nav={nav} />}
+        {/* AQUÍ ESTÁ EL CAMBIO: Se agregó casesList={casesList} */}
+        {page === "inicio" && <HomeView nav={nav} casesList={casesList} />}
         {page === "catalogo" && <CatalogView nav={nav} />}
         {page === "valor" && <ValorView stats={marketStats} />}
         {page === "casos" && <CasesView casesData={casesList} />}
