@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import emailjs from '@emailjs/browser';
-// Aquí importamos todo de un solo jalón, sin duplicados
 import { COLORS, CATALOG, CASES, PILLARS, CASES_CSV_URL, SHEET_CSV_URL, CATALOGO_CSV_URL,} from "./data";
 import "./index.css";
 
@@ -58,7 +57,6 @@ function SectionLabel({ children }) {
 }
 
 // ── VISTAS ───────────────────────────────────────────────────────────────
-// Recibimos 'casesList' como prop, por defecto un arreglo vacío para evitar errores
 function HomeView({ nav, casesList = [] }) {
   const [playVideo, setPlayVideo] = useState(false);
   const [tickerData, setTickerData] = useState(CATALOG);
@@ -86,26 +84,64 @@ function HomeView({ nav, casesList = [] }) {
       }).catch(err => console.error("Error cargando listón:", err));
   }, []);
 
-  // ── LÓGICA DEL SOCIAL PROOF CON GOOGLE SHEETS ──
-  // Extraemos los clientes de la prop 'casesList' que nos mandó la App
   const clients = casesList.map(c => c.client);
-  
-  // Condición: solo se anima si hay 3 o más clientes
   const shouldAnimate = clients.length >= 3;
-  
-  // Si se anima, cuadruplicamos la lista para que el loop no tenga cortes
   const displayClients = shouldAnimate 
     ? [...clients, ...clients, ...clients, ...clients] 
     : clients;
 
   return (
     <div style={{ background: BG }}>
-      {/* 1. HERO EXPANDIDO Y ESPACIADO */}
+      
+      {/* Estilos CSS de animaciones de esta vista */}
+      <style>{`
+        /* 1. ANIMACIÓN DE LA LUZ PARPADEANTE */
+        @keyframes pulseLight {
+          0% { opacity: 1; transform: scale(1); box-shadow: 0 0 14px ${ACCENT}; }
+          50% { opacity: 0.5; transform: scale(0.85); box-shadow: 0 0 4px ${ACCENT}; }
+          100% { opacity: 1; transform: scale(1); box-shadow: 0 0 14px ${ACCENT}; }
+        }
+        .status-indicator {
+          animation: pulseLight 2s ease-in-out infinite;
+        }
+
+        /* 2. ANIMACIÓN DEL LISTÓN INFERIOR */
+        @keyframes scrollTicker {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .ticker-track {
+          display: flex;
+          width: max-content;
+          animation: scrollTicker 40s linear infinite;
+        }
+        .ticker-track:hover {
+          animation-play-state: paused;
+        }
+
+        /* 3. ANIMACIÓN DE MARCAS SOCIAL PROOF */
+        @keyframes scrollSocialProof {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .social-proof-track {
+          display: flex;
+          width: max-content;
+        }
+        .social-proof-animated {
+          animation: scrollSocialProof 40s linear infinite;
+        }
+        .social-proof-track:not(.social-proof-animated) span:last-child {
+          padding-right: 0 !important;
+        }
+      `}</style>
+
+      {/* HERO EXPANDIDO Y ESPACIADO */}
       <section style={{ padding: "100px 8vw 160px", position: "relative", overflow: "hidden", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "60px", minHeight: "100vh" }}>
         
         <div style={{ flex: "1 1 300px", position: "relative", zIndex: 2 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-            <div style={{ width: 12, height: 12, borderRadius: "50%", background: ACCENT, boxShadow: `0 0 14px ${ACCENT}` }} />
+            <div className="status-indicator" style={{ width: 12, height: 12, borderRadius: "50%", background: ACCENT }} />
             <span style={{ fontSize: 12, fontWeight: 700, color: INK2, letterSpacing: "0.1em", textTransform: "uppercase" }}>UNIDAD DE RESPUESTA RÁPIDA · PUEBLA, MX</span>
           </div>
           
@@ -127,8 +163,8 @@ function HomeView({ nav, casesList = [] }) {
           </div>
         </div>
 
-        {/* ── ELEMENTO VISUAL HERO ── */}
-        <div style={{ flex: "1 1 400px", minHeight: "400px", background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: "8px", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+        {/* CONTENEDOR DE VIDEO CON PROPORCIÓN DE ASPECTO PERFECTA */}
+        <div style={{ flex: "1 1 400px", width: "100%", aspectRatio: "16 / 9", background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: "8px", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
           {!playVideo ? (
             <>
               <div style={{ position: "absolute", inset: 0, backgroundImage: `linear-gradient(${BORDER} 1px, transparent 1px), linear-gradient(90deg, ${BORDER} 1px, transparent 1px)`, backgroundSize: "40px 40px", opacity: 0.5 }} />
@@ -147,7 +183,8 @@ function HomeView({ nav, casesList = [] }) {
           ) : (
             <iframe 
               style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
-              src="https://player.vimeo.com/video/201106279?autoplay=1&title=0&byline=0&portrait=0" 
+              // AQUÍ ESTÁ LA MAGIA: Se agregó &loop=1 y &autopause=0
+              src="https://player.vimeo.com/video/201106279?autoplay=1&loop=1&autopause=0&title=0&byline=0&portrait=0" 
               allow="autoplay; fullscreen; picture-in-picture" 
               allowFullScreen
               title="Showreel Riders.Media"
@@ -156,32 +193,18 @@ function HomeView({ nav, casesList = [] }) {
         </div>
 
         {/* TICKER INFERIOR */}
-        <style>{`
-          @keyframes scrollTicker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-          .ticker-track {
-            display: flex;
-            width: max-content;
-            animation: scrollTicker 40s linear infinite;
-          }
-          .ticker-track:hover {
-            animation-play-state: paused;
-          }
-        `}</style>
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, borderTop: `1px solid ${BORDER}`, padding: "15px 0", background: SURFACE, zIndex: 3, overflow: "hidden" }}>
            <div className="ticker-track">
-              {[...tickerData, ...tickerData, ...tickerData, ...tickerData].map((s, i) => (
-                <span key={i} style={{ color: i % 2 === 0 ? ACCENT : INK3, fontWeight: 800, fontSize: 14, textTransform: "uppercase", letterSpacing: "0.1em", whiteSpace: "nowrap", paddingRight: "50px" }}>
-                  {s.name} •
-                </span>
-              ))}
+             {[...tickerData, ...tickerData, ...tickerData, ...tickerData].map((s, i) => (
+               <span key={i} style={{ color: i % 2 === 0 ? ACCENT : INK3, fontWeight: 800, fontSize: 14, textTransform: "uppercase", letterSpacing: "0.1em", whiteSpace: "nowrap", paddingRight: "50px" }}>
+                 {s.name} •
+               </span>
+             ))}
            </div>
         </div>
       </section>
 
-      {/* 2. PROBLEMA VS SOLUCIÓN */}
+      {/* PROBLEMA VS SOLUCIÓN */}
       <section style={{ padding: "120px 8vw", background: BG }}>
         <SectionLabel>El Estándar Riders</SectionLabel>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 80, marginTop: 40 }}>
@@ -215,7 +238,7 @@ function HomeView({ nav, casesList = [] }) {
         </div>
       </section>
 
-      {/* 3. MÉTRICAS DE IMPACTO */}
+      {/* MÉTRICAS DE IMPACTO */}
       <section style={{ padding: "40px 8vw", background: INK, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 32, borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}` }}>
           {[
             { val: "48h", lab: "Tiempo de Respuesta" },
@@ -230,7 +253,7 @@ function HomeView({ nav, casesList = [] }) {
           ))}
       </section>
 
-      {/* 4. FILOSOFÍA */}
+      {/* FILOSOFÍA */}
       <section style={{ padding: "120px 8vw", background: SURFACE, position: "relative", overflow: "hidden" }}>
         <div style={{ 
           position: "absolute", 
@@ -267,7 +290,7 @@ function HomeView({ nav, casesList = [] }) {
         </div>
       </section>
 
-      {/* 5. CTA DE CIERRE */}
+      {/* CTA DE CIERRE */}
       <section style={{ padding: "140px 8vw", background: BG, borderBottom: `1px solid ${BORDER}`, textAlign: "center" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <div style={{ width: 64, height: 64, background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 32px", color: ACCENT }}>
@@ -285,31 +308,11 @@ function HomeView({ nav, casesList = [] }) {
         </div>
       </section>
 
-    {/* 6. SOCIAL PROOF ANIMADO */}
-      <style>{`
-        @keyframes scrollSocialProof {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .social-proof-track {
-          display: flex;
-          width: max-content;
-        }
-        .social-proof-animated {
-          animation: scrollSocialProof 40s linear infinite;
-        }
-        /* Esta regla le quita el padding derecho al último elemento SOLO si la lista no está animada, permitiendo un centrado perfecto */
-        .social-proof-track:not(.social-proof-animated) span:last-child {
-          padding-right: 0 !important;
-        }
-      `}</style>
-
       <section style={{ padding: "15px 0", background: MUTED_TEAL, borderBottom: `1px solid ${BG}`, textAlign: "center", overflow: "hidden" }}>
         <p style={{ fontSize: 15, fontWeight: 800, color: INK2, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 15 }}>
           -Marcas que confían en nosotros-
         </p>
         
-        {/* Mostramos "Podrías ser el primero" si la base de datos está vacía */}
         {clients.length === 0 ? (
           <div style={{ fontSize: "clamp(18px, 3vw, 24px)", fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", color: INK, opacity: 0.5 }}>
             Podrías ser el primero
@@ -377,7 +380,6 @@ function CatalogView({ nav }) {
                 id: `sheet-item-${index}`,
                 name: row["Servicio"]?.trim() || "",
                 tag: row["Tipo de Pago"]?.trim() || "",
-                // NUEVO: Capturamos la columna "Precio real"
                 realPrice: row["Precio real"] ? row["Precio real"].toString().trim() : "",
                 price: row["Inversión (Desde)"] ? row["Inversión (Desde)"].toString().trim() : "",
                 desc: row["Descripción"]?.trim() || "",
@@ -438,28 +440,23 @@ function CatalogView({ nav }) {
               <div>
                 <Chip outline={!s.highlight}>{s.tag}</Chip>
                 
-                {/* NUEVO: Contenedor para ambos precios */}
                 <div style={{ marginTop: 24, marginBottom: 8 }}>
-                  
-                  {/* Si existe un precio real, lo mostramos tachado */}
                   {s.realPrice && (
                     <div style={{ 
                       fontFamily: "'Barlow Condensed', sans-serif", 
                       fontSize: 22, 
-                      color: INK3 || "#888", // Un color grisáceo suave
+                      color: INK3 || "#888", 
                       textDecoration: "line-through", 
-                      marginBottom: -4, // Acerca el precio tachado al precio de promoción
+                      marginBottom: -4, 
                       fontWeight: 600
                     }}>
                       {s.realPrice}
                     </div>
                   )}
 
-                  {/* Precio de promoción o normal */}
                   <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 48, fontWeight: 900, color: INK, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
                     {s.price} <span style={{ fontSize: 16, fontWeight: 600, color: INK3 }}>MXN</span>
                   </div>
-
                 </div>
 
                 <h3 style={{ fontSize: 22, color: INK, margin: "0 0 12px", fontWeight: 800 }}>{s.name}</h3>
@@ -487,10 +484,9 @@ function CatalogView({ nav }) {
     );
   }
 
-if (isLoading) {
+  if (isLoading) {
     return (
       <div style={{ padding: "120px 8vw", background: BG, minHeight: "50vh", display: "flex", justifyContent: "center", alignItems: "center", position: "relative", overflow: "hidden" }}>
-        
         <style>{`
           @keyframes giantWave {
             0% { opacity: 0.01; transform: scale(1); }
@@ -534,7 +530,6 @@ if (isLoading) {
 
   return (
     <div style={{ padding: "120px 8vw", background: BG, position: "relative", overflow: "hidden" }}>
-      
       <div style={{
         position: "absolute",
         top: 0,
@@ -570,20 +565,15 @@ if (isLoading) {
         <Section title="Pago único" items={oneTime} />
         <Section title="Paquetes mensuales" items={monthly} />
       </div>
-      
     </div>
   );
 }
 
 function ValorView({ stats }) {
-  // CONFIGURACIÓN TÁCTICA DEL PATRÓN
-  const PATRON_URL = '/patron.svg'; // Asegúrate que el archivo de imagen 14 se llame así en tu carpeta 'public'
+  const PATRON_URL = '/patron.svg'; 
 
   return (
-    // 1. Agregamos position: relative y overflow: hidden al contenedor principal
     <div style={{ padding: "120px 8vw", background: COLORS.BG, minHeight: "100vh", position: "relative", overflow: "hidden" }}>
-      
-      {/* 2. CAPA DEL PATRÓN DE FONDO (Marca de agua degradada) */}
       <div style={{
         position: "absolute",
         top: 0,
@@ -592,25 +582,16 @@ function ValorView({ stats }) {
         height: "100%",
         backgroundImage: `url(${PATRON_URL})`,
         backgroundRepeat: "repeat",
-        
-        // GRANDE: Tamaño masivo para que sea poco invasivo
         backgroundSize: "1200px", 
         backgroundPosition: "top center",
-        
-        // POCO INVASIVO Y OSCURO: Opacidad bajísima y filtro invertido
-        // (esto vuelve oscuras las formas blancas de la imagen 14)
         opacity: 0.02, 
         filter: "invert(1)", 
-        
-        // DEGRADADO HACIA ABAJO: Usamos CSS mask-image
         maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
         WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
-        
-        pointerEvents: "none", // No interfiere con los clics
+        pointerEvents: "none",
         zIndex: 0,
       }} />
 
-      {/* 3. Envolvemos el contenido existente en un div con zIndex: 1 para estar SOBRE el patrón */}
       <div style={{ position: "relative", zIndex: 1 }}>
         <SectionLabel>Análisis de Mercado</SectionLabel>
         <h1 style={{ fontSize: "clamp(32px, 5vw, 48px)", fontWeight: 900, marginBottom: 80, fontFamily: "'Barlow Condensed'", textTransform: "uppercase", color: COLORS.INK }}>
@@ -669,10 +650,7 @@ function CasesView({ casesData }) {
   const safeCases = casesData && casesData.length > 0 ? casesData : [];
   
   return (
-    // 1. Agregamos position relative y overflow hidden al contenedor principal
     <div style={{ padding: "120px 8vw", background: BG, position: "relative", overflow: "hidden" }}>
-      
-      {/* 2. CAPA DEL PATRÓN DE FONDO (Marca de agua degradada) */}
       <div style={{
         position: "absolute",
         top: 0,
@@ -681,20 +659,16 @@ function CasesView({ casesData }) {
         height: "100%",
         backgroundImage: "url('/patron.svg')",
         backgroundRepeat: "repeat",
-        backgroundSize: "1200px", /* Tamaño gigante y poco invasivo */
+        backgroundSize: "1200px", 
         backgroundPosition: "top center",
-        opacity: 0.02, /* Opacidad súper sutil */
-        filter: "invert(1)", /* Oscurece el SVG */
-        
-        // DEGRADADO HACIA ABAJO
+        opacity: 0.02, 
+        filter: "invert(1)", 
         maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
         WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
-        
-        pointerEvents: "none", // Vital para no bloquear los clics de tus casos
+        pointerEvents: "none", 
         zIndex: 0,
       }} />
 
-      {/* 3. CONTENIDO PRINCIPAL (Enuelto para estar por encima del patrón) */}
       <div style={{ position: "relative", zIndex: 1 }}>
         <div style={{ marginBottom: 64, display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 32 }}>
           <div>
@@ -709,7 +683,6 @@ function CasesView({ casesData }) {
             <a key={i} href={c.link || "#"} target="_blank" rel="noopener noreferrer" onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)}
               style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", padding: "32px 0", borderBottom: `1px solid ${BORDER}`, position: "relative", cursor: "pointer", textDecoration: "none", transition: "all 0.3s ease" }}>
               
-              {/* Fondo del hover (superficie que aparece al pasar el ratón) */}
               <div style={{ position: "absolute", inset: 0, background: SURFACE, zIndex: 0, opacity: hovered === i ? 1 : 0, transition: "opacity 0.2s ease", left: "-2vw", right: "-2vw", borderRadius: "8px" }} />
               
               <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
@@ -725,17 +698,13 @@ function CasesView({ casesData }) {
           ))}
         </div>
       </div>
-      
     </div>
   );
 }
 
 function AboutView() {
   return (
-    // 1. Contenedor principal preparado para contener el patrón absoluto
     <div style={{ padding: "120px 8vw", background: BG, position: "relative", overflow: "hidden" }}>
-      
-      {/* 2. CAPA DEL PATRÓN DE FONDO (Marca de agua degradada) */}
       <div style={{
         position: "absolute",
         top: 0,
@@ -744,20 +713,16 @@ function AboutView() {
         height: "100%",
         backgroundImage: "url('/patron.svg')",
         backgroundRepeat: "repeat",
-        backgroundSize: "1200px", /* Mantiene el tamaño masivo */
+        backgroundSize: "1200px", 
         backgroundPosition: "top center",
-        opacity: 0.02, /* Opacidad súper sutil */
-        filter: "invert(1)", /* Oscurece el SVG blanco */
-        
-        // DEGRADADO HACIA ABAJO
+        opacity: 0.02, 
+        filter: "invert(1)", 
         maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
         WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
-        
         pointerEvents: "none", 
         zIndex: 0,
       }} />
 
-      {/* 3. CONTENIDO PRINCIPAL (Envuelto para estar por encima del patrón) */}
       <div style={{ position: "relative", zIndex: 1 }}>
         <div style={{ maxWidth: 800, marginBottom: 80 }}>
           <SectionLabel>Sobre la Agencia</SectionLabel>
@@ -778,24 +743,106 @@ function AboutView() {
            ))}
         </div>
       </div>
-      
     </div>
   );
 }
 
+
 function ContactView({ isMobile }) {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", service: "content", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", service: "", message: "" });
   const [sent, setSent] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   
+  // Estado para guardar la lista dinámica desde Excel
+  const [servicesList, setServicesList] = useState([]);
+
+  // useEffect para leer el Google Sheet de catálogo
+  useEffect(() => {
+    // Si no detecta PapaParse o el URL, usa CATALOG de data.js como respaldo de seguridad
+    if (!window.Papa || !CATALOGO_CSV_URL) {
+      setServicesList(CATALOG);
+      if (CATALOG.length > 0) setForm(prev => ({ ...prev, service: CATALOG[0].id }));
+      return;
+    }
+
+    fetch(`${CATALOGO_CSV_URL}&t=${Date.now()}`)
+      .then(res => res.text())
+      .then(csvText => {
+        if (csvText.trim().startsWith('<')) {
+          setServicesList(CATALOG);
+          if (CATALOG.length > 0) setForm(prev => ({ ...prev, service: CATALOG[0].id }));
+          return;
+        }
+        window.Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          transformHeader: h => h.trim(),
+          complete: (results) => {
+            const fetchedData = results.data
+              .filter(row => row["Servicio"] && row["Servicio"].trim() !== "")
+              .map((row, index) => ({
+                id: `sheet-item-${index}`,
+                name: row["Servicio"]?.trim() || "",
+                price: row["Inversión (Desde)"] ? row["Inversión (Desde)"].toString().trim() : "",
+              }));
+
+            if (fetchedData.length > 0) {
+              setServicesList(fetchedData);
+              // Auto-seleccionamos el primer servicio de la lista de Excel
+              setForm(prev => ({ ...prev, service: fetchedData[0].id }));
+            } else {
+              setServicesList(CATALOG);
+              if (CATALOG.length > 0) setForm(prev => ({ ...prev, service: CATALOG[0].id }));
+            }
+          }
+        });
+      })
+      .catch(err => {
+        console.error("Error cargando Excel para el formulario:", err);
+        setServicesList(CATALOG); // Si hay fallo de red, muestra los estáticos
+        if (CATALOG.length > 0) setForm(prev => ({ ...prev, service: CATALOG[0].id }));
+      });
+  }, []);
+
   const handle = (e) => {
-    e.preventDefault(); setLoading(true); setError(false);
-    const selectedService = CATALOG.find(s => s.id === form.service);
-    const serviceName = selectedService ? `${selectedService.name} (${selectedService.price})` : form.service;
-    const templateParams = { name: form.name, email: form.email, service_requested: serviceName, message: form.message, phone: form.phone };
+    e.preventDefault(); 
+    setLoading(true); 
+    setError(false);
+    
+    // Buscamos el servicio seleccionado en nuestra lista dinámica del Excel
+    const selectedService = servicesList.find(s => s.id === form.service);
+    
+    // Formateamos el nombre con el precio para WhatsApp y Correo
+    const serviceName = selectedService 
+      ? `${selectedService.name} (${selectedService.price.includes('$') ? selectedService.price : '$' + selectedService.price} MXN)` 
+      : form.service;
+    
+    const templateParams = { 
+      name: form.name, 
+      email: form.email, 
+      service_requested: serviceName, 
+      message: form.message, 
+      phone: form.phone 
+    };
+
     emailjs.send("service_ko9wm6r", "template_p02dor7", templateParams, "1b2HC5hu9s5FV_mHd")
-    .then(() => { setLoading(false); setSent(true); setForm({ name: "", email: "", phone: "", service: "content", message: "" }); setTimeout(() => setSent(false), 6000); }, () => { setLoading(false); setError(true); });
+    .then(() => { 
+      setLoading(false); 
+      setSent(true); 
+      // Al reiniciar, volvemos a apuntar al primer elemento del Excel
+      setForm({ name: "", email: "", phone: "", service: servicesList.length > 0 ? servicesList[0].id : "", message: "" }); 
+      setTimeout(() => setSent(false), 6000); 
+    }, () => { 
+      setLoading(false); 
+      setError(true); 
+    });
+
+    const waNumber = "522202256586";
+    const waMessage = `¡Hola! Me interesa solicitar una cotización.\n\n*Mis datos:*\n 👋🏼 Nombre: ${form.name}\n 📬 Email: ${form.email}\n 🤳🏼 Teléfono: ${form.phone}\n 📦 Servicio: ${serviceName}\n\n*Mi mensaje:*\n${form.message}`;
+    const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`;
+    
+    window.open(waUrl, "_blank");
   };
 
   const inputStyle = { width: "100%", background: BG, border: `1px solid ${BORDER}`, padding: "16px", borderRadius: "4px", color: INK, fontSize: 15, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s", fontFamily: "inherit" };
@@ -803,26 +850,21 @@ function ContactView({ isMobile }) {
 
   return (
     <div style={{ padding: "120px 8vw", background: BG }}>
-      {/* AQUÍ ESTÁ EL AJUSTE RESPONSIVE DE COLUMNAS DE CONTACTO */}
       <div style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1.5fr", gap: 0, border: `1px solid ${BORDER}`, borderRadius: "8px", overflow: "hidden" }}>
-        
-        {/* ZONA GRIS CON EL PATRÓN INYECTADO */}
         <div style={{ background: BG2, padding: "60px 40px", display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative", overflow: "hidden" }}>
           
-          {/* CAPA DEL PATRÓN (MARCA DE AGUA) */}
           <div style={{
             position: "absolute",
             inset: 0,
             backgroundImage: "url('/patron.svg')",
             backgroundRepeat: "repeat",
-            backgroundSize: "300px", /* Ajusta el tamaño de la 'M' aquí */
-            opacity: 0.04, /* Opacidad súper baja para que sea una sombra sutil */
-            filter: "invert(1)", /* Oscurece el SVG blanco original */
+            backgroundSize: "300px",
+            opacity: 0.04, 
+            filter: "invert(1)", 
             pointerEvents: "none",
             zIndex: 0
           }} />
 
-          {/* TEXTOS Y DATOS (Con zIndex: 1 para estar encima del patrón) */}
           <div style={{ position: "relative", zIndex: 1 }}>
             <h1 style={{ fontSize: "clamp(36px, 4vw, 48px)", fontWeight: 900, color: INK, marginBottom: 40, fontFamily: "'Barlow Condensed', sans-serif", textTransform: "uppercase", lineHeight: 1 }}>Hablemos<br /><span style={{ color: ACCENT }}>Hoy.</span></h1>
             <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
@@ -843,13 +885,11 @@ function ContactView({ isMobile }) {
             </div>
           </div>
           
-          {/* CAJA INFERIOR BLANCA (Con zIndex: 1 para estar encima del patrón) */}
           <div style={{ marginTop: 60, padding: 24, background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: "4px", position: "relative", zIndex: 1 }}>
             <p style={{ fontSize: 13, color: INK2, lineHeight: 1.6, fontStyle: "italic", margin: 0 }}>Respondemos en menos de 24 horas. Sin filtros, directo a la estrategia.</p>
           </div>
         </div>
 
-        {/* COLUMNA DEL FORMULARIO */}
         <form onSubmit={handle} style={{ padding: "60px 40px", display: "flex", flexDirection: "column", gap: 24, background: SURFACE }}>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 20 }}>
             <div>
@@ -865,22 +905,34 @@ function ContactView({ isMobile }) {
             <label style={labelStyle}>Teléfono</label>
             <input required type="tel" style={inputStyle} value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
           </div>
+          
+          {/* AQUÍ ESTÁ EL SELECT ENLAZADO AL EXCEL */}
           <div>
             <label style={labelStyle}>Servicio</label>
             <select style={inputStyle} value={form.service} onChange={e => setForm({ ...form, service: e.target.value })}>
-              {CATALOG.map(s => <option key={s.id} value={s.id}>{s.name} — {s.price} MXN</option>)}
+              {servicesList.map(s => {
+                // Asegura el formato visual con el signo de dólar ($)
+                const formattedPrice = s.price.toString().includes('$') ? s.price : `$${s.price}`;
+                return (
+                  <option key={s.id} value={s.id}>
+                    {s.name} — {formattedPrice} MXN
+                  </option>
+                );
+              })}
             </select>
           </div>
+
           <div>
             <label style={labelStyle}>Mensaje</label>
             <textarea required rows={5} style={inputStyle} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} />
           </div>
           <button type="submit" disabled={loading} style={{ background: loading ? INK3 : INK, color: "#fff", border: "none", padding: "18px", borderRadius: "4px", fontWeight: 800, cursor: loading ? "wait" : "pointer" }}>
-            {loading ? "Enviando..." : "Enviar Solicitud →"}
+            {loading ? "Procesando..." : "Enviar y Chatear por WhatsApp →"}
           </button>
-          {sent && <div style={{ color: ACCENT, fontWeight: 700 }}>✓ Mensaje recibido.</div>}
+          
+          {sent && <div style={{ color: "#25D366", fontWeight: 700 }}>✓ Solicitud enviada correctamente.</div>}
+          {error && <div style={{ color: "red", fontWeight: 700 }}>❌ Hubo un error al enviar el correo, pero el chat debería abrirse.</div>}
         </form>
-        
       </div>
     </div>
   );
@@ -894,7 +946,6 @@ function SocialFloat({ isMobile }) {
     { name: "FB", color: "#1877F2", url: "https://www.facebook.com/profile.php?id=61579283677547" },
     { name: "IG", color: "#E4405F", url: "https://www.instagram.com/riders_media.mk/" },
     { name: "WA", color: "#25D366", url: "https://wa.me/522202256586?text=Quiero%20cotizar%20con%20ustedes%21" },
-  
   ];
 
   const btnSize = isMobile ? "40px" : "50px";
@@ -914,7 +965,6 @@ function SocialFloat({ isMobile }) {
         zIndex: 2000 
       }}
     >
-      {/* BOTÓN DISPARADOR */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
@@ -939,7 +989,6 @@ function SocialFloat({ isMobile }) {
         +
       </button>
 
-      {/* BOTONES DE REDES SOCIALES */}
       {socialLinks.map((link, index) => (
         <a 
           key={link.name} 
@@ -985,13 +1034,12 @@ export default function App() {
   const [marketStats, setMarketStats] = useState([]);
   const [casesList, setCasesList] = useState(CASES || []);
   
-  // Estados para el Responsive
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
   
   const nav = (p) => { 
     setPage(p); 
-    setMenuOpen(false); // Cierra el menú al navegar
+    setMenuOpen(false); 
     window.scrollTo({ top: 0, behavior: "smooth" }); 
   };
 
@@ -1053,7 +1101,6 @@ export default function App() {
           <span style={{ fontWeight: 900, fontSize: "20px", letterSpacing: "0.01em" }}>IDERS MEDIA</span>
         </div>
         
-        {/* NAVEGACIÓN RESPONSIVE */}
         {!isMobile ? (
           <>
             <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
@@ -1074,7 +1121,6 @@ export default function App() {
         )}
       </nav>
 
-      {/* MENÚ DESPLEGABLE MÓVIL */}
       {isMobile && menuOpen && (
         <div style={{ position: "fixed", top: "80px", left: 0, right: 0, background: BG, borderBottom: `1px solid ${BORDER}`, zIndex: 999, display: "flex", flexDirection: "column", padding: "20px 5vw", boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}>
            {PAGES.map(p => (
@@ -1089,7 +1135,6 @@ export default function App() {
       )}
 
       <main style={{ flex: 1, paddingTop: "80px" }}>
-        {/* AQUÍ ESTÁ EL CAMBIO: Se agregó casesList={casesList} */}
         {page === "inicio" && <HomeView nav={nav} casesList={casesList} />}
         {page === "catalogo" && <CatalogView nav={nav} />}
         {page === "valor" && <ValorView stats={marketStats} />}
