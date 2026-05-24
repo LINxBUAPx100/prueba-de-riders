@@ -9,32 +9,32 @@ export const CATALOGO_CSV_URL = "https://docs.google.com/spreadsheets/d/1SEdPIwc
 // ── PALETA DE COLORES (ESTÉTICA PROFESIONAL) ─────────────────────────────
 export const COLORS = {
   // --- FONDOS Y SUPERFICIES ---
-  BG:       "#F4F6F8",   // Gris azulado ultra claro (El fondo general limpio de la imagen)
-  BG2:      "#DBDDDF",   // Gris claro/acero (Directo del moodboard. Útil para secciones secundarias)
-  SURFACE:  "#FFFFFF",   // Blanco puro (Para que los mockups y tarjetas destaquen limpiamente)
+  BG:      "#FFFFFF",    // Blanco puro — base limpia y moderna
+  BG2:     "#F5F0E6",    // Crema cálida — secciones secundarias
+  SURFACE: "#FAF7F2",    // Crema suave — tarjetas y superficies elevadas
 
   // --- TINTAS / TIPOGRAFÍA ---
-  INK:      "#273545",   // Azul marino oscuro (Directo del moodboard. Reemplaza al negro para un texto más suave y elegante)
-  INK2:     "#5A6B7C",   // Azul marino desaturado (Texto secundario para jerarquía visual)
-  INK3:     "#92AABE",   // Azul acero suave (Directo del moodboard. Para textos terciarios, placeholders o iconos)
+  INK:     "#0D1B2A",    // Azul noche oscuro — texto principal
+  INK2:    "#1D3557",    // Azul marino — texto secundario
+  INK3:    "#6B7C93",    // Acero azulado — textos terciarios e íconos
 
   // --- COLORES PRINCIPALES ---
-  ACCENT:   "#3D5C71",   // Azul pizarra (Directo del moodboard. Tu color principal para botones e identidad gráfica)
-  ACCENT2:  "#273545",   // Azul marino oscuro (Ideal para el hover del azul pizarra)
-  BORDER:   "#DBDDDF",   // Gris claro/acero (Directo del moodboard. Bordes estructurados y limpios)
-  RIDERS:   "#A66C46",   // Cobre / Tierra (Directo del moodboard. El único acento cálido que corta la frialdad de los azules)
+  ACCENT:  "#F5A623",    // Ámbar naranja — color principal de marca Riders
+  ACCENT2: "#1D3557",    // Azul marino — variante de acento
+  BORDER:  "#E8E0D0",    // Borde cálido sutil
 
-  // --- ESTADOS UI (Ajustados para no romper la estética orgánica) ---
-  SUCCESS:  "#4E7A5E",   // Verde bosque desaturado (Mantiene el tono sobrio y maduro)
-  WARNING:  "#C68C53",   // Ocre suave (Derivado del cobre principal para mantener armonía)
-  INFO:     "#92AABE",   // Azul acero suave (Reutilizamos el tono de la paleta para coherencia)
+  RIDERS:  "#F5A623",    // Alias del naranja principal
+
+  // --- ESTADOS UI ---
+  SUCCESS:    "#2D7D4F",
+  WARNING:    "#E8930F",
+  INFO:       "#1D3557",
 
   // --- ACENTOS SECUNDARIOS ---
-  MUTED_RED:  "#F4EBE6", // Cobre ultra lavado (Fondo sutil para etiquetas que lleven texto en color RIDERS)
-  MUTED_TEAL: "#E6ECF0", // Azul pizarra ultra lavado (Fondo sutil para etiquetas que lleven texto en color ACCENT)
-  TERRA:      "#8B5A39", // Cobre oscuro (Para contrastes o iconos secundarios de la familia tierra)
+  MUTED_RED:  "#FFF4E0",    // Naranja ultra lavado — fondo sutil etiquetas naranja
+  MUTED_TEAL: "#EAF0FF",    // Azul ultra lavado — fondo sutil etiquetas azul
+  TERRA:      "#C47B0A",    // Ámbar tierra — íconos y contrastes secundarios
 };
-
 
 // ── CATÁLOGO DE SERVICIOS ────────────────────────────────────────────────
 export const CATALOG = [
