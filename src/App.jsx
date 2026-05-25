@@ -5,6 +5,19 @@ import "./index.css";
 
 const { BG, BG2, SURFACE, INK, INK2, INK3, ACCENT, ACCENT2, BORDER, RIDERS, SUCCESS, WARNING, INFO, MUTED_RED, MUTED_TEAL, TERRA } = COLORS;
 
+// ── PATRÓN DE FONDO: cambia a false para ocultar por sección ─────────────
+const PATRON = {
+  global:         false, // Overlay fijo sobre TODA la página (evita duplicados con secciones)
+  filosofia:      true,  // HomeView — sección filosofía (fondo oscuro)
+  catalogo_carga: true,  // CatalogView — pantalla de carga animada
+  catalogo:       true,  // CatalogView — vista principal
+  valor:          true,  // ValorView — análisis de mercado
+  casos:          true,  // CasesView — casos de éxito
+  agencia:        false, // AboutView — sobre la agencia
+  contacto:       false, // ContactView — página de contacto
+};
+
+
 // ── HOOK RESPONSIVE (DETECTOR DE CELULARES) ──────────────────────────────
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 800);
@@ -56,6 +69,34 @@ function SectionLabel({ children }) {
   );
 }
 
+function PatternBg({ show, opacity = 0.025, filter = "invert(1)", maskStop = "70%", animated = false }) {
+  if (!show) return null;
+  return (
+    <div
+      className={animated ? "giant-wave-pattern" : undefined}
+      style={{
+        position: "absolute",
+        top: animated ? "-10%" : 0,
+        left: animated ? "-10%" : 0,
+        width: animated ? "120%" : "100%",
+        height: animated ? "120%" : "100%",
+        backgroundImage: "url('/patron.svg')",
+        backgroundRepeat: "repeat",
+        backgroundSize: "1200px",
+        backgroundPosition: animated ? "center" : "top center",
+        opacity,
+        ...(filter ? { filter } : {}),
+        ...(maskStop ? {
+          maskImage: `linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) ${maskStop})`,
+          WebkitMaskImage: `linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) ${maskStop})`,
+        } : {}),
+        pointerEvents: "none",
+        zIndex: 0
+      }}
+    />
+  );
+}
+
 function HomeView({ nav, casesList = [] }) {
   const [playVideo, setPlayVideo] = useState(false);
   const [tickerData, setTickerData] = useState(CATALOG);
@@ -104,9 +145,8 @@ function HomeView({ nav, casesList = [] }) {
         .ticker-track {
           display: flex;
           width: max-content;
-          animation: scrollTicker 40s linear infinite;
+          will-change: transform;
         }
-        .ticker-track:hover { animation-play-state: paused; }
 
         @keyframes scrollSocialProof {
           0%   { transform: translateX(0); }
@@ -292,8 +332,11 @@ function HomeView({ nav, casesList = [] }) {
           background: SURFACE,
           zIndex: 3, overflow: "hidden"
         }}>
-          <div className="ticker-track">
-            {[...tickerData, ...tickerData, ...tickerData, ...tickerData].map((s, i) => (
+          <div
+            className="ticker-track"
+            style={{ animation: `scrollTicker ${Math.max(50, tickerData.length * 5)}s linear infinite` }}
+          >
+            {[...tickerData, ...tickerData].map((s, i) => (
               <span key={i} style={{
                 color: i % 2 === 0 ? ACCENT : INK3,
                 fontWeight: 800, fontSize: 13,
@@ -389,7 +432,7 @@ function HomeView({ nav, casesList = [] }) {
 
       {/* ── MÉTRICAS — fondo naranja ──────────────────────────── */}
       <section style={{
-        padding: "64px 8vw",
+        padding: "35px 8vw",
         background: ACCENT,
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
@@ -398,7 +441,7 @@ function HomeView({ nav, casesList = [] }) {
         {[
           { val: "48h",          lab: "Tiempo de Respuesta"  },
           { val: "100%",         lab: "Transparencia de Costos" },
-          { val: CATALOG.length, lab: "Servicios Activos"    },
+          { val: tickerData.length, lab: "Servicios Activos"    },
           { val: "B2B",          lab: "Enfoque Principal"    }
         ].map((m, i) => (
           <div key={i} style={{ textAlign: "center" }}>
@@ -420,16 +463,11 @@ function HomeView({ nav, casesList = [] }) {
 
       {/* ── FILOSOFÍA — fondo oscuro ──────────────────────────── */}
       <section style={{
-        padding: "120px 8vw",
+        padding: "68px 8vw",
         background: INK,
         position: "relative", overflow: "hidden"
       }}>
-        <div style={{
-          position: "absolute", inset: 0,
-          backgroundImage: "url('/patron.svg')",
-          backgroundRepeat: "repeat", backgroundSize: "1200px",
-          opacity: 0.04, pointerEvents: "none", zIndex: 0
-        }} />
+        <PatternBg show={PATRON.filosofia} opacity={0.03} filter={null} maskStop={null} />
 
         <div style={{ position: "relative", zIndex: 1 }}>
           <SectionLabel>Filosofía</SectionLabel>
@@ -457,14 +495,14 @@ function HomeView({ nav, casesList = [] }) {
                 }}
               >
                 <div style={{
-                  fontSize: 72, fontWeight: 900,
+                  fontSize: 79, fontWeight: 900,
                   color: ACCENT, opacity: 0.75,
                   marginBottom: 16,
                   fontFamily: "'Barlow Condensed', sans-serif",
                   lineHeight: 1
                 }}>{p.num}</div>
                 <h3 style={{
-                  fontSize: 22, color: "#ffffff",
+                  fontSize: 32, color: "#ffffff",
                   marginBottom: 12, fontWeight: 800, textTransform: "uppercase"
                 }}>{p.title}</h3>
                 <p style={{ color: "rgba(255,255,255,0.58)", lineHeight: 1.7, fontSize: 15 }}>
@@ -781,17 +819,7 @@ function CatalogView({ nav }) {
           .giant-wave-pattern { animation: giantWave 4s ease-in-out infinite; }
         `}</style>
 
-        <div className="giant-wave-pattern" style={{
-          position: "absolute",
-          top: "-10%", left: "-10%",
-          width: "120%", height: "120%",
-          backgroundImage: "url('/patron.svg')",
-          backgroundRepeat: "repeat",
-          backgroundSize: "1200px",
-          backgroundPosition: "center",
-          filter: "invert(1)",
-          pointerEvents: "none", zIndex: 0
-        }} />
+        <PatternBg show={PATRON.catalogo_carga} animated filter="invert(1)" maskStop={null} />
 
         {/* Indicador de carga con el naranja de marca */}
         <div style={{ position: "relative", zIndex: 1, textAlign: "center" }}>
@@ -825,18 +853,7 @@ function CatalogView({ nav }) {
       background: BG,
       position: "relative", overflow: "hidden"
     }}>
-      {/* Patrón de fondo sutil */}
-      <div style={{
-        position: "absolute", top: 0, left: 0,
-        width: "120%", height: "120%",
-        backgroundImage: "url('/patron.svg')",
-        backgroundRepeat: "repeat", backgroundSize: "1200px",
-        backgroundPosition: "top center",
-        opacity: 0.025, filter: "invert(1)",
-        maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%)",
-        WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%)",
-        pointerEvents: "none", zIndex: 0
-      }} />
+      <PatternBg show={PATRON.catalogo} maskStop="60%" />
 
       <div style={{ position: "relative", zIndex: 1 }}>
 
@@ -885,239 +902,497 @@ function CatalogView({ nav }) {
 }
 
 function ValorView({ stats }) {
-  const PATRON_URL = '/patron.svg';
+
+  // ── KPI card con mini barras ──────────────────────────────────
+  function KPICard({ stat, highlight }) {
+    const maxVal  = Math.max(stat.freelance, stat.agencias, stat.riders);
+    const safeMax = maxVal === 0 ? 1 : maxVal;
+    const entries = [
+      { name: "Free",    val: stat.freelance, color: "#C8C0B4" },
+      { name: "Agencia", val: stat.agencias,  color: INK2      },
+      { name: "Riders",  val: stat.riders,    color: ACCENT    },
+    ];
+
+    return (
+      <div
+        style={{
+          background: SURFACE,
+          border: `1px solid ${highlight ? ACCENT : BORDER}`,
+          borderRadius: "12px", padding: "22px",
+          display: "flex", flexDirection: "column", gap: 14,
+          boxShadow: highlight ? `0 4px 20px ${ACCENT}20` : "none",
+          transition: "border-color 0.2s, box-shadow 0.2s"
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.borderColor = ACCENT;
+          e.currentTarget.style.boxShadow = `0 8px 28px ${ACCENT}20`;
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.borderColor = highlight ? ACCENT : BORDER;
+          e.currentTarget.style.boxShadow   = highlight ? `0 4px 20px ${ACCENT}20` : "none";
+        }}
+      >
+        <div style={{
+          fontSize: 9, fontWeight: 900, color: INK3,
+          textTransform: "uppercase", letterSpacing: "0.15em"
+        }}>{stat.label}</div>
+
+        <div style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontSize: 38, fontWeight: 900, color: ACCENT, lineHeight: 1
+        }}>
+          {stat.riders}
+          <span style={{ fontSize: 14, fontWeight: 600, color: INK3, marginLeft: 3 }}>
+            {stat.unidad}
+          </span>
+        </div>
+
+        {/* Mini barras comparativas — eliminan el espacio vacío */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+          {entries.map(entry => (
+            <div key={entry.name} style={{ display: "flex", alignItems: "center", gap: 7 }}>
+              <span style={{
+                fontSize: 8, fontWeight: 800,
+                color: entry.color === ACCENT ? ACCENT : INK3,
+                textTransform: "uppercase", letterSpacing: "0.04em",
+                width: 40, flexShrink: 0
+              }}>{entry.name}</span>
+              <div style={{ flex: 1, height: 5, background: BORDER, borderRadius: 3, overflow: "hidden" }}>
+                <div style={{
+                  height: "100%",
+                  width: `${(entry.val / safeMax) * 100}%`,
+                  background: entry.color,
+                  borderRadius: 3,
+                  boxShadow: entry.color === ACCENT ? `0 0 6px ${ACCENT}40` : "none"
+                }} />
+              </div>
+              <span style={{
+                fontSize: 10, fontWeight: 800,
+                color: entry.color === ACCENT ? ACCENT : INK3,
+                width: 30, textAlign: "right", flexShrink: 0
+              }}>{entry.val}{stat.unidad}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Ring gauge: anillos concéntricos ─────────────────────────
+  function RingGaugeCard({ stat }) {
+    const rings = [
+      { r: 50, val: stat.freelance, color: "#C8C0B4", label: "Freelance" },
+      { r: 37, val: stat.agencias,  color: INK2,      label: "Agencias"  },
+      { r: 24, val: stat.riders,    color: ACCENT,    label: "Riders"    },
+    ];
+
+    return (
+      <div
+        style={{
+          background: SURFACE, border: `1px solid ${BORDER}`,
+          borderRadius: "12px", padding: "36px 32px",
+          display: "flex", flexDirection: "column", alignItems: "center",
+          transition: "box-shadow 0.25s, transform 0.25s"
+        }}
+        onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 12px 40px rgba(0,0,0,0.09)`; e.currentTarget.style.transform = "translateY(-3px)"; }}
+        onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "translateY(0)"; }}
+      >
+        <h3 style={{
+          fontSize: 11, fontWeight: 900, color: INK,
+          textTransform: "uppercase", letterSpacing: "0.15em",
+          marginBottom: 32, textAlign: "center"
+        }}>{stat.label}</h3>
+
+        <svg width="180" height="180" viewBox="0 0 120 120">
+          {rings.map(ring => {
+            const circ = 2 * Math.PI * ring.r;
+            const fill = Math.min(ring.val, 100) / 100 * circ;
+            return (
+              <g key={ring.r}>
+                <circle cx="60" cy="60" r={ring.r} fill="none" stroke={BORDER} strokeWidth="7" />
+                <circle
+                  cx="60" cy="60" r={ring.r}
+                  fill="none" stroke={ring.color} strokeWidth="7"
+                  strokeDasharray={`${fill} ${circ}`}
+                  strokeLinecap="round"
+                  transform="rotate(-90 60 60)"
+                  style={{
+                    filter: ring.color === ACCENT ? `drop-shadow(0 0 4px ${ACCENT}80)` : "none",
+                    transition: "stroke-dasharray 1.2s cubic-bezier(0.4,0,0.2,1)"
+                  }}
+                />
+              </g>
+            );
+          })}
+          {/* NÚMEROS PEQUEÑOS en el centro */}
+          <text x="60" y="57" textAnchor="middle"
+            fontSize="13" fontWeight="900" fill={ACCENT}
+            fontFamily="'Barlow Condensed', sans-serif">
+            {stat.riders}{stat.unidad}
+          </text>
+          <text x="60" y="67" textAnchor="middle"
+            fontSize="5.5" fontWeight="800" fill={INK3}
+            fontFamily="system-ui, sans-serif">
+            RIDERS
+          </text>
+        </svg>
+
+        {/* Leyenda */}
+        <div style={{ display: "flex", gap: 28, marginTop: 28 }}>
+          {rings.map(ring => (
+            <div key={ring.label} style={{ textAlign: "center" }}>
+              <div style={{
+                width: 10, height: 10, borderRadius: "3px",
+                background: ring.color, margin: "0 auto 8px",
+                boxShadow: ring.color === ACCENT ? `0 0 6px ${ACCENT}60` : "none"
+              }} />
+              <div style={{
+                fontSize: 16, fontWeight: 900,
+                color: ring.color === ACCENT ? ACCENT : INK,
+                fontFamily: "'Barlow Condensed', sans-serif"
+              }}>{ring.val}{stat.unidad}</div>
+              <div style={{
+                fontSize: 9, fontWeight: 700, color: INK3,
+                textTransform: "uppercase", letterSpacing: "0.04em", marginTop: 2
+              }}>{ring.label}</div>
+            </div>
+          ))}
+        </div>
+
+        <p style={{
+          fontSize: 13, color: INK2, marginTop: 24,
+          textAlign: "center", lineHeight: 1.6,
+          paddingTop: 20, borderTop: `1px solid ${BORDER}`, width: "100%"
+        }}>{stat.description}</p>
+      </div>
+    );
+  }
+
+  // ── Race bars: barras horizontales ────────────────────────────
+  function RaceCard({ stat }) {
+    const maxVal  = Math.max(stat.freelance, stat.agencias, stat.riders);
+    const safeMax = maxVal === 0 ? 1 : maxVal;
+    const bars = [
+      { name: "Freelance", val: stat.freelance, color: "#C8C0B4", textColor: INK3  },
+      { name: "Agencias",  val: stat.agencias,  color: INK2,      textColor: INK2  },
+      { name: "Riders",    val: stat.riders,    color: ACCENT,    textColor: ACCENT },
+    ];
+
+    return (
+      <div
+        style={{
+          background: SURFACE, border: `1px solid ${BORDER}`,
+          borderRadius: "12px", padding: "32px",
+          display: "flex", flexDirection: "column", justifyContent: "space-between",
+          transition: "box-shadow 0.25s, transform 0.25s"
+        }}
+        onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 12px 40px rgba(0,0,0,0.09)`; e.currentTarget.style.transform = "translateY(-3px)"; }}
+        onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "translateY(0)"; }}
+      >
+        <div>
+          <h3 style={{
+            fontSize: 11, fontWeight: 900, color: INK,
+            textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 28
+          }}>{stat.label}</h3>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+            {bars.map(bar => (
+              <div key={bar.name}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, alignItems: "baseline" }}>
+                  <span style={{
+                    fontSize: 10, fontWeight: 800, color: bar.textColor,
+                    textTransform: "uppercase", letterSpacing: "0.06em"
+                  }}>{bar.name}</span>
+                  <span style={{ fontSize: 14, fontWeight: 900, color: bar.textColor }}>
+                    {bar.val}
+                    <span style={{ fontWeight: 600, fontSize: 10, marginLeft: 2 }}>{stat.unidad}</span>
+                  </span>
+                </div>
+                <div style={{ height: 8, background: BORDER, borderRadius: "4px", overflow: "hidden" }}>
+                  <div style={{
+                    height: "100%",
+                    width: `${(bar.val / safeMax) * 100}%`,
+                    background: bar.color,
+                    borderRadius: "4px",
+                    transition: "width 1.2s cubic-bezier(0.4,0,0.2,1)",
+                    boxShadow: bar.color === ACCENT ? `0 0 10px ${ACCENT}50` : "none"
+                  }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p style={{
+          fontSize: 13, color: INK2, marginTop: 24,
+          lineHeight: 1.6, paddingTop: 20,
+          borderTop: `1px solid ${BORDER}`
+        }}>{stat.description}</p>
+      </div>
+    );
+  }
+
+  // ── Bar chart: barras verticales ──────────────────────────────
+  function BarCard({ stat }) {
+    const maxVal  = Math.max(stat.freelance, stat.agencias, stat.riders);
+    const safeMax = maxVal === 0 ? 1 : maxVal;
+    const fH = Math.max((stat.freelance / safeMax) * 100, 4);
+    const aH = Math.max((stat.agencias  / safeMax) * 100, 4);
+    const rH = Math.max((stat.riders    / safeMax) * 100, 4);
+    const isMoney = maxVal > 1000;
+    const fmt = (n) => {
+      if (isMoney) return `$${(n / 1000).toFixed(0)}k`;
+      return `${n}${stat.unidad ? " " + stat.unidad : ""}`;
+    };
+    const bars = [
+      { name: "Freelance", h: fH, val: stat.freelance, color: "#C8C0B4", textColor: INK3  },
+      { name: "Agencias",  h: aH, val: stat.agencias,  color: INK2,      textColor: INK2  },
+      { name: "Riders",    h: rH, val: stat.riders,    color: ACCENT,    textColor: ACCENT },
+    ];
+
+    return (
+      <div
+        style={{
+          background: SURFACE, border: `1px solid ${BORDER}`,
+          borderRadius: "12px", padding: "32px",
+          display: "flex", flexDirection: "column", justifyContent: "space-between",
+          transition: "box-shadow 0.25s, transform 0.25s"
+        }}
+        onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 12px 40px rgba(0,0,0,0.09)`; e.currentTarget.style.transform = "translateY(-3px)"; }}
+        onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "translateY(0)"; }}
+      >
+        <div>
+          <h3 style={{
+            fontSize: 11, fontWeight: 900, color: INK,
+            textTransform: "uppercase", letterSpacing: "0.12em",
+            marginBottom: 28, textAlign: "center"
+          }}>{stat.label}</h3>
+
+          <div style={{ position: "relative" }}>
+            {[25, 50, 75].map(pct => (
+              <div key={pct} style={{
+                position: "absolute", left: 0, right: 0,
+                bottom: `${pct * 1.6}px`,
+                borderTop: `1px dashed ${BORDER}`,
+                zIndex: 0, pointerEvents: "none"
+              }} />
+            ))}
+            <div style={{
+              display: "flex", alignItems: "flex-end",
+              height: "160px", gap: "12px",
+              borderBottom: `2px solid ${BORDER}`,
+              position: "relative", zIndex: 1
+            }}>
+              {bars.map(bar => (
+                <div key={bar.name} style={{
+                  flex: 1, display: "flex", flexDirection: "column",
+                  alignItems: "center", height: "100%"
+                }}>
+                  <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
+                    <div style={{
+                      height: `${bar.h}%`, width: "100%",
+                      background: bar.color,
+                      borderRadius: "4px 4px 0 0",
+                      boxShadow: bar.color === ACCENT ? `0 -6px 18px ${ACCENT}30` : "none",
+                      transition: "height 1.1s cubic-bezier(0.4,0,0.2,1)"
+                    }} />
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 900, marginTop: 9, color: bar.textColor }}>
+                    {fmt(bar.val)}
+                  </span>
+                  <span style={{
+                    fontSize: 8, fontWeight: 700, marginTop: 3,
+                    color: bar.textColor, textTransform: "uppercase", letterSpacing: "0.04em"
+                  }}>{bar.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <p style={{
+          fontSize: 13, color: INK2, marginTop: 20,
+          lineHeight: 1.6, textAlign: "center",
+          paddingTop: 16, borderTop: `1px solid ${BORDER}`
+        }}>{stat.description}</p>
+      </div>
+    );
+  }
+
+  // ── Estado vacío / cargando ───────────────────────────────────
+  if (!stats || stats.length === 0) {
+    return (
+      <div style={{ padding: "120px 8vw", background: BG, minHeight: "100vh" }}>
+        <SectionLabel>Análisis de Mercado</SectionLabel>
+        <p style={{ fontWeight: 700, color: INK2, marginTop: 32 }}>Cargando análisis de mercado...</p>
+      </div>
+    );
+  }
+
+  const ringStats = stats.filter(s => s.tipo === "anillo");
+  const raceStats = stats.filter(s => s.tipo === "carrera");
+  const barStats  = stats.filter(s => !s.tipo || s.tipo === "barra");
 
   return (
     <div style={{
       padding: "120px 8vw",
       background: BG,
       minHeight: "100vh",
-      position: "relative",
-      overflow: "hidden"
+      position: "relative", overflow: "hidden"
     }}>
-      {/* Patrón de fondo */}
-      <div style={{
-        position: "absolute", top: 0, left: 0,
-        width: "100%", height: "100%",
-        backgroundImage: `url(${PATRON_URL})`,
-        backgroundRepeat: "repeat", backgroundSize: "1200px",
-        backgroundPosition: "top center",
-        opacity: 0.025, filter: "invert(1)",
-        maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%)",
-        WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%)",
-        pointerEvents: "none", zIndex: 0
-      }} />
+      <PatternBg show={PATRON.valor} />
 
-      <div style={{ position: "relative", zIndex: 1 }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 1400, margin: "0 auto" }}>
 
-        {/* Encabezado de sección */}
+        {/* ── ENCABEZADO + LEYENDA ── */}
         <SectionLabel>Análisis de Mercado</SectionLabel>
-        <h1 style={{
-          fontSize: "clamp(32px, 5vw, 52px)",
-          fontWeight: 900, marginBottom: 64,
-          fontFamily: "'Barlow Condensed', sans-serif",
-          textTransform: "uppercase",
-          color: INK, lineHeight: 1.05
-        }}>
-          ¿Por qué Riders es la{" "}
-          <span style={{ color: ACCENT }}>opción lógica?</span>
-        </h1>
-
-        {/* Leyenda global */}
         <div style={{
-          display: "flex", gap: 24, marginBottom: 40,
-          padding: "16px 24px",
-          background: SURFACE,
-          border: `1px solid ${BORDER}`,
-          borderRadius: "8px",
-          width: "fit-content"
+          display: "flex", alignItems: "flex-end",
+          justifyContent: "space-between",
+          flexWrap: "wrap", gap: 24, marginBottom: 48
         }}>
-          {[
-            { color: BORDER,  label: "Freelance" },
-            { color: INK2,    label: "Agencias"  },
-            { color: ACCENT,  label: "Riders"    }
-          ].map(item => (
-            <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{
-                width: 12, height: 12, borderRadius: "3px",
-                background: item.color,
-                boxShadow: item.color === ACCENT ? `0 0 8px ${ACCENT}60` : "none"
-              }} />
-              <span style={{
-                fontSize: 11, fontWeight: 800,
-                color: item.color === ACCENT ? ACCENT : INK2,
-                textTransform: "uppercase", letterSpacing: "0.08em"
-              }}>{item.label}</span>
-            </div>
+          <h1 style={{
+            fontSize: "clamp(32px, 5vw, 52px)",
+            fontWeight: 900, margin: 0,
+            fontFamily: "'Barlow Condensed', sans-serif",
+            textTransform: "uppercase",
+            color: INK, lineHeight: 1.05
+          }}>
+            ¿Por qué Riders es la{" "}
+            <span style={{ color: ACCENT }}>opción lógica?</span>
+          </h1>
+
+          <div style={{
+            display: "flex", gap: 18,
+            padding: "12px 20px",
+            background: SURFACE, border: `1px solid ${BORDER}`,
+            borderRadius: "8px", flexShrink: 0
+          }}>
+            {[
+              { color: "#C8C0B4", label: "Freelance" },
+              { color: INK2,      label: "Agencias"  },
+              { color: ACCENT,    label: "Riders"    },
+            ].map(item => (
+              <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <div style={{
+                  width: 10, height: 10, borderRadius: "3px",
+                  background: item.color,
+                  boxShadow: item.color === ACCENT ? `0 0 7px ${ACCENT}60` : "none"
+                }} />
+                <span style={{
+                  fontSize: 10, fontWeight: 800,
+                  color: item.color === ACCENT ? ACCENT : INK2,
+                  textTransform: "uppercase", letterSpacing: "0.08em"
+                }}>{item.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── KPI STRIP con mini barras ── */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+          gap: 16, marginBottom: 52
+        }}>
+          {/* Hero oscuro */}
+          <div style={{
+            background: BG2, borderRadius: "12px",
+            padding: "26px 22px",
+            position: "relative", overflow: "hidden"
+          }}>
+            <div style={{
+              position: "absolute", top: -40, right: -40,
+              width: 130, height: 130, borderRadius: "50%",
+              background: `${ACCENT}15`, pointerEvents: "none"
+            }} />
+            <div style={{
+              fontSize: 9, fontWeight: 900,
+              color: "rgba(255,255,255,0.3)",
+              textTransform: "uppercase", letterSpacing: "0.2em", marginBottom: 14
+            }}>Riders Media</div>
+            <div style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontSize: 40, fontWeight: 900,
+              color: ACCENT, lineHeight: 1
+            }}>La mejor<br />opción.</div>
+            <div style={{
+              fontSize: 11, color: "rgba(255,255,255,0.35)",
+              marginTop: 14, lineHeight: 1.5
+            }}>Datos verificados.<br />Sin letra chica.</div>
+          </div>
+
+          {stats.slice(0, 4).map((stat, i) => (
+            <KPICard key={i} stat={stat} highlight={i === 0} />
           ))}
         </div>
 
-        {/* Grid de gráficas */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "28px"
-        }}>
-          {stats && stats.length > 0 ? stats.map((stat, i) => {
-            const maxVal  = Math.max(stat.freelance, stat.agencias, stat.riders);
-            const safeMax = maxVal === 0 ? 1 : maxVal;
-            const fHeight = Math.max((stat.freelance / safeMax) * 100, 4);
-            const aHeight = Math.max((stat.agencias  / safeMax) * 100, 4);
-            const rHeight = Math.max((stat.riders    / safeMax) * 100, 4);
-            const isMoney = maxVal > 100;
-            const fmt = (n) => isMoney ? `$${n.toLocaleString()}` : `${n}%`;
+        {/* ── ANILLOS ── */}
+        {ringStats.length > 0 && (
+          <div style={{ marginBottom: 44 }}>
+            <div style={{
+              display: "flex", alignItems: "center", gap: 14, marginBottom: 24
+            }}>
+              <span style={{
+                fontSize: 10, fontWeight: 900, color: INK3,
+                textTransform: "uppercase", letterSpacing: "0.15em", whiteSpace: "nowrap"
+              }}>Métricas de satisfacción</span>
+              <span style={{ flex: 1, height: 1, background: BORDER }} />
+            </div>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: 24
+            }}>
+              {ringStats.map((stat, i) => <RingGaugeCard key={i} stat={stat} />)}
+            </div>
+          </div>
+        )}
 
-            return (
-              <div key={i}
-                style={{
-                  background: SURFACE,
-                  padding: "32px",
-                  borderRadius: "12px",
-                  border: `1px solid ${BORDER}`,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  transition: "box-shadow 0.25s, transform 0.25s"
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.boxShadow = `0 12px 40px rgba(0,0,0,0.09)`;
-                  e.currentTarget.style.transform  = "translateY(-3px)";
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.boxShadow = "none";
-                  e.currentTarget.style.transform  = "translateY(0)";
-                }}
-              >
-                {/* Título */}
-                <h3 style={{
-                  fontSize: "12px", fontWeight: 900,
-                  marginBottom: "32px",
-                  textAlign: "center",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.12em",
-                  color: INK
-                }}>{stat.label}</h3>
+        {/* ── BARRAS VERTICALES ── */}
+        {barStats.length > 0 && (
+          <div style={{ marginBottom: 44 }}>
+            <div style={{
+              display: "flex", alignItems: "center", gap: 14, marginBottom: 24
+            }}>
+              <span style={{
+                fontSize: 10, fontWeight: 900, color: INK3,
+                textTransform: "uppercase", letterSpacing: "0.15em", whiteSpace: "nowrap"
+              }}>Comparativa de valores</span>
+              <span style={{ flex: 1, height: 1, background: BORDER }} />
+            </div>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: 24
+            }}>
+              {barStats.map((stat, i) => <BarCard key={i} stat={stat} />)}
+            </div>
+          </div>
+        )}
 
-                {/* Área de gráfica */}
-                <div style={{ position: "relative" }}>
+        {/* ── CARRERA / RACE BARS ── */}
+        {raceStats.length > 0 && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{
+              display: "flex", alignItems: "center", gap: 14, marginBottom: 24
+            }}>
+              <span style={{
+                fontSize: 10, fontWeight: 900, color: INK3,
+                textTransform: "uppercase", letterSpacing: "0.15em", whiteSpace: "nowrap"
+              }}>Índices de calidad</span>
+              <span style={{ flex: 1, height: 1, background: BORDER }} />
+            </div>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: 24
+            }}>
+              {raceStats.map((stat, i) => <RaceCard key={i} stat={stat} />)}
+            </div>
+          </div>
+        )}
 
-                  {/* Líneas de cuadrícula horizontales */}
-                  {[25, 50, 75].map(pct => (
-                    <div key={pct} style={{
-                      position: "absolute",
-                      left: 0, right: 0,
-                      bottom: `${pct * 2}px`,
-                      borderTop: `1px dashed ${BORDER}`,
-                      zIndex: 0, pointerEvents: "none"
-                    }} />
-                  ))}
-
-                  {/* Barras */}
-                  <div style={{
-                    display: "flex",
-                    alignItems: "flex-end",
-                    height: "200px",
-                    gap: "10px",
-                    borderBottom: `2px solid ${BORDER}`,
-                    position: "relative",
-                    zIndex: 1
-                  }}>
-
-                    {/* Freelance */}
-                    <div style={{
-                      flex: 1, display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center", height: "100%"
-                    }}>
-                      <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
-                        <div style={{
-                          height: `${fHeight}%`, width: "100%",
-                          background: BORDER,
-                          borderRadius: "4px 4px 0 0",
-                          transition: "height 1s cubic-bezier(0.4, 0, 0.2, 1)"
-                        }} />
-                      </div>
-                      <span style={{
-                        fontSize: "11px", fontWeight: 800,
-                        marginTop: "10px", color: INK
-                      }}>{fmt(stat.freelance)}</span>
-                      <span style={{
-                        fontSize: "9px", fontWeight: 700,
-                        marginTop: "4px", color: INK3,
-                        letterSpacing: "0.05em", textTransform: "uppercase"
-                      }}>Freelance</span>
-                    </div>
-
-                    {/* Agencias */}
-                    <div style={{
-                      flex: 1, display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center", height: "100%"
-                    }}>
-                      <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
-                        <div style={{
-                          height: `${aHeight}%`, width: "100%",
-                          background: INK2,
-                          borderRadius: "4px 4px 0 0",
-                          transition: "height 1s cubic-bezier(0.4, 0, 0.2, 1)"
-                        }} />
-                      </div>
-                      <span style={{
-                        fontSize: "11px", fontWeight: 800,
-                        marginTop: "10px", color: INK
-                      }}>{fmt(stat.agencias)}</span>
-                      <span style={{
-                        fontSize: "9px", fontWeight: 700,
-                        marginTop: "4px", color: INK3,
-                        letterSpacing: "0.05em", textTransform: "uppercase"
-                      }}>Agencias</span>
-                    </div>
-
-                    {/* Riders — destacado en naranja */}
-                    <div style={{
-                      flex: 1, display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center", height: "100%"
-                    }}>
-                      <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
-                        <div style={{
-                          height: `${rHeight}%`, width: "100%",
-                          background: ACCENT,
-                          borderRadius: "4px 4px 0 0",
-                          boxShadow: `0 -8px 24px ${ACCENT}55`,
-                          transition: "height 1s cubic-bezier(0.4, 0, 0.2, 1)"
-                        }} />
-                      </div>
-                      <span style={{
-                        fontSize: "14px", fontWeight: 900,
-                        marginTop: "10px", color: ACCENT
-                      }}>{fmt(stat.riders)}</span>
-                      <span style={{
-                        fontSize: "9px", fontWeight: 900,
-                        marginTop: "4px", color: ACCENT,
-                        letterSpacing: "0.05em", textTransform: "uppercase"
-                      }}>Riders</span>
-                    </div>
-
-                  </div>
-                </div>
-
-                {/* Descripción de la métrica */}
-                <p style={{
-                  fontSize: "13px", color: INK2,
-                  marginTop: "24px", lineHeight: "1.65",
-                  textAlign: "center",
-                  paddingTop: "20px",
-                  borderTop: `1px solid ${BORDER}`
-                }}>{stat.description}</p>
-              </div>
-            );
-          }) : (
-            <p style={{ fontWeight: 700, color: INK2 }}>
-              Cargando análisis de mercado...
-            </p>
-          )}
-        </div>
       </div>
     </div>
   );
@@ -1130,22 +1405,7 @@ function CasesView({ casesData }) {
   return (
     <div style={{ padding: "120px 8vw", background: BG, position: "relative", overflow: "hidden", minHeight: "100vh" }}>
       
-      {/* Patrón de fondo sutil */}
-      <div style={{
-        position: "absolute",
-        top: 0, left: 0,
-        width: "100%", height: "100%",
-        backgroundImage: "url('/patron.svg')",
-        backgroundRepeat: "repeat",
-        backgroundSize: "1200px", 
-        backgroundPosition: "top center",
-        opacity: 0.02, 
-        filter: "invert(1)", 
-        maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%)",
-        WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%)",
-        pointerEvents: "none", 
-        zIndex: 0,
-      }} />
+      <PatternBg show={PATRON.casos} opacity={0.02} maskStop="80%" />
 
       <div style={{ position: "relative", zIndex: 1, maxWidth: "1600px", margin: "0 auto" }}>
         
@@ -1205,61 +1465,62 @@ function CasesView({ casesData }) {
                 }}>
                 
                 {/* Fondo Hover */}
-                <div style={{ 
-                  position: "absolute", 
-                  inset: 0, 
-                  background: SURFACE, 
-                  zIndex: 0, 
-                  opacity: hovered === i ? 1 : 0, 
-                  transition: "opacity 0.2s ease", 
+                <div style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: SURFACE,
+                  zIndex: 0,
+                  opacity: hovered === i ? 1 : 0,
+                  transition: "opacity 0.2s ease",
                   borderRadius: "8px",
-                  boxShadow: hovered === i ? `0 10px 30px rgba(0,0,0,0.15)` : "none"
+                  boxShadow: hovered === i ? `0 10px 48px ${c.color}40, 0 0 0 1.5px ${c.color}60` : "none"
                 }} />
-                
+
                 {/* Categoría y Cliente */}
                 <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: 12, flex: "1 1 200px" }}>
-                  <div style={{ 
-                    fontSize: 11, 
-                    fontWeight: 800, 
-                    letterSpacing: "0.2em", 
-                    textTransform: "uppercase", 
-                    color: hovered === i ? ACCENT : INK3, 
-                    transition: "color 0.3s ease" 
+                  <div style={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: "0.2em",
+                    textTransform: "uppercase",
+                    color: hovered === i ? c.color : INK3,
+                    transition: "color 0.3s ease"
                   }}>
                     {c.cat}
                   </div>
-                  <div style={{ 
-                    fontSize: "clamp(24px, 3vw, 36px)", 
-                    fontWeight: 800, 
-                    color: INK, 
+                  <div style={{
+                    fontSize: "clamp(24px, 3vw, 36px)",
+                    fontWeight: 800,
+                    color: INK,
                     letterSpacing: "-0.01em",
                     lineHeight: 1.1
                   }}>
                     {c.client}
                   </div>
                 </div>
-                
+
                 {/* Resultado y Flecha */}
                 <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 32, flex: "1 1 auto", justifyContent: "flex-end" }}>
-                  <div style={{ 
-                    fontFamily: "'Barlow Condensed', sans-serif", 
-                    fontSize: "clamp(40px, 6vw, 64px)", 
-                    fontWeight: 900, 
-                    color: hovered === i ? ACCENT : INK2, 
-                    lineHeight: 1, 
-                    letterSpacing: "-0.02em", 
-                    transition: "color 0.3s ease, transform 0.3s ease",
+                  <div style={{
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontSize: "clamp(40px, 6vw, 64px)",
+                    fontWeight: 900,
+                    color: hovered === i ? c.color : INK2,
+                    lineHeight: 1,
+                    letterSpacing: "-0.02em",
+                    transition: "color 0.3s ease, transform 0.3s ease, text-shadow 0.3s ease",
                     transform: hovered === i ? "scale(1.05)" : "scale(1)",
-                    transformOrigin: "right center"
+                    transformOrigin: "right center",
+                    textShadow: hovered === i ? `0 0 32px ${c.color}60` : "none"
                   }}>
                     {c.result}
                   </div>
-                  <div style={{ 
-                    fontSize: 28, 
-                    color: hovered === i ? ACCENT : BORDER, 
-                    fontWeight: 300, 
-                    transform: hovered === i ? "translateX(8px)" : "translateX(0)", 
-                    transition: "all 0.3s ease" 
+                  <div style={{
+                    fontSize: 28,
+                    color: hovered === i ? c.color : BORDER,
+                    fontWeight: 300,
+                    transform: hovered === i ? "translateX(8px)" : "translateX(0)",
+                    transition: "all 0.3s ease"
                   }}>
                     →
                   </div>
@@ -1278,22 +1539,7 @@ function AboutView() {
   return (
     <div style={{ padding: "120px 8vw", background: BG, position: "relative", overflow: "hidden", minHeight: "100vh" }}>
       
-      {/* Patrón de fondo */}
-      <div style={{
-        position: "absolute",
-        top: 0, left: 0,
-        width: "100%", height: "100%",
-        backgroundImage: "url('/patron.svg')",
-        backgroundRepeat: "repeat",
-        backgroundSize: "1200px", 
-        backgroundPosition: "top center",
-        opacity: 0.02, 
-        filter: "invert(1)", 
-        maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%)",
-        WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%)",
-        pointerEvents: "none", 
-        zIndex: 0,
-      }} />
+      <PatternBg show={PATRON.agencia} opacity={0.02} maskStop="80%" />
 
       <div style={{ position: "relative", zIndex: 1, maxWidth: "1600px", margin: "0 auto" }}>
         
@@ -1391,19 +1637,14 @@ function ContactView({ isMobile }) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  
-  // Estado para guardar la lista dinámica desde Excel
   const [servicesList, setServicesList] = useState([]);
 
-  // useEffect para leer el Google Sheet de catálogo
   useEffect(() => {
-    // Si no detecta PapaParse o el URL, usa CATALOG de data.js como respaldo de seguridad
     if (!window.Papa || !CATALOGO_CSV_URL) {
       setServicesList(CATALOG);
       if (CATALOG.length > 0) setForm(prev => ({ ...prev, service: CATALOG[0].id }));
       return;
     }
-
     fetch(`${CATALOGO_CSV_URL}&t=${Date.now()}`)
       .then(res => res.text())
       .then(csvText => {
@@ -1413,8 +1654,7 @@ function ContactView({ isMobile }) {
           return;
         }
         window.Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true,
+          header: true, skipEmptyLines: true,
           transformHeader: h => h.trim(),
           complete: (results) => {
             const fetchedData = results.data
@@ -1424,10 +1664,8 @@ function ContactView({ isMobile }) {
                 name: row["Servicio"]?.trim() || "",
                 price: row["Inversión (Desde)"] ? row["Inversión (Desde)"].toString().trim() : "",
               }));
-
             if (fetchedData.length > 0) {
               setServicesList(fetchedData);
-              // Auto-seleccionamos el primer servicio de la lista de Excel
               setForm(prev => ({ ...prev, service: fetchedData[0].id }));
             } else {
               setServicesList(CATALOG);
@@ -1436,141 +1674,363 @@ function ContactView({ isMobile }) {
           }
         });
       })
-      .catch(err => {
-        console.error("Error cargando Excel para el formulario:", err);
-        setServicesList(CATALOG); // Si hay fallo de red, muestra los estáticos
+      .catch(() => {
+        setServicesList(CATALOG);
         if (CATALOG.length > 0) setForm(prev => ({ ...prev, service: CATALOG[0].id }));
       });
   }, []);
 
   const handle = (e) => {
-    e.preventDefault(); 
-    setLoading(true); 
+    e.preventDefault();
+    setLoading(true);
     setError(false);
-    
-    // Buscamos el servicio seleccionado en nuestra lista dinámica del Excel
     const selectedService = servicesList.find(s => s.id === form.service);
-    
-    // Formateamos el nombre con el precio para WhatsApp y Correo
-    const serviceName = selectedService 
-      ? `${selectedService.name} (${selectedService.price.includes('$') ? selectedService.price : '$' + selectedService.price} MXN)` 
+    const serviceName = selectedService
+      ? `${selectedService.name} (${selectedService.price.includes('$') ? selectedService.price : '$' + selectedService.price} MXN)`
       : form.service;
-    
-    const templateParams = { 
-      name: form.name, 
-      email: form.email, 
-      service_requested: serviceName, 
-      message: form.message, 
-      phone: form.phone 
+    const templateParams = {
+      name: form.name, email: form.email,
+      service_requested: serviceName,
+      message: form.message, phone: form.phone
     };
-
     emailjs.send("service_ko9wm6r", "template_p02dor7", templateParams, "1b2HC5hu9s5FV_mHd")
-    .then(() => { 
-      setLoading(false); 
-      setSent(true); 
-      // Al reiniciar, volvemos a apuntar al primer elemento del Excel
-      setForm({ name: "", email: "", phone: "", service: servicesList.length > 0 ? servicesList[0].id : "", message: "" }); 
-      setTimeout(() => setSent(false), 6000); 
-    }, () => { 
-      setLoading(false); 
-      setError(true); 
-    });
+      .then(() => {
+        setLoading(false); setSent(true);
+        setForm({ name: "", email: "", phone: "", service: servicesList.length > 0 ? servicesList[0].id : "", message: "" });
+        setTimeout(() => setSent(false), 6000);
+      }, () => { setLoading(false); setError(true); });
 
     const waNumber = "522202256586";
     const waMessage = `¡Hola! Me interesa solicitar una cotización.\n\n*Mis datos:*\n 👋🏼 Nombre: ${form.name}\n 📬 Email: ${form.email}\n 🤳🏼 Teléfono: ${form.phone}\n 📦 Servicio: ${serviceName}\n\n*Mi mensaje:*\n${form.message}`;
-    const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`;
-    
-    window.open(waUrl, "_blank");
+    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`, "_blank");
   };
 
-  const inputStyle = { width: "100%", background: BG, border: `1px solid ${BORDER}`, padding: "16px", borderRadius: "4px", color: INK, fontSize: 15, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s", fontFamily: "inherit" };
-  const labelStyle = { fontSize: 12, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: INK2, display: "block", marginBottom: 8 };
+  // ── Inputs con borde visible sobre fondo claro ───────────────
+  const inputStyle = {
+    width: "100%",
+    background: BG,
+    border: `1.5px solid ${BORDER}`,
+    padding: "14px 18px",
+    borderRadius: "8px",
+    color: INK,
+    fontSize: 15,
+    outline: "none",
+    boxSizing: "border-box",
+    transition: "border-color 0.2s, box-shadow 0.2s",
+    fontFamily: "inherit"
+  };
+  const onFocusInput = e => {
+    e.currentTarget.style.borderColor = ACCENT;
+    e.currentTarget.style.boxShadow  = `0 0 0 3px ${ACCENT}20`;
+  };
+  const onBlurInput = e => {
+    e.currentTarget.style.borderColor = BORDER;
+    e.currentTarget.style.boxShadow   = "none";
+  };
+  const labelStyle = {
+    fontSize: 11, fontWeight: 900,
+    letterSpacing: "0.15em", textTransform: "uppercase",
+    color: INK2, display: "block", marginBottom: 9
+  };
 
   return (
-    <div style={{ padding: "120px 8vw", background: BG }}>
-      <div style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1.5fr", gap: 0, border: `1px solid ${BORDER}`, borderRadius: "8px", overflow: "hidden" }}>
-        <div style={{ background: BG2, padding: "60px 40px", display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative", overflow: "hidden" }}>
-          
+    <div style={{ padding: "120px 8vw", background: BG, position: "relative", overflow: "hidden" }}>
+
+      <PatternBg show={PATRON.contacto} opacity={0.02} maskStop="80%" />
+
+      <style>{`
+        @keyframes pulseContactDot {
+          0%,100% { opacity:1; transform:scale(1); }
+          50% { opacity:0.5; transform:scale(0.8); }
+        }
+        .contact-dot { animation: pulseContactDot 2s ease-in-out infinite; }
+      `}</style>
+
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 1100, margin: "0 auto" }}>
+
+        {/* Encabezado */}
+        <SectionLabel>Contacto</SectionLabel>
+        <h1 style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontSize: "clamp(48px, 6vw, 80px)",
+          fontWeight: 900, textTransform: "uppercase",
+          color: INK, lineHeight: 0.95,
+          marginBottom: 56, letterSpacing: "-0.02em"
+        }}>
+          Hablemos <span style={{ color: ACCENT }}>Hoy.</span>
+        </h1>
+
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : "1fr 1.7fr",
+          gap: "24px", alignItems: "start"
+        }}>
+
+          {/* ── Panel izquierdo — oscuro ─────────────────────── */}
           <div style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage: "url('/patron.svg')",
-            backgroundRepeat: "repeat",
-            backgroundSize: "300px",
-            opacity: 0.04, 
-            filter: "invert(1)", 
-            pointerEvents: "none",
-            zIndex: 0
-          }} />
+            background: INK2,
+            padding: "44px 36px",
+            borderRadius: "12px",
+            display: "flex", flexDirection: "column",
+            justifyContent: "space-between",
+            position: "relative", overflow: "hidden",
+            minHeight: isMobile ? "auto" : "580px"
+          }}>
+            {/* Círculo decorativo */}
+            <div style={{
+              position: "absolute", bottom: -70, right: -70,
+              width: 220, height: 220, borderRadius: "50%",
+              background: `${ACCENT}12`, pointerEvents: "none"
+            }} />
+            <div style={{
+              position: "absolute", top: -40, left: -40,
+              width: 120, height: 120, borderRadius: "50%",
+              background: `${ACCENT}08`, pointerEvents: "none"
+            }} />
 
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <h1 style={{ fontSize: "clamp(36px, 4vw, 48px)", fontWeight: 900, color: INK, marginBottom: 40, fontFamily: "'Barlow Condensed', sans-serif", textTransform: "uppercase", lineHeight: 1 }}>Hablemos<br /><span style={{ color: ACCENT }}>Hoy.</span></h1>
-            <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-              {[
-                { label: "Email", val: "contacto@riders.media" }, 
-                { label: "WhatsApp", color: "#25D366", valColor: INK, val: "+52 220 225 6586", href: "https://wa.me/522202256586?text=Quiero%20cotizar%20con%20ustedes%21" }, 
-                { label: "Ciudad", val: "Puebla, MX" }
-              ].map(c => (
-                <div key={c.label}>
-                  <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: c.color || ACCENT, marginBottom: 6 }}>
-                    {c.label}
+            <div style={{ position: "relative", zIndex: 1 }}>
+
+              {/* Logo */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 36 }}>
+                <LogoIcon size={26} />
+                <span style={{ fontWeight: 900, fontSize: 15, color: "#ffffff", letterSpacing: "0.05em" }}>
+                  IDERS MEDIA
+                </span>
+              </div>
+
+              {/* Badge de disponibilidad */}
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                padding: "8px 14px", borderRadius: "20px", marginBottom: 28
+              }}>
+                <div className="contact-dot" style={{
+                  width: 7, height: 7, borderRadius: "50%", background: ACCENT
+                }} />
+                <span style={{
+                  fontSize: 10, fontWeight: 800,
+                  color: "rgba(255,255,255,0.65)",
+                  letterSpacing: "0.1em", textTransform: "uppercase"
+                }}>Respuesta en menos de 24h</span>
+              </div>
+
+              <p style={{
+                color: "rgba(255,255,255,0.5)", fontSize: 15,
+                lineHeight: 1.75, marginBottom: 44
+              }}>
+                Sin filtros, sin juntas innecesarias.<br />
+                Directo al punto y a la estrategia de tu negocio.
+              </p>
+
+              {/* Datos de contacto */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+                {[
+                  { label: "Email",     val: "contacto@riders.media",  href: "mailto:contacto@riders.media" },
+                  { label: "WhatsApp",  val: "+52 220 225 6586",        href: "https://wa.me/522202256586?text=Quiero%20cotizar%20con%20ustedes%21" },
+                  { label: "Ciudad",    val: "Puebla, MX" }
+                ].map(c => (
+                  <div key={c.label}>
+                    <div style={{
+                      fontSize: 10, fontWeight: 900,
+                      letterSpacing: "0.2em", textTransform: "uppercase",
+                      color: ACCENT, marginBottom: 6
+                    }}>{c.label}</div>
+                    <div style={{ fontSize: 15, color: "#ffffff", fontWeight: 600 }}>
+                      {c.href
+                        ? <a href={c.href} target="_blank" rel="noopener noreferrer"
+                            style={{ color: "inherit", textDecoration: "none", transition: "color 0.2s" }}
+                            onMouseEnter={e => e.currentTarget.style.color = ACCENT}
+                            onMouseLeave={e => e.currentTarget.style.color = "#ffffff"}
+                          >{c.val}</a>
+                        : c.val}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 16, color: c.valColor || INK, fontWeight: 600 }}>
-                    {c.href ? <a href={c.href} target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>{c.val}</a> : c.val}
-                  </div>
-                </div>
-               ))}
+                ))}
+              </div>
+            </div>
+
+            {/* Social links */}
+            <div style={{
+              position: "relative", zIndex: 1,
+              marginTop: 44, paddingTop: 28,
+              borderTop: "1px solid rgba(255,255,255,0.08)"
+            }}>
+              <div style={{
+                fontSize: 9, fontWeight: 800,
+                color: "rgba(255,255,255,0.28)",
+                textTransform: "uppercase", letterSpacing: "0.15em",
+                marginBottom: 14
+              }}>Síguenos</div>
+              <div style={{ display: "flex", gap: 10 }}>
+                {[
+                  { name: "IG", color: "#E4405F", url: "https://www.instagram.com/riders_media.mk/" },
+                  { name: "FB", color: "#1877F2", url: "https://www.facebook.com/profile.php?id=61579283677547" },
+                  { name: "WA", color: "#25D366", url: "https://wa.me/522202256586?text=Quiero%20cotizar%20con%20ustedes%21" },
+                  { name: "TL", color: "#0088cc", url: "https://t.me/Ridersmedia?text=Quiero%20cotizar%20con%20ustedes%21" },
+                ].map(link => (
+                  <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer"
+                    style={{
+                      width: 40, height: 40, borderRadius: "8px",
+                      background: "rgba(255,255,255,0.06)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      color: "rgba(255,255,255,0.5)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      textDecoration: "none", fontSize: 11, fontWeight: 900,
+                      transition: "all 0.2s"
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background   = link.color;
+                      e.currentTarget.style.borderColor  = link.color;
+                      e.currentTarget.style.color        = "#ffffff";
+                      e.currentTarget.style.transform    = "translateY(-2px)";
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background   = "rgba(255,255,255,0.06)";
+                      e.currentTarget.style.borderColor  = "rgba(255,255,255,0.08)";
+                      e.currentTarget.style.color        = "rgba(255,255,255,0.5)";
+                      e.currentTarget.style.transform    = "translateY(0)";
+                    }}
+                  >{link.name}</a>
+                ))}
+              </div>
             </div>
           </div>
-          
-          <div style={{ marginTop: 60, padding: 24, background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: "4px", position: "relative", zIndex: 1 }}>
-            <p style={{ fontSize: 13, color: INK2, lineHeight: 1.6, fontStyle: "italic", margin: 0 }}>Respondemos en menos de 24 horas. Sin filtros, directo a la estrategia.</p>
-          </div>
+
+          {/* ── Formulario ──────────────────────────────────── */}
+          <form onSubmit={handle} style={{
+            background: SURFACE,
+            padding: isMobile ? "36px 24px" : "48px 44px",
+            borderRadius: "12px",
+            border: `1px solid ${BORDER}`,
+            display: "flex", flexDirection: "column", gap: 22,
+          }}>
+
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 20 }}>
+              <div>
+                <label style={labelStyle}>Nombre</label>
+                <input required style={inputStyle} value={form.name}
+                  onChange={e => setForm({ ...form, name: e.target.value })}
+                  placeholder="Shaiel Saucedo"
+                  onFocus={onFocusInput} onBlur={onBlurInput} />
+              </div>
+              <div>
+                <label style={labelStyle}>Email</label>
+                <input required type="email" style={inputStyle} value={form.email}
+                  onChange={e => setForm({ ...form, email: e.target.value })}
+                  placeholder="Micorreo@Gmail.com"
+                  onFocus={onFocusInput} onBlur={onBlurInput} />
+              </div>
+            </div>
+
+            <div>
+              <label style={labelStyle}>Teléfono</label>
+              <input required type="tel" style={inputStyle} value={form.phone}
+                onChange={e => setForm({ ...form, phone: e.target.value })}
+                placeholder="+52 1 234 567 8910"
+                onFocus={onFocusInput} onBlur={onBlurInput} />
+            </div>
+
+            <div>
+              <label style={labelStyle}>Servicio de interés</label>
+              <select
+                style={{
+                  ...inputStyle, cursor: "pointer",
+                  appearance: "none", WebkitAppearance: "none",
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%236B7C93' d='M5 7L0 2h10z'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 18px center",
+                  paddingRight: "44px"
+                }}
+                value={form.service}
+                onChange={e => setForm({ ...form, service: e.target.value })}
+                onFocus={onFocusInput} onBlur={onBlurInput}
+              >
+                {servicesList.map(s => {
+                  const formattedPrice = s.price.toString().includes('$') ? s.price : `$${s.price}`;
+                  return (
+                    <option key={s.id} value={s.id} style={{ background: BG, color: INK }}>
+                      {s.name} — {formattedPrice} MXN
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            <div>
+              <label style={labelStyle}>Mensaje</label>
+              <textarea required rows={4}
+                style={{ ...inputStyle, resize: "vertical" }}
+                value={form.message}
+                onChange={e => setForm({ ...form, message: e.target.value })}
+                placeholder="Cuéntame sobre tu proyecto, ¿qué necesitas?"
+                onFocus={onFocusInput} onBlur={onBlurInput}
+              />
+            </div>
+
+            {/* Nota informativa — nuevo */}
+            <div style={{
+              display: "flex", gap: 12, alignItems: "flex-start",
+              background: MUTED_RED,
+              border: `1px solid ${ACCENT}25`,
+              padding: "14px 16px", borderRadius: "8px"
+            }}>
+              <span style={{ fontSize: 16, flexShrink: 0 }}>💬</span>
+              <p style={{ color: INK2, fontSize: 12, lineHeight: 1.65, margin: 0 }}>
+                Al enviar se abrirá un chat de WhatsApp con tu información prellenada para continuar la conversación directamente con el equipo.
+              </p>
+            </div>
+
+            <button type="submit" disabled={loading}
+              style={{
+                background: loading ? INK3 : ACCENT,
+                color: loading ? "#fff" : INK,
+                border: "none", padding: "18px",
+                borderRadius: "8px", fontWeight: 900,
+                cursor: loading ? "wait" : "pointer",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em", fontSize: 14,
+                boxShadow: loading ? "none" : `0 8px 24px ${ACCENT}40`,
+                transition: "all 0.25s"
+              }}
+              onMouseEnter={e => {
+                if (!loading) {
+                  e.currentTarget.style.transform  = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow  = `0 12px 32px ${ACCENT}60`;
+                }
+              }}
+              onMouseLeave={e => {
+                if (!loading) {
+                  e.currentTarget.style.transform  = "translateY(0)";
+                  e.currentTarget.style.boxShadow  = `0 8px 24px ${ACCENT}40`;
+                }
+              }}
+            >
+              {loading ? "Procesando..." : "Enviar y Chatear por WhatsApp →"}
+            </button>
+
+            {sent && (
+              <div style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                color: SUCCESS, fontWeight: 800, textAlign: "center",
+                padding: "12px", background: `${SUCCESS}12`,
+                border: `1px solid ${SUCCESS}30`, borderRadius: "8px"
+              }}>
+                ✓ Solicitud enviada correctamente.
+              </div>
+            )}
+            {error && (
+              <div style={{
+                color: "#ff4d4f", fontWeight: 800, textAlign: "center",
+                padding: "12px", background: "#ff4d4f12",
+                border: "1px solid #ff4d4f30", borderRadius: "8px"
+              }}>
+                ❌ Hubo un error al enviar el correo, pero el chat debería abrirse.
+              </div>
+            )}
+          </form>
+
         </div>
-
-        <form onSubmit={handle} style={{ padding: "60px 40px", display: "flex", flexDirection: "column", gap: 24, background: SURFACE }}>
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 20 }}>
-            <div>
-              <label style={labelStyle}>Nombre</label>
-              <input required style={inputStyle} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-            </div>
-            <div>
-              <label style={labelStyle}>Email</label>
-              <input required type="email" style={inputStyle} value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
-            </div>
-          </div>
-          <div>
-            <label style={labelStyle}>Teléfono</label>
-            <input required type="tel" style={inputStyle} value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
-          </div>
-          
-          {/* AQUÍ ESTÁ EL SELECT ENLAZADO AL EXCEL */}
-          <div>
-            <label style={labelStyle}>Servicio</label>
-            <select style={inputStyle} value={form.service} onChange={e => setForm({ ...form, service: e.target.value })}>
-              {servicesList.map(s => {
-                // Asegura el formato visual con el signo de dólar ($)
-                const formattedPrice = s.price.toString().includes('$') ? s.price : `$${s.price}`;
-                return (
-                  <option key={s.id} value={s.id}>
-                    {s.name} — {formattedPrice} MXN
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-
-          <div>
-            <label style={labelStyle}>Mensaje</label>
-            <textarea required rows={5} style={inputStyle} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} />
-          </div>
-          <button type="submit" disabled={loading} style={{ background: loading ? INK3 : INK, color: "#fff", border: "none", padding: "18px", borderRadius: "4px", fontWeight: 800, cursor: loading ? "wait" : "pointer" }}>
-            {loading ? "Procesando..." : "Enviar y Chatear por WhatsApp →"}
-          </button>
-          
-          {sent && <div style={{ color: "#25D366", fontWeight: 700 }}>✓ Solicitud enviada correctamente.</div>}
-          {error && <div style={{ color: "red", fontWeight: 700 }}>❌ Hubo un error al enviar el correo, pero el chat debería abrirse.</div>}
-        </form>
       </div>
     </div>
   );
@@ -1681,25 +2141,57 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" }); 
   };
 
-  useEffect(() => {
-    if (!SHEET_CSV_URL || SHEET_CSV_URL === "" || SHEET_CSV_URL.includes("sharing")) return;
-    fetch(`${SHEET_CSV_URL}&t=${Date.now()}`)
-      .then(res => res.text())
-      .then(csvText => {
-        if (csvText.trim().startsWith('<')) return;
-        const rows = csvText.split('\n').slice(1); 
-        const parsed = rows.map(row => {
-          const cols = row.replace(/\r/g, '').split(','); 
-          if (cols.length >= 4) {
-             const freelanceVal = parseFloat(cols[1]); 
-             if (isNaN(freelanceVal)) return null;
-             return { label: cols[0], freelance: freelanceVal || 0, agencias: parseFloat(cols[2]) || 0, riders: parseFloat(cols[3]) || 0, description: cols.slice(4).join(',') };
+ useEffect(() => {
+  if (!SHEET_CSV_URL || SHEET_CSV_URL === "" || SHEET_CSV_URL.includes("sharing")) return;
+  fetch(`${SHEET_CSV_URL}&t=${Date.now()}`)
+    .then(res => res.text())
+    .then(csvText => {
+      if (csvText.trim().startsWith('<')) return;
+
+      if (window.Papa) {
+        window.Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          transformHeader: h => h.trim(),
+          complete: (results) => {
+            const parsed = results.data
+              .map(row => ({
+                label:       row["Etiqueta"]?.trim()   || "",
+                freelance:   parseFloat(row["Freelance"]) || 0,
+                agencias:    parseFloat(row["Agencias"])  || 0,
+                riders:      parseFloat(row["Riders"])    || 0,
+                description: row["Descripcion"]?.trim()  || "",
+                tipo:       (row["Tipo"]?.trim()          || "barra").toLowerCase(),
+                unidad:      row["Unidad"]?.trim()        || "",
+                mejor:      (row["Mejor"]?.trim()         || "mayor").toLowerCase(),
+              }))
+              .filter(item => item.label && !isNaN(item.freelance));
+            if (parsed.length > 0) setMarketStats(parsed);
           }
-          return null;
+        });
+      } else {
+        // Fallback manual (sin PapaParse)
+        const rows = csvText.split('\n').slice(1);
+        const parsed = rows.map(row => {
+          const cols = row.replace(/\r/g, '').split(',');
+          if (cols.length < 4) return null;
+          const freelanceVal = parseFloat(cols[1]);
+          if (isNaN(freelanceVal)) return null;
+          return {
+            label:       cols[0]?.trim() || "",
+            freelance:   freelanceVal    || 0,
+            agencias:    parseFloat(cols[2]) || 0,
+            riders:      parseFloat(cols[3]) || 0,
+            description: cols[4]?.trim() || "",
+            tipo:        cols[5]?.trim().toLowerCase() || "barra",
+            unidad:      cols[6]?.trim() || "",
+            mejor:       cols[7]?.trim().toLowerCase() || "mayor",
+          };
         }).filter(item => item && item.label);
-        if(parsed.length > 0) setMarketStats(parsed);
-      }).catch(err => console.error(err));
-  }, []);
+        if (parsed.length > 0) setMarketStats(parsed);
+      }
+    }).catch(err => console.error(err));
+}, []);
 
   useEffect(() => {
     if (!CASES_CSV_URL || CASES_CSV_URL === "" || CASES_CSV_URL.includes("sharing")) return;
@@ -1730,7 +2222,17 @@ export default function App() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: BG, color: INK, fontFamily: "system-ui, sans-serif" }}>
-      
+
+      {PATRON.global && (
+        <div style={{
+          position: "fixed", top: 0, left: 0,
+          width: "100vw", height: "100vh",
+          backgroundImage: "url('/patron.svg')",
+          backgroundRepeat: "repeat", backgroundSize: "150px",
+          opacity: 0.04, pointerEvents: "none", zIndex: 9999
+        }} />
+      )}
+
       <SocialFloat isMobile={isMobile} />
 
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: `${BG}ee`, backdropFilter: "blur(12px)", borderBottom: `1px solid ${BORDER}`, height: "80px", display: "flex", alignItems: "center", padding: "0 5vw", justifyContent: "space-between" }}>

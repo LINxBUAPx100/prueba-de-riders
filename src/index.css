@@ -54,28 +54,3 @@ body {
   background-color: #070B10; 
 }
 
-/* --- PATRÓN DE FONDO INFINITO --- */
-body::after {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  
-  /* AQUÍ CARGA TU IMAGEN (RUTA CORREGIDA) */
-  background-image: url('/patron.svg'); 
-  
-  /* ESTO HACE LA MAGIA DEL TAPIZ INFINITO */
-  background-repeat: repeat; 
-  background-size: 150px; /* Cambia este número si quieres las "M" más grandes o chicas */
-  
-  /* OPACIDAD TÁCTICA PARA QUE NO CANSE LA VISTA */
-  opacity: 0.04; 
-  
-  /* SEGURIDAD: Deja que los clics pasen hacia tus botones */
-  pointer-events: none; 
-  
-  /* Lo pone por encima de todos tus fondos para que siempre se vea */
-  z-index: 9999; 
-}
