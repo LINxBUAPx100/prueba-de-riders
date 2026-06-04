@@ -118,6 +118,20 @@ body {
   background-size: 140px 140px;
 }
 
+/* --- HERO: emblema (desktop) vs tiles bento (móvil) --- */
+.aside-emblem { display: flex; }
+.aside-tiles  { display: grid; }
+@media (max-width: 860px) { .aside-emblem { display: none !important; } }
+@media (min-width: 861px) { .aside-tiles  { display: none !important; } }
+
+@keyframes spin360    { to { transform: rotate(360deg); } }
+@keyframes spin360rev { to { transform: rotate(-360deg); } }
+.emblem-ring-a { animation: spin360 40s linear infinite; }
+.emblem-ring-b { animation: spin360rev 30s linear infinite; }
+
+@keyframes emblemFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.emblem-float { animation: emblemFloat 5s ease-in-out infinite; }
+
 /* --- REVEAL AL SCROLL (bloque único) --- */
 .reveal {
   opacity: 0;

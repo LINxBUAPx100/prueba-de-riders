@@ -297,7 +297,10 @@ function HomeView({ nav, casesList = [] }) {
           complete: (results) => {
             const sheetServices = results.data
               .filter(row => row["Servicio"] && row["Servicio"].trim() !== "")
-              .map(row => ({ name: row["Servicio"].trim() }));
+              .map(row => ({
+                name: row["Servicio"].trim(),
+                price: row["Inversión (Desde)"] ? row["Inversión (Desde)"].toString().trim() : ""
+              }));
             if (sheetServices.length > 0) setTickerData(sheetServices);
           }
         });
@@ -411,60 +414,88 @@ function HomeView({ nav, casesList = [] }) {
               </div>
             </div>
 
-            {/* COLUMNA DERECHA — tiles anidados */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, gridAutoRows: "min-content" }}>
+            {/* COLUMNA DERECHA — emblema en desktop, tiles bento en móvil */}
+            <div style={{ position: "relative", display: "flex", flexDirection: "column" }}>
 
-              {/* Stat 48h (ámbar) */}
-              <div style={{ ...tile, background: GRAD.brandSoft, border: "none", boxShadow: `0 18px 50px ${ACCENT}33` }}>
-                <Counter className="font-num" value="48h" style={{ fontSize: "clamp(40px, 5vw, 56px)", fontWeight: 900, lineHeight: 1, color: INK }} />
-                <div style={{ fontSize: 10, fontWeight: 800, color: INK, opacity: 0.72, textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 6 }}>Respuesta</div>
-              </div>
-
-              {/* Stat 100% */}
-              <div style={tile}>
-                <Counter className="font-num" value="100%" style={{ fontSize: "clamp(40px, 5vw, 56px)", fontWeight: 900, lineHeight: 1, color: INK }} />
-                <div style={{ fontSize: 10, fontWeight: 800, color: INK3, textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 6 }}>Transparente</div>
-              </div>
-
-              {/* Tile estado en vivo (oscuro) */}
-              <div style={{
-                gridColumn: "1 / -1",
-                background: "linear-gradient(145deg, #0D1B2A, #1D3557)",
-                borderRadius: 18, padding: "18px 22px",
-                display: "flex", alignItems: "center", justifyContent: "space-between"
+              {/* ── DESKTOP: emblema de marca (oculto en móvil) ── */}
+              <div className="aside-emblem" style={{
+                flex: 1, position: "relative", overflow: "hidden",
+                borderRadius: 28, padding: "48px 40px",
+                background: "linear-gradient(160deg, #0D1B2A 0%, #1D3557 100%)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                flexDirection: "column", alignItems: "center", justifyContent: "center",
+                boxShadow: "0 30px 80px rgba(13,27,42,0.18)"
               }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div className="status-indicator" style={{ width: 9, height: 9, borderRadius: "50%", background: ACCENT }} />
-                  <span style={{ fontSize: 11, fontWeight: 800, color: "#fff", letterSpacing: "0.14em", textTransform: "uppercase" }}>Operando en vivo</span>
+                <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 360, height: 360, borderRadius: "50%", background: `radial-gradient(circle, ${ACCENT}33 0%, transparent 65%)`, filter: "blur(34px)", pointerEvents: "none" }} />
+                <div className="emblem-ring-a" style={{ position: "absolute", top: "50%", left: "50%", width: 300, height: 300, marginTop: -150, marginLeft: -150, borderRadius: "50%", border: `1px dashed ${ACCENT}55`, pointerEvents: "none" }} />
+                <div className="emblem-ring-b" style={{ position: "absolute", top: "50%", left: "50%", width: 224, height: 224, marginTop: -112, marginLeft: -112, borderRadius: "50%", border: "1px dashed rgba(255,255,255,0.14)", pointerEvents: "none" }} />
+                <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+                  <div className="emblem-float" style={{ filter: `drop-shadow(0 10px 30px ${ACCENT}66)` }}>
+                    <LogoIcon size={104} />
+                  </div>
+                  <div className="font-display" style={{ marginTop: 24, fontSize: 26, fontWeight: 800, color: "#fff", letterSpacing: "0.02em" }}>RIDERS MEDIA</div>
+                  <div style={{ width: 48, height: 3, background: GRAD.brandSoft, borderRadius: 2, margin: "18px 0" }} />
+                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", lineHeight: 1.9 }}>
+                    Motion Graphics · Desarrollo Web<br />Estrategia de Contenido
+                  </div>
                 </div>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)" }}>
-                  {new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}
-                </span>
               </div>
 
-              {/* Tile servicios destacados */}
-              <div style={{ gridColumn: "1 / -1", ...tile, minHeight: 0, padding: "22px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-                  <LogoIcon size={16} />
-                  <span style={{ fontSize: 10, fontWeight: 900, color: INK3, textTransform: "uppercase", letterSpacing: "0.16em" }}>Servicios destacados</span>
+              {/* ── MÓVIL: tiles bento (ocultos en desktop) ── */}
+              <div className="aside-tiles" style={{ gridTemplateColumns: "1fr 1fr", gap: 18, gridAutoRows: "min-content" }}>
+
+                {/* Stat 48h (ámbar) */}
+                <div style={{ ...tile, background: GRAD.brandSoft, border: "none", boxShadow: `0 18px 50px ${ACCENT}33` }}>
+                  <Counter className="font-num" value="48h" style={{ fontSize: "clamp(40px, 5vw, 56px)", fontWeight: 900, lineHeight: 1, color: INK }} />
+                  <div style={{ fontSize: 10, fontWeight: 800, color: INK, opacity: 0.72, textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 6 }}>Respuesta</div>
                 </div>
-                {tickerData.slice(0, 3).map((s, i) => (
-                  <div key={i} style={{
-                    display: "flex", alignItems: "center", justifyContent: "space-between",
-                    padding: "9px 0", borderBottom: i < 2 ? `1px solid ${BORDER}` : "none"
-                  }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: INK }}>{s.name}</span>
-                    {s.price && (
-                      <span className="font-num gradient-text" style={{ fontSize: 16, fontWeight: 800 }}>
-                        {s.price.toString().includes('$') ? s.price : `$${s.price}`} MXN
-                      </span>
-                    )}
+
+                {/* Stat 100% */}
+                <div style={tile}>
+                  <Counter className="font-num" value="100%" style={{ fontSize: "clamp(40px, 5vw, 56px)", fontWeight: 900, lineHeight: 1, color: INK }} />
+                  <div style={{ fontSize: 10, fontWeight: 800, color: INK3, textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 6 }}>Transparente</div>
+                </div>
+
+                {/* Tile estado en vivo (oscuro) */}
+                <div style={{
+                  gridColumn: "1 / -1",
+                  background: "linear-gradient(145deg, #0D1B2A, #1D3557)",
+                  borderRadius: 18, padding: "18px 22px",
+                  display: "flex", alignItems: "center", justifyContent: "space-between"
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div className="status-indicator" style={{ width: 9, height: 9, borderRadius: "50%", background: ACCENT }} />
+                    <span style={{ fontSize: 11, fontWeight: 800, color: "#fff", letterSpacing: "0.14em", textTransform: "uppercase" }}>Operando en vivo</span>
                   </div>
-                ))}
-                <div style={{ marginTop: 16 }}>
-                  <Btn variant="secondary" full onClick={() => nav("catalogo")} style={{ padding: "13px", fontSize: 12, minHeight: 44 }}>
-                    Ver Catálogo Completo →
-                  </Btn>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)" }}>
+                    {new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}
+                  </span>
+                </div>
+
+                {/* Tile servicios destacados */}
+                <div style={{ gridColumn: "1 / -1", ...tile, minHeight: 0, padding: "22px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                    <LogoIcon size={16} />
+                    <span style={{ fontSize: 10, fontWeight: 900, color: INK3, textTransform: "uppercase", letterSpacing: "0.16em" }}>Servicios destacados</span>
+                  </div>
+                  {tickerData.slice(0, 3).map((s, i) => (
+                    <div key={i} style={{
+                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                      padding: "9px 0", borderBottom: i < 2 ? `1px solid ${BORDER}` : "none"
+                    }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: INK }}>{s.name}</span>
+                      {s.price && (
+                        <span className="font-num gradient-text" style={{ fontSize: 16, fontWeight: 800 }}>
+                          {s.price.toString().includes('$') ? s.price : `$${s.price}`} MXN
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                  <div style={{ marginTop: 16 }}>
+                    <Btn variant="secondary" full onClick={() => nav("catalogo")} style={{ padding: "13px", fontSize: 12, minHeight: 44 }}>
+                      Ver Catálogo Completo →
+                    </Btn>
+                  </div>
                 </div>
               </div>
             </div>
