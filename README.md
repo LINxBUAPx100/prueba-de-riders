@@ -75,13 +75,32 @@ Usado en: botones CTA, texto destacado, línea de acento en tarjetas y bordes de
 
 ---
 
+## Jerarquía de Botones
+
+Una sola regla semántica, consistente en todo el sitio (componente `<Btn variant>` en `App.jsx`):
+
+| Variante        | Estilo                                   | Significado            | Ejemplos |
+|-----------------|------------------------------------------|------------------------|----------|
+| `primary`       | Gradiente ámbar + texto `INK` + glow     | **Convertir / hablar** | "Cotizar" (nav escritorio y móvil), "Agendar Llamada", "Cotizar Mi Proyecto", "Enviar y Chatear", tarjetas de catálogo destacadas |
+| `ghost-accent`  | Borde ámbar, transparente → relleno ámbar | Convertir (menor peso) | "Cotizar este servicio" en tarjetas **no** destacadas |
+| `secondary`     | Navy `INK` sólido + texto blanco / hover ámbar | **Explorar / navegar** | "Ver Catálogo 2026", "Ver Catálogo Completo" |
+| `secondary-light` | Borde claro sobre fondo oscuro         | Navegar (en secciones oscuras) | reservado para CTAs sobre fondo navy |
+| `text`          | Texto ámbar con flecha                    | Enlace inline          | "Conoce cómo trabajamos →" |
+
+> **Regla mental:** ámbar = *convertir/hablar*, navy = *explorar/navegar*. El texto sobre ámbar
+> siempre es `INK` (#0D1B2A) para cumplir contraste AA — nunca blanco sobre ámbar.
+> El botón flotante de redes usa `INK`/`INK2` (en paleta); los íconos expandidos conservan los
+> colores oficiales de cada red (IG, FB, WA, TL).
+
+---
+
 ## Tecnología
 
 | Capa       | Herramienta                       |
 |------------|-----------------------------------|
 | UI         | React 18 + Vite 5                 |
 | Estilos    | Inline CSS + clases utilitarias   |
-| Fuentes    | Barlow Condensed, DM Sans (Google Fonts) |
+| Fuentes    | Bricolage Grotesque (titulares), Barlow Condensed (números), DM Sans (cuerpo) — Google Fonts |
 | Contacto   | EmailJS + WhatsApp API            |
 | Datos      | Google Sheets CSV (PapaParse)     |
 | Deploy     | GitHub Pages (dominio custom)     |

@@ -36,6 +36,13 @@ export const COLORS = {
   TERRA:      "#C47B0A",    // Ámbar tierra — íconos y contrastes secundarios
 };
 
+// ── GRADIENTES DE MARCA ──────────────────────────────────────────────────
+// Usados por los botones primarios, textos destacados y líneas de acento.
+export const GRAD = {
+  brand:     "linear-gradient(135deg, #F5A623 0%, #E8930F 55%, #C47B0A 100%)",
+  brandSoft: "linear-gradient(135deg, #F5A623 0%, #E8930F 100%)",
+};
+
 // ── CATÁLOGO DE SERVICIOS ────────────────────────────────────────────────
 export const CATALOG = [
   
