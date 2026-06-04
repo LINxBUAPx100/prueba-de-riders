@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=sentient@400,500,700&display=swap');
 
 * {
   margin: 0;
@@ -11,9 +12,9 @@ html {
 }
 
 body {
-  background: #FFFFFF;
-  color: #0D1B2A;
-  font-family: 'DM Sans', sans-serif;
+  background: #f2efe6;
+  color: #191b18;
+  font-family: 'Sentient', Georgia, 'Times New Roman', serif;
   overflow-x: hidden;
   position: relative;
   -webkit-font-smoothing: antialiased;
@@ -22,12 +23,20 @@ body {
 }
 
 /* --- HELPERS TIPOGRÁFICOS --- */
+/* Oswald = títulos / texto grueso · Sentient = cuerpo / texto delgado */
 .font-display {
-  font-family: 'Bricolage Grotesque', 'DM Sans', sans-serif;
+  font-family: 'Oswald', 'Arial Narrow', sans-serif;
 }
 .font-num {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Oswald', 'Arial Narrow', sans-serif;
   font-variant-numeric: tabular-nums;
+}
+.font-body {
+  font-family: 'Sentient', Georgia, serif;
+}
+/* Texto de UI (nav, footer, menú móvil) usa Oswald */
+nav button, footer button, .mobile-menu button {
+  font-family: 'Oswald', 'Arial Narrow', sans-serif;
 }
 
 /* --- ANIMACIONES BASE --- */
@@ -59,7 +68,7 @@ body {
 
 /* --- TEXTO CON GRADIENTE DE MARCA --- */
 .gradient-text {
-  background: linear-gradient(135deg, #F5A623 0%, #E8930F 55%, #C47B0A 100%);
+  background: linear-gradient(135deg, #f8b42c 0%, #f5a313 55%, #d98709 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -84,23 +93,23 @@ body {
 
 /* --- MESH GRADIENTS CÁLIDOS (claro) --- */
 .mesh-warm {
-  background-color: #FFFFFF;
+  background-color: #f2efe6;
   background-image:
-    radial-gradient(at 16% 20%, rgba(245, 166, 35, 0.20) 0px, transparent 50%),
-    radial-gradient(at 84% 10%, rgba(245, 240, 230, 0.95) 0px, transparent 55%),
-    radial-gradient(at 78% 76%, rgba(29, 53, 87, 0.10) 0px, transparent 50%),
-    radial-gradient(at 28% 88%, rgba(245, 166, 35, 0.10) 0px, transparent 46%);
+    radial-gradient(at 16% 20%, rgba(245, 163, 19, 0.20) 0px, transparent 50%),
+    radial-gradient(at 84% 10%, rgba(248, 180, 44, 0.16) 0px, transparent 55%),
+    radial-gradient(at 78% 76%, rgba(24, 52, 87, 0.10) 0px, transparent 50%),
+    radial-gradient(at 28% 88%, rgba(88, 6, 64, 0.07) 0px, transparent 46%);
   background-size: 200% 200%;
 }
 .mesh-warm-animated { animation: gradientShift 20s ease infinite; }
 
-/* --- MESH GRADIENTS "CENTRO DE MANDO" (oscuro) --- */
+/* --- MESH GRADIENTS "CENTRO DE MANDO" (oscuro navy) --- */
 .mesh-dark {
-  background-color: #0D1B2A;
+  background-color: #122c49;
   background-image:
-    radial-gradient(at 14% 18%, rgba(245, 166, 35, 0.16) 0px, transparent 46%),
-    radial-gradient(at 86% 24%, rgba(29, 53, 87, 0.60) 0px, transparent 52%),
-    radial-gradient(at 70% 92%, rgba(245, 166, 35, 0.09) 0px, transparent 46%);
+    radial-gradient(at 14% 18%, rgba(245, 163, 19, 0.16) 0px, transparent 46%),
+    radial-gradient(at 86% 24%, rgba(24, 52, 87, 0.65) 0px, transparent 52%),
+    radial-gradient(at 70% 92%, rgba(88, 6, 64, 0.18) 0px, transparent 48%);
   background-size: 200% 200%;
 }
 .mesh-dark-animated { animation: gradientShift 24s ease infinite; }
@@ -131,6 +140,24 @@ body {
 
 @keyframes emblemFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 .emblem-float { animation: emblemFloat 5s ease-in-out infinite; }
+
+/* --- DEGRADADO EN MOVIMIENTO (CTA de cierre) --- */
+.cta-flow {
+  background-color: #f2efe6;
+  background-image:
+    radial-gradient(circle at 18% 28%, rgba(245, 163, 19, 0.30) 0px, transparent 42%),
+    radial-gradient(circle at 82% 38%, rgba(24, 52, 87, 0.22) 0px, transparent 44%),
+    radial-gradient(circle at 50% 84%, rgba(88, 6, 64, 0.18) 0px, transparent 46%),
+    radial-gradient(circle at 70% 12%, rgba(248, 180, 44, 0.22) 0px, transparent 40%);
+  background-size: 200% 200%, 220% 220%, 200% 200%, 180% 180%;
+  background-repeat: no-repeat;
+  animation: ctaFlow 18s ease-in-out infinite;
+}
+@keyframes ctaFlow {
+  0%   { background-position:   0% 0%, 100% 0%,  50% 100%, 100% 50%; }
+  50%  { background-position: 100% 100%, 0% 80%, 60% 0%,    0% 60%; }
+  100% { background-position:   0% 0%, 100% 0%,  50% 100%, 100% 50%; }
+}
 
 /* --- REVEAL AL SCROLL (bloque único) --- */
 .reveal {
@@ -172,15 +199,15 @@ body {
 
 /* --- SCROLLBAR --- */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #F5F0E6; }
+::-webkit-scrollbar-track { background: #e9e2d3; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(245, 166, 35, 0.35);
+  background: rgba(245, 163, 19, 0.40);
   border-radius: 3px;
 }
 
 ::selection {
-  background: rgba(245, 166, 35, 0.25);
-  color: #0D1B2A;
+  background: rgba(245, 163, 19, 0.28);
+  color: #191b18;
 }
 
 /* --- FOCO VISIBLE (accesibilidad) --- */

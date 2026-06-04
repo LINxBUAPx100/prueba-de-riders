@@ -6,41 +6,46 @@ export const CATALOGO_CSV_URL = "https://docs.google.com/spreadsheets/d/1SEdPIwc
 
 // Y aquí sigues teniendo tus colores, etc.
 
-// ── PALETA DE COLORES (ESTÉTICA PROFESIONAL) ─────────────────────────────
+// ── PALETA DE COLORES (MARCA RIDERS — SIN VERDE) ─────────────────────────
+// Paleta oficial: cream, negro cálido, dos ámbares principales, azul marino y
+// púrpura de apoyo. El verde NO forma parte de la identidad.
 export const COLORS = {
   // --- FONDOS Y SUPERFICIES ---
-  BG:      "#FFFFFF",    // Blanco puro — base limpia y moderna
-  BG2:     "#F5F0E6",    // Crema cálida — secciones secundarias
-  SURFACE: "#FAF7F2",    // Crema suave — tarjetas y superficies elevadas
+  BG:      "#f2efe6",    // Cream — fondo base de marca
+  BG2:     "#e9e2d3",    // Cream más cálido — secciones alternas y footer
+  SURFACE: "#f8f5ee",    // Cream claro — tarjetas y superficies elevadas
 
   // --- TINTAS / TIPOGRAFÍA ---
-  INK:     "#0D1B2A",    // Azul noche oscuro — texto principal
-  INK2:    "#1D3557",    // Azul marino — texto secundario
-  INK3:    "#6B7C93",    // Acero azulado — textos terciarios e íconos
+  INK:     "#191b18",    // Negro cálido — texto principal y subtextos
+  INK2:    "#183457",    // Azul marino — texto secundario y superficies oscuras
+  INK3:    "#5f7387",    // Acero azulado — textos terciarios, labels e íconos
 
   // --- COLORES PRINCIPALES ---
-  ACCENT:  "#F5A623",    // Ámbar naranja — color principal de marca Riders
-  ACCENT2: "#1D3557",    // Azul marino — variante de acento
-  BORDER:  "#E8E0D0",    // Borde cálido sutil
+  ACCENT:  "#f5a313",    // Ámbar — color principal de marca
+  AMBER2:  "#f8b42c",    // Ámbar claro — segundo amarillo principal (gradientes)
+  ACCENT2: "#183457",    // Azul marino — segundo color principal
+  PURPLE:  "#580640",    // Púrpura — color de apoyo / contraste
+  BORDER:  "#e3dac7",    // Borde cálido sutil sobre cream
 
-  RIDERS:  "#F5A623",    // Alias del naranja principal
+  RIDERS:  "#f5a313",    // Alias del ámbar principal
 
-  // --- ESTADOS UI ---
-  SUCCESS:    "#2D7D4F",
-  WARNING:    "#E8930F",
-  INFO:       "#1D3557",
+  // --- ESTADOS UI (sin verde) ---
+  SUCCESS:    "#183457",    // Confirmaciones — azul marino de marca
+  WARNING:    "#f5a313",    // Advertencias — ámbar
+  INFO:       "#183457",    // Informativos — azul marino
 
   // --- ACENTOS SECUNDARIOS ---
-  MUTED_RED:  "#FFF4E0",    // Naranja ultra lavado — fondo sutil etiquetas naranja
-  MUTED_TEAL: "#EAF0FF",    // Azul ultra lavado — fondo sutil etiquetas azul
-  TERRA:      "#C47B0A",    // Ámbar tierra — íconos y contrastes secundarios
+  MUTED_RED:  "#faecc9",    // Ámbar ultra lavado — fondo sutil de chips/alertas
+  MUTED_TEAL: "#e4ecf5",    // Azul ultra lavado — fondo sutil de chips info
+  TERRA:      "#d98709",    // Ámbar tierra — extremo oscuro del gradiente
 };
 
 // ── GRADIENTES DE MARCA ──────────────────────────────────────────────────
 // Usados por los botones primarios, textos destacados y líneas de acento.
 export const GRAD = {
-  brand:     "linear-gradient(135deg, #F5A623 0%, #E8930F 55%, #C47B0A 100%)",
-  brandSoft: "linear-gradient(135deg, #F5A623 0%, #E8930F 100%)",
+  brand:     "linear-gradient(135deg, #f8b42c 0%, #f5a313 55%, #d98709 100%)",
+  brandSoft: "linear-gradient(135deg, #f8b42c 0%, #f5a313 100%)",
+  blue:      "linear-gradient(135deg, #2c5e9e 0%, #183457 100%)",
 };
 
 // ── CATÁLOGO DE SERVICIOS ────────────────────────────────────────────────
@@ -60,7 +65,7 @@ export const CATALOG = [
 
 // ── CASOS DE ÉXITO ───────────────────────────────────────────────────────
 export const CASES = [
-  { cat: "Muy pronto!", client: "Podrias ser el primero", result: "Alcanza tus metas", color: "#0D9488", link: "#" },
+  { cat: "Muy pronto!", client: "Podrias ser el primero", result: "Alcanza tus metas", color: "#183457", link: "#" },
 
 ];
 

@@ -3,7 +3,7 @@ import emailjs from '@emailjs/browser';
 import { COLORS, CATALOG, CASES, PILLARS, CASES_CSV_URL, SHEET_CSV_URL, CATALOGO_CSV_URL, GRAD } from "./data";
 import "./index.css";
 
-const { BG, BG2, SURFACE, INK, INK2, INK3, ACCENT, ACCENT2, BORDER, RIDERS, SUCCESS, WARNING, INFO, MUTED_RED, MUTED_TEAL, TERRA } = COLORS;
+const { BG, BG2, SURFACE, INK, INK2, INK3, ACCENT, AMBER2, ACCENT2, PURPLE, BORDER, RIDERS, SUCCESS, WARNING, INFO, MUTED_RED, MUTED_TEAL, TERRA } = COLORS;
 
 // ── PATRÓN DE FONDO: cambia a false para ocultar por sección ─────────────
 const PATRON = {
@@ -132,16 +132,16 @@ function IconSpark({ size = 24 })  { return <svg width={size} height={size} view
 function Chip({ children, outline, accent }) {
   const isAccent = accent || !outline;
   return (
-    <span style={{
+    <span className="font-display" style={{
       display: "inline-block",
       background: isAccent ? ACCENT : "transparent",
       color: isAccent ? INK : ACCENT,
       border: `1px solid ${ACCENT}`,
-      padding: "4px 12px",
+      padding: "5px 13px",
       borderRadius: "20px",
-      fontSize: 10,
-      fontWeight: 800,
-      letterSpacing: "0.05em",
+      fontSize: 11,
+      fontWeight: 600,
+      letterSpacing: "0.08em",
       textTransform: "uppercase"
     }}>
       {children}
@@ -149,10 +149,12 @@ function Chip({ children, outline, accent }) {
   );
 }
 
-function LogoIcon({ size = 32 }) {
+// Logo bicolor: `square` = color del cuadro, `mark` = color de la "R" (combinaciones aprobadas).
+function LogoIcon({ size = 32, square = ACCENT, mark = INK }) {
   return (
     <svg width={size} height={size} viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path fill="#F5A623" d="M787.11,0h-494.22C131.13,0,0,131.13,0,292.89v494.22c0,161.76,131.13,292.89,292.89,292.89h494.22c161.76,0,292.89-131.13,292.89-292.89v-494.22C1080,131.13,948.87,0,787.11,0ZM807.56,539.99h-52.57c-40.5,0-73.34-32.84-73.34-73.34v-52.65c0-21.19-17.18-38.38-38.38-38.38h-201.35l365.64,365.64-89.03,89.02-320.18-320.17v194.27c0,34.75-14.08,66.23-36.88,89.02-22.79,22.8-54.27,36.88-89.03,36.88V249.72h405.8c71.42,0,129.32,57.89,129.32,129.31v160.96Z"/>
+      <rect x="0" y="0" width="1080" height="1080" rx="292.89" ry="292.89" fill={mark} />
+      <path fill={square} d="M787.11,0h-494.22C131.13,0,0,131.13,0,292.89v494.22c0,161.76,131.13,292.89,292.89,292.89h494.22c161.76,0,292.89-131.13,292.89-292.89v-494.22C1080,131.13,948.87,0,787.11,0ZM807.56,539.99h-52.57c-40.5,0-73.34-32.84-73.34-73.34v-52.65c0-21.19-17.18-38.38-38.38-38.38h-201.35l365.64,365.64-89.03,89.02-320.18-320.17v194.27c0,34.75-14.08,66.23-36.88,89.02-22.79,22.8-54.27,36.88-89.03,36.88V249.72h405.8c71.42,0,129.32,57.89,129.32,129.31v160.96Z"/>
     </svg>
   );
 }
@@ -160,7 +162,7 @@ function LogoIcon({ size = 32 }) {
 function SectionLabel({ children, dark = false }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-      <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: ACCENT }}>
+      <span className="font-display" style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: ACCENT }}>
         {children}
       </span>
       <span style={{ flex: 1, height: 1, background: dark ? "rgba(255,255,255,0.14)" : BORDER }} />
@@ -215,7 +217,7 @@ function Btn({ variant = "primary", children, onClick, type = "button", full = f
           cursor: disabled ? "not-allowed" : "pointer",
           color: ACCENT, fontWeight: 800, fontSize: 13,
           letterSpacing: "0.06em", textTransform: "uppercase",
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Oswald', sans-serif",
           display: "inline-flex", alignItems: "center", gap: 6,
           transform: h ? "translateX(3px)" : "none",
           transition: "transform 0.2s ease",
@@ -229,7 +231,7 @@ function Btn({ variant = "primary", children, onClick, type = "button", full = f
 
   const base = {
     display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
-    fontFamily: "'DM Sans', sans-serif", fontWeight: 800, fontSize: 13,
+    fontFamily: "'Oswald', sans-serif", fontWeight: 800, fontSize: 13,
     letterSpacing: "0.06em", textTransform: "uppercase",
     padding: "16px 34px", borderRadius: 12, minHeight: 48,
     border: "2px solid transparent",
@@ -255,9 +257,9 @@ function Btn({ variant = "primary", children, onClick, type = "button", full = f
     };
   } else if (variant === "secondary") {
     v = {
-      background: h ? ACCENT : INK, color: h ? INK : "#fff",
-      borderColor: h ? ACCENT : INK,
-      boxShadow: h ? `0 12px 30px ${INK}2e` : "none",
+      background: h ? ACCENT : INK2, color: h ? INK : "#fff",
+      borderColor: h ? ACCENT : INK2,
+      boxShadow: h ? `0 12px 30px ${INK2}33` : "none",
       transform: h ? "translateY(-2px)" : "none"
     };
   } else if (variant === "secondary-light") {
@@ -380,7 +382,7 @@ function HomeView({ nav, casesList = [] }) {
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
                 <div className="status-indicator" style={{ width: 10, height: 10, borderRadius: "50%", background: ACCENT }} />
-                <span style={{ fontSize: 11, fontWeight: 700, color: INK3, letterSpacing: "0.15em", textTransform: "uppercase" }}>
+                <span className="font-display" style={{ fontSize: 12, fontWeight: 600, color: INK3, letterSpacing: "0.15em", textTransform: "uppercase" }}>
                   Unidad de Respuesta Rápida · Puebla, MX
                 </span>
               </div>
@@ -421,7 +423,7 @@ function HomeView({ nav, casesList = [] }) {
               <div className="aside-emblem" style={{
                 flex: 1, position: "relative", overflow: "hidden",
                 borderRadius: 28, padding: "48px 40px",
-                background: "linear-gradient(160deg, #0D1B2A 0%, #1D3557 100%)",
+                background: "linear-gradient(160deg, #0f2336 0%, #183457 100%)",
                 border: "1px solid rgba(255,255,255,0.08)",
                 flexDirection: "column", alignItems: "center", justifyContent: "center",
                 boxShadow: "0 30px 80px rgba(13,27,42,0.18)"
@@ -459,7 +461,7 @@ function HomeView({ nav, casesList = [] }) {
                 {/* Tile estado en vivo (oscuro) */}
                 <div style={{
                   gridColumn: "1 / -1",
-                  background: "linear-gradient(145deg, #0D1B2A, #1D3557)",
+                  background: "linear-gradient(145deg, #0f2336, #183457)",
                   borderRadius: 18, padding: "18px 22px",
                   display: "flex", alignItems: "center", justifyContent: "space-between"
                 }}>
@@ -621,10 +623,9 @@ function HomeView({ nav, casesList = [] }) {
         </div>
       </section>
 
-      {/* ── CTA DE CIERRE ─────────────────────────────────────── */}
-      <section style={{
+      {/* ── CTA DE CIERRE (degradado en movimiento) ───────────── */}
+      <section className="cta-flow" style={{
         padding: "130px 6vw",
-        background: `linear-gradient(180deg, ${BG2} 0%, #EDE8DC 100%)`,
         textAlign: "center", position: "relative", overflow: "hidden"
       }}>
         <div style={{
@@ -753,7 +754,7 @@ function CatalogView({ nav }) {
           {items.map(s => (
             <div key={s.id}
               style={{
-                background: s.highlight ? `linear-gradient(145deg, ${BG2} 0%, #EDE8DC 100%)` : SURFACE,
+                background: s.highlight ? `linear-gradient(145deg, ${BG2} 0%, #ece4d1 100%)` : SURFACE,
                 border: `1px solid ${s.highlight ? ACCENT + "60" : BORDER}`,
                 padding: "40px", borderRadius: 16,
                 position: "relative", display: "flex", flexDirection: "column",
@@ -965,8 +966,8 @@ function ValorView({ stats }) {
               </g>
             );
           })}
-          <text x="60" y="57" textAnchor="middle" fontSize="13" fontWeight="900" fill={ACCENT} fontFamily="'Barlow Condensed', sans-serif">{stat.riders}{stat.unidad}</text>
-          <text x="60" y="67" textAnchor="middle" fontSize="5.5" fontWeight="800" fill={D_TXT3} fontFamily="system-ui, sans-serif">RIDERS</text>
+          <text x="60" y="57" textAnchor="middle" fontSize="13" fontWeight="700" fill={ACCENT} fontFamily="'Oswald', sans-serif">{stat.riders}{stat.unidad}</text>
+          <text x="60" y="67" textAnchor="middle" fontSize="5.5" fontWeight="600" fill={D_TXT3} fontFamily="'Oswald', sans-serif">RIDERS</text>
         </svg>
 
         <div style={{ display: "flex", gap: 28, marginTop: 28 }}>
@@ -1111,7 +1112,7 @@ function ValorView({ stats }) {
 
         {/* ── KPI STRIP ── */}
         <Reveal group style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 16, marginBottom: 52 }}>
-          <div style={{ background: "linear-gradient(145deg, rgba(245,166,35,0.18), rgba(29,53,87,0.45))", border: `1px solid ${ACCENT}45`, borderRadius: 14, padding: "26px 22px", position: "relative", overflow: "hidden" }}>
+          <div style={{ background: "linear-gradient(145deg, rgba(245,163,19,0.18), rgba(24,52,87,0.45))", border: `1px solid ${ACCENT}45`, borderRadius: 14, padding: "26px 22px", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: -40, right: -40, width: 130, height: 130, borderRadius: "50%", background: `${ACCENT}22`, pointerEvents: "none" }} />
             <div style={{ fontSize: 9, fontWeight: 900, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.2em", marginBottom: 14 }}>Riders Media</div>
             <div className="font-num" style={{ fontSize: 40, fontWeight: 900, color: ACCENT, lineHeight: 1 }}>La mejor<br />opción.</div>
@@ -1341,7 +1342,7 @@ function ContactView({ isMobile, initialService }) {
 
           {/* ── Panel izquierdo ── */}
           <div style={{
-            background: `linear-gradient(150deg, ${INK2} 0%, ${INK} 55%, #0A1520 100%)`,
+            background: `linear-gradient(150deg, #183457 0%, #11293f 55%, #0a1c2e 100%)`,
             padding: "44px 36px", borderRadius: 16,
             display: "flex", flexDirection: "column", justifyContent: "space-between",
             position: "relative", overflow: "hidden",
@@ -1354,7 +1355,7 @@ function ContactView({ isMobile, initialService }) {
             <div style={{ position: "relative", zIndex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 36 }}>
                 <LogoIcon size={26} />
-                <span style={{ fontWeight: 900, fontSize: 15, color: "#ffffff", letterSpacing: "0.05em" }}>IDERS MEDIA</span>
+                <span className="font-display" style={{ fontWeight: 700, fontSize: 17, color: "#ffffff", letterSpacing: "0.05em" }}>IDERS MEDIA</span>
               </div>
 
               <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", padding: "8px 14px", borderRadius: 20, marginBottom: 28 }}>
@@ -1463,7 +1464,7 @@ function ContactView({ isMobile, initialService }) {
             </Btn>
 
             {sent && (
-              <div role="alert" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: "#7CE0A6", fontWeight: 800, textAlign: "center", padding: 12, background: "rgba(45,125,79,0.18)", border: "1px solid rgba(124,224,166,0.35)", borderRadius: 8 }}>
+              <div role="alert" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: "#f8b42c", fontWeight: 800, textAlign: "center", padding: 12, background: "rgba(245,163,19,0.16)", border: "1px solid rgba(245,163,19,0.40)", borderRadius: 8 }}>
                 ✓ Solicitud enviada correctamente.
               </div>
             )}
@@ -1630,7 +1631,7 @@ export default function App() {
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: BG, color: INK, fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: BG, color: INK, fontFamily: "'Sentient', Georgia, serif" }}>
 
       {PATRON.global && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", backgroundImage: "url('/patron.svg')", backgroundRepeat: "repeat", backgroundSize: "150px", opacity: 0.04, pointerEvents: "none", zIndex: 9999 }} />
@@ -1641,7 +1642,7 @@ export default function App() {
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: `rgba(255,255,255,0.85)`, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderBottom: `1px solid ${BORDER}`, height: "80px", display: "flex", alignItems: "center", padding: "0 5vw", justifyContent: "space-between" }}>
         <div onClick={() => nav("inicio")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 3.5 }}>
           <LogoIcon size={32} />
-          <span style={{ fontWeight: 900, fontSize: "20px", letterSpacing: "0.01em" }}>IDERS MEDIA</span>
+          <span className="font-display" style={{ fontWeight: 700, fontSize: "22px", letterSpacing: "0.03em" }}>IDERS MEDIA</span>
         </div>
 
         {!isMobile ? (
@@ -1663,7 +1664,7 @@ export default function App() {
       </nav>
 
       {isMobile && menuOpen && (
-        <div style={{ position: "fixed", top: "80px", left: 0, right: 0, background: BG, borderBottom: `1px solid ${BORDER}`, zIndex: 999, display: "flex", flexDirection: "column", padding: "20px 5vw", boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}>
+        <div className="mobile-menu" style={{ position: "fixed", top: "80px", left: 0, right: 0, background: BG, borderBottom: `1px solid ${BORDER}`, zIndex: 999, display: "flex", flexDirection: "column", padding: "20px 5vw", boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}>
            {PAGES.map(p => (
              <button key={p.id} onClick={() => nav(p.id)} style={{ background: "none", border: "none", color: page === p.id ? ACCENT : INK, fontSize: "16px", fontWeight: 800, textTransform: "uppercase", textAlign: "left", padding: "15px 0", borderBottom: `1px solid ${BORDER}` }}>
                {p.label}
@@ -1684,11 +1685,11 @@ export default function App() {
         {page === "contacto" && <ContactView isMobile={isMobile} initialService={preselectedService} />}
       </main>
 
-      <footer style={{ padding: "20px 5vw", borderTop: `3px solid transparent`, borderImage: `linear-gradient(90deg, ${ACCENT}, #E8930F, ${INK2}) 1`, background: `linear-gradient(180deg, ${BG2} 0%, #ECE7DC 100%)` }}>
+      <footer style={{ padding: "20px 5vw", borderTop: `3px solid transparent`, borderImage: `linear-gradient(90deg, ${ACCENT}, ${AMBER2}, ${INK2}) 1`, background: `linear-gradient(180deg, ${BG2} 0%, #e3dac7 100%)` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
              <LogoIcon size={24} />
-             <span style={{ fontWeight: 900, color: INK, letterSpacing: "0.05em" }}>IDERS MEDIA</span>
+             <span className="font-display" style={{ fontWeight: 700, color: INK, letterSpacing: "0.05em", fontSize: 18 }}>IDERS MEDIA</span>
           </div>
 
           <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
