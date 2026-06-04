@@ -150,7 +150,8 @@ function Chip({ children, outline, accent }) {
 }
 
 // Logo bicolor: `square` = color del cuadro, `mark` = color de la "R" (combinaciones aprobadas).
-function LogoIcon({ size = 32, square = ACCENT, mark = INK }) {
+// Por defecto: cuadro navy + "R" cream (blanca) → se ve blanca sobre oscuro y visible sobre cream.
+function LogoIcon({ size = 32, square = INK2, mark = BG }) {
   return (
     <svg width={size} height={size} viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="0" y="0" width="1080" height="1080" rx="292.89" ry="292.89" fill={mark} />
