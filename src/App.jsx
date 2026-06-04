@@ -98,7 +98,6 @@ function PatternBg({ show, opacity = 0.025, filter = "invert(1)", maskStop = "70
 }
 
 function HomeView({ nav, casesList = [] }) {
-  const [playVideo, setPlayVideo] = useState(false);
   const [tickerData, setTickerData] = useState(CATALOG);
 
   useEffect(() => {
@@ -168,6 +167,26 @@ function HomeView({ nav, casesList = [] }) {
         borderBottom: `1px solid ${BORDER}`
       }}>
 
+        {/* Mesh gradient orbs */}
+        <div className="float-orb-a" style={{
+          position: "absolute", top: "-20%", right: "-8%",
+          width: "700px", height: "700px", borderRadius: "50%",
+          background: `radial-gradient(circle, ${ACCENT}1a 0%, transparent 68%)`,
+          filter: "blur(72px)", pointerEvents: "none", zIndex: 0
+        }} />
+        <div className="float-orb-b" style={{
+          position: "absolute", bottom: "8%", left: "-18%",
+          width: "600px", height: "600px", borderRadius: "50%",
+          background: `radial-gradient(circle, ${INK2}14 0%, transparent 68%)`,
+          filter: "blur(96px)", pointerEvents: "none", zIndex: 0
+        }} />
+        <div style={{
+          position: "absolute", top: "40%", left: "40%",
+          width: "400px", height: "400px", borderRadius: "50%",
+          background: `radial-gradient(circle, ${ACCENT}0a 0%, transparent 70%)`,
+          filter: "blur(60px)", pointerEvents: "none", zIndex: 0
+        }} />
+
         <div style={{ flex: "1 1 300px", position: "relative", zIndex: 2 }}>
 
           {/* Badge estado */}
@@ -183,7 +202,7 @@ function HomeView({ nav, casesList = [] }) {
             </span>
           </div>
 
-          {/* H1 — nuevo copy */}
+          {/* H1 con gradient text */}
           <h1 style={{
             fontSize: "clamp(52px, 8vw, 110px)",
             color: INK, fontWeight: 900, lineHeight: 0.9,
@@ -191,10 +210,10 @@ function HomeView({ nav, casesList = [] }) {
             fontFamily: "'Barlow Condensed', sans-serif",
             textTransform: "uppercase"
           }}>
-            De la Idea<br />a la <span style={{ color: ACCENT }}>Realidad.</span>
+            De la Idea<br />a la <span className="gradient-text">Realidad.</span>
           </h1>
 
-          {/* Subtítulo — nuevo copy */}
+          {/* Subtítulo */}
           <p style={{
             fontSize: "clamp(12px, 1vw, 14px)",
             color: INK3, maxWidth: 500,
@@ -205,7 +224,7 @@ function HomeView({ nav, casesList = [] }) {
             Dirección visual premium e infraestructura web de alto rendimiento.
           </p>
 
-          {/* Párrafo — nuevo copy */}
+          {/* Párrafo */}
           <p style={{
             fontSize: "clamp(16px, 1.3vw, 18px)",
             color: INK2, maxWidth: 520,
@@ -266,62 +285,120 @@ function HomeView({ nav, casesList = [] }) {
           </div>
         </div>
 
-        {/* VIDEO / SHOWREEL */}
-        <div style={{
-          flex: "1 1 400px", width: "100%", aspectRatio: "16 / 9",
-          background: SURFACE,
-          border: `1px solid ${BORDER}`,
-          borderRadius: "12px",
+        {/* Floating stats card (reemplaza el showreel) */}
+        <div className="glass-card" style={{
+          flex: "1 1 380px",
+          borderRadius: "24px",
+          padding: "40px",
+          boxShadow: `0 32px 80px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.7)`,
           position: "relative",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          overflow: "hidden",
-          boxShadow: `0 24px 64px rgba(0,0,0,0.07)`
+          zIndex: 2,
+          overflow: "hidden"
         }}>
-          {!playVideo ? (
-            <>
-              <div style={{
-                position: "absolute", inset: 0,
-                backgroundImage: `linear-gradient(${BORDER} 1px, transparent 1px), linear-gradient(90deg, ${BORDER} 1px, transparent 1px)`,
-                backgroundSize: "40px 40px",
-                opacity: 0.7
-              }} />
-              <div style={{ textAlign: "center", zIndex: 2 }}>
-                <div
-                  onClick={() => setPlayVideo(true)}
-                  style={{
-                    width: 80, height: 80, borderRadius: "50%",
-                    background: ACCENT, color: INK,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    margin: "0 auto 16px", fontSize: 22, cursor: "pointer",
-                    boxShadow: `0 12px 32px ${ACCENT}60`,
-                    transition: "transform 0.2s, box-shadow 0.2s"
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.transform = "scale(1.08)";
-                    e.currentTarget.style.boxShadow = `0 18px 48px ${ACCENT}80`;
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.transform = "scale(1)";
-                    e.currentTarget.style.boxShadow = `0 12px 32px ${ACCENT}60`;
-                  }}
-                >
-                  ▶
-                </div>
-                <span style={{
-                  fontSize: 12, fontWeight: 800, color: INK2,
-                  letterSpacing: "0.15em", textTransform: "uppercase"
-                }}>Ver Showreel</span>
+          {/* Gradient accent line */}
+          <div style={{
+            position: "absolute", top: 0, left: 0, right: 0, height: "3px",
+            background: `linear-gradient(90deg, ${ACCENT} 0%, #E8930F 50%, ${INK2} 100%)`
+          }} />
+
+          {/* Brand badge */}
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            background: MUTED_RED, border: `1px solid ${ACCENT}35`,
+            borderRadius: "20px", padding: "7px 14px", marginBottom: 28
+          }}>
+            <LogoIcon size={16} />
+            <span style={{ fontSize: 10, fontWeight: 900, color: ACCENT, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              Riders Media
+            </span>
+          </div>
+
+          {/* Metrics grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 28 }}>
+            {[
+              { val: "48h",   lab: "Respuesta",    accent: true  },
+              { val: "100%",  lab: "Transparente", accent: false },
+              { val: `${tickerData.length}+`, lab: "Servicios", accent: false },
+              { val: "B2B",   lab: "Enfocado",     accent: false }
+            ].map((m, i) => (
+              <div key={i} style={{
+                background: m.accent
+                  ? `linear-gradient(135deg, ${ACCENT}20, ${ACCENT}08)`
+                  : `${SURFACE}cc`,
+                border: `1px solid ${m.accent ? ACCENT + "35" : BORDER}`,
+                borderRadius: "14px",
+                padding: "18px 16px",
+                textAlign: "center"
+              }}>
+                <div style={{
+                  fontSize: "clamp(26px, 3vw, 34px)",
+                  fontWeight: 900, lineHeight: 1,
+                  color: m.accent ? ACCENT : INK,
+                  fontFamily: "'Barlow Condensed', sans-serif"
+                }}>{m.val}</div>
+                <div style={{
+                  fontSize: 9, fontWeight: 800, color: INK3,
+                  textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 5
+                }}>{m.lab}</div>
               </div>
-            </>
-          ) : (
-            <iframe
-              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
-              src="https://player.vimeo.com/video/201106279?autoplay=1&loop=1&autopause=0&title=0&byline=0&portrait=0"
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-              title="Showreel Riders.Media"
-            />
-          )}
+            ))}
+          </div>
+
+          {/* Services preview */}
+          <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 20 }}>
+            <div style={{
+              fontSize: 9, fontWeight: 900, color: INK3,
+              textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: 14
+            }}>
+              Servicios Destacados
+            </div>
+            {tickerData.slice(0, 3).map((s, i) => (
+              <div key={i} style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "10px 0",
+                borderBottom: i < 2 ? `1px solid ${BORDER}` : "none"
+              }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: INK }}>{s.name}</span>
+                {s.price && (
+                  <span style={{
+                    fontSize: 12, fontWeight: 800,
+                    background: `linear-gradient(135deg, ${ACCENT}, #E8930F)`,
+                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                    backgroundClip: "text"
+                  }}>
+                    {s.price.toString().includes('$') ? s.price : `$${s.price}`} MXN
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Ver catálogo link */}
+          <button
+            onClick={() => nav("catalogo")}
+            style={{
+              marginTop: 20, width: "100%",
+              padding: "12px",
+              background: `linear-gradient(135deg, ${ACCENT} 0%, #E8930F 100%)`,
+              color: INK,
+              border: "none", borderRadius: "12px",
+              fontWeight: 900, cursor: "pointer",
+              fontSize: 12, letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              boxShadow: `0 8px 24px ${ACCENT}30`,
+              transition: "all 0.25s"
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = `0 14px 36px ${ACCENT}45`;
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = `0 8px 24px ${ACCENT}30`;
+            }}
+          >
+            Ver Catálogo Completo →
+          </button>
         </div>
 
         {/* TICKER INFERIOR */}
@@ -430,14 +507,21 @@ function HomeView({ nav, casesList = [] }) {
         </div>
       </section>
 
-      {/* ── MÉTRICAS — fondo naranja ──────────────────────────── */}
+      {/* ── MÉTRICAS — fondo degradado ───────────────────────── */}
       <section style={{
         padding: "35px 8vw",
-        background: ACCENT,
+        background: `linear-gradient(135deg, ${ACCENT} 0%, #E8930F 55%, #D4770A 100%)`,
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-        gap: 32
+        gap: 32,
+        position: "relative",
+        overflow: "hidden"
       }}>
+        <div style={{
+          position: "absolute", inset: 0,
+          background: `radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.08) 0%, transparent 60%)`,
+          pointerEvents: "none"
+        }} />
         {[
           { val: "48h",          lab: "Tiempo de Respuesta"  },
           { val: "100%",         lab: "Transparencia de Costos" },
@@ -461,13 +545,21 @@ function HomeView({ nav, casesList = [] }) {
         ))}
       </section>
 
-      {/* ── FILOSOFÍA — fondo oscuro ──────────────────────────── */}
+      {/* ── FILOSOFÍA — fondo oscuro con degradado ───────────── */}
       <section style={{
         padding: "68px 8vw",
-        background: INK,
+        background: `linear-gradient(145deg, ${INK} 0%, #152333 45%, ${INK2}ee 100%)`,
         position: "relative", overflow: "hidden"
       }}>
-        <PatternBg show={PATRON.filosofia} opacity={0.03} filter={null} maskStop={null} />
+        {/* Glow central naranja */}
+        <div style={{
+          position: "absolute", top: "50%", left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "600px", height: "400px", borderRadius: "50%",
+          background: `radial-gradient(ellipse, ${ACCENT}0d 0%, transparent 65%)`,
+          filter: "blur(40px)", pointerEvents: "none"
+        }} />
+        <PatternBg show={PATRON.filosofia} opacity={0.025} filter={null} maskStop={null} />
 
         <div style={{ position: "relative", zIndex: 1 }}>
           <SectionLabel>Filosofía</SectionLabel>
@@ -479,19 +571,23 @@ function HomeView({ nav, casesList = [] }) {
             {PILLARS.map(p => (
               <div key={p.num}
                 style={{
-                  background: "rgba(255,255,255,0.04)",
+                  background: "rgba(255,255,255,0.05)",
+                  backdropFilter: "blur(16px)",
+                  WebkitBackdropFilter: "blur(16px)",
                   padding: "40px",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: "8px",
-                  transition: "border-color 0.3s, transform 0.3s"
+                  border: "1px solid rgba(255,255,255,0.09)",
+                  borderRadius: "16px",
+                  transition: "border-color 0.3s, transform 0.3s, box-shadow 0.3s"
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = ACCENT;
-                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.borderColor = `${ACCENT}80`;
+                  e.currentTarget.style.transform = "translateY(-6px)";
+                  e.currentTarget.style.boxShadow = `0 20px 50px rgba(0,0,0,0.3), 0 0 0 1px ${ACCENT}30`;
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.09)";
                   e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
                 <div style={{
@@ -517,9 +613,18 @@ function HomeView({ nav, casesList = [] }) {
       {/* ── CTA DE CIERRE ─────────────────────────────────────── */}
       <section style={{
         padding: "140px 8vw",
-        background: BG2,
-        textAlign: "center"
+        background: `linear-gradient(180deg, ${BG2} 0%, #EDE8DC 100%)`,
+        textAlign: "center",
+        position: "relative",
+        overflow: "hidden"
       }}>
+        <div style={{
+          position: "absolute", top: "-30%", left: "50%",
+          transform: "translateX(-50%)",
+          width: "800px", height: "400px", borderRadius: "50%",
+          background: `radial-gradient(ellipse, ${ACCENT}0e 0%, transparent 65%)`,
+          filter: "blur(60px)", pointerEvents: "none"
+        }} />
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <div style={{
             width: 64, height: 64,
@@ -545,23 +650,26 @@ function HomeView({ nav, casesList = [] }) {
           <button
             onClick={() => nav("contacto")}
             style={{
-              background: ACCENT, color: INK,
+              background: `linear-gradient(135deg, ${ACCENT} 0%, #E8930F 100%)`,
+              color: INK,
               border: "none", padding: "20px 52px",
-              fontWeight: 800, borderRadius: "4px",
+              fontWeight: 800, borderRadius: "8px",
               cursor: "pointer", fontSize: 14,
               letterSpacing: "0.08em", textTransform: "uppercase",
-              boxShadow: `0 8px 24px ${ACCENT}40`,
+              boxShadow: `0 8px 28px ${ACCENT}45`,
               transition: "all 0.25s"
             }}
             onMouseEnter={e => {
               e.currentTarget.style.background = INK;
               e.currentTarget.style.color = "#fff";
               e.currentTarget.style.transform = "translateY(-3px)";
+              e.currentTarget.style.boxShadow = `0 14px 40px ${INK}30`;
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.background = ACCENT;
+              e.currentTarget.style.background = `linear-gradient(135deg, ${ACCENT} 0%, #E8930F 100%)`;
               e.currentTarget.style.color = INK;
               e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = `0 8px 28px ${ACCENT}45`;
             }}
           >
             Cotizar Mi Proyecto
@@ -692,31 +800,33 @@ function CatalogView({ nav }) {
           {items.map(s => (
             <div key={s.id}
               style={{
-                background: s.highlight ? BG2 : SURFACE,
-                border: `1px solid ${s.highlight ? ACCENT : BORDER}`,
+                background: s.highlight
+                  ? `linear-gradient(145deg, ${BG2} 0%, #EDE8DC 100%)`
+                  : SURFACE,
+                border: `1px solid ${s.highlight ? ACCENT + "60" : BORDER}`,
                 padding: "40px",
-                borderRadius: "8px",
+                borderRadius: "16px",
                 position: "relative",
                 display: "flex",
                 flexDirection: "column",
                 boxShadow: s.highlight
-                  ? `0 8px 32px ${ACCENT}22`
+                  ? `0 8px 40px ${ACCENT}20, inset 0 1px 0 rgba(255,255,255,0.5)`
                   : "0 4px 16px rgba(0,0,0,0.04)",
-                transition: "transform 0.2s, border-color 0.2s, box-shadow 0.2s"
+                transition: "transform 0.25s, border-color 0.25s, box-shadow 0.25s"
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.transform = "translateY(-6px)";
                 e.currentTarget.style.boxShadow = s.highlight
-                  ? `0 16px 48px ${ACCENT}30`
-                  : `0 12px 36px rgba(0,0,0,0.09)`;
-                if (!s.highlight) e.currentTarget.style.borderColor = ACCENT;
+                  ? `0 20px 60px ${ACCENT}28, inset 0 1px 0 rgba(255,255,255,0.5)`
+                  : `0 16px 48px rgba(0,0,0,0.10)`;
+                e.currentTarget.style.borderColor = s.highlight ? ACCENT : `${ACCENT}60`;
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.transform = "translateY(0)";
                 e.currentTarget.style.boxShadow = s.highlight
-                  ? `0 8px 32px ${ACCENT}22`
+                  ? `0 8px 40px ${ACCENT}20, inset 0 1px 0 rgba(255,255,255,0.5)`
                   : "0 4px 16px rgba(0,0,0,0.04)";
-                if (!s.highlight) e.currentTarget.style.borderColor = BORDER;
+                e.currentTarget.style.borderColor = s.highlight ? `${ACCENT}60` : BORDER;
               }}
             >
               {/* Badge popular */}
@@ -769,27 +879,36 @@ function CatalogView({ nav }) {
 
               {/* CTA de tarjeta */}
               <button
-                onClick={() => nav("contacto")}
+                onClick={() => nav("contacto", s.id)}
                 style={{
                   width: "100%", padding: "14px",
-                  background: s.highlight ? INK : "transparent",
-                  color:      s.highlight ? "#fff" : INK,
-                  border: `2px solid ${s.highlight ? INK : ACCENT}`,
-                  borderRadius: "4px",
+                  background: s.highlight
+                    ? `linear-gradient(135deg, ${ACCENT} 0%, #E8930F 100%)`
+                    : "transparent",
+                  color: s.highlight ? INK : INK,
+                  border: `2px solid ${s.highlight ? "transparent" : ACCENT}`,
+                  borderRadius: "8px",
                   fontWeight: 800, cursor: "pointer",
                   fontSize: 13, letterSpacing: "0.05em",
                   textTransform: "uppercase",
+                  boxShadow: s.highlight ? `0 6px 20px ${ACCENT}30` : "none",
                   transition: "all 0.2s"
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.background = ACCENT;
-                  e.currentTarget.style.borderColor = ACCENT;
+                  e.currentTarget.style.background = `linear-gradient(135deg, ${ACCENT} 0%, #E8930F 100%)`;
+                  e.currentTarget.style.borderColor = "transparent";
                   e.currentTarget.style.color = INK;
+                  e.currentTarget.style.boxShadow = `0 10px 28px ${ACCENT}40`;
+                  e.currentTarget.style.transform = "translateY(-1px)";
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.background = s.highlight ? INK : "transparent";
-                  e.currentTarget.style.borderColor = s.highlight ? INK : ACCENT;
-                  e.currentTarget.style.color = s.highlight ? "#fff" : INK;
+                  e.currentTarget.style.background = s.highlight
+                    ? `linear-gradient(135deg, ${ACCENT} 0%, #E8930F 100%)`
+                    : "transparent";
+                  e.currentTarget.style.borderColor = s.highlight ? "transparent" : ACCENT;
+                  e.currentTarget.style.color = INK;
+                  e.currentTarget.style.boxShadow = s.highlight ? `0 6px 20px ${ACCENT}30` : "none";
+                  e.currentTarget.style.transform = "translateY(0)";
                 }}
               >
                 Cotizar este servicio →
@@ -870,7 +989,7 @@ function CatalogView({ nav }) {
             lineHeight: 0.95
           }}>
             Servicios &<br />
-            <span style={{ color: ACCENT }}>Precios.</span>
+            <span className="gradient-text">Precios.</span>
           </h1>
           <p style={{ color: INK2, fontSize: 18, lineHeight: 1.7 }}>
             Sin letra chica. Sin sorpresas. Todos los precios son desde —
@@ -1632,8 +1751,8 @@ function AboutView() {
 }
 
 
-function ContactView({ isMobile }) {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", service: "", message: "" });
+function ContactView({ isMobile, initialService }) {
+  const [form, setForm] = useState({ name: "", email: "", phone: "", service: initialService || "", message: "" });
   const [sent, setSent] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -1642,7 +1761,8 @@ function ContactView({ isMobile }) {
   useEffect(() => {
     if (!window.Papa || !CATALOGO_CSV_URL) {
       setServicesList(CATALOG);
-      if (CATALOG.length > 0) setForm(prev => ({ ...prev, service: CATALOG[0].id }));
+      const defaultService = initialService || (CATALOG.length > 0 ? CATALOG[0].id : "");
+      setForm(prev => ({ ...prev, service: defaultService }));
       return;
     }
     fetch(`${CATALOGO_CSV_URL}&t=${Date.now()}`)
@@ -1650,7 +1770,8 @@ function ContactView({ isMobile }) {
       .then(csvText => {
         if (csvText.trim().startsWith('<')) {
           setServicesList(CATALOG);
-          if (CATALOG.length > 0) setForm(prev => ({ ...prev, service: CATALOG[0].id }));
+          const defaultService = initialService || (CATALOG.length > 0 ? CATALOG[0].id : "");
+          setForm(prev => ({ ...prev, service: defaultService }));
           return;
         }
         window.Papa.parse(csvText, {
@@ -1666,19 +1787,22 @@ function ContactView({ isMobile }) {
               }));
             if (fetchedData.length > 0) {
               setServicesList(fetchedData);
-              setForm(prev => ({ ...prev, service: fetchedData[0].id }));
+              const defaultService = initialService || fetchedData[0].id;
+              setForm(prev => ({ ...prev, service: defaultService }));
             } else {
               setServicesList(CATALOG);
-              if (CATALOG.length > 0) setForm(prev => ({ ...prev, service: CATALOG[0].id }));
+              const defaultService = initialService || (CATALOG.length > 0 ? CATALOG[0].id : "");
+              setForm(prev => ({ ...prev, service: defaultService }));
             }
           }
         });
       })
       .catch(() => {
         setServicesList(CATALOG);
-        if (CATALOG.length > 0) setForm(prev => ({ ...prev, service: CATALOG[0].id }));
+        const defaultService = initialService || (CATALOG.length > 0 ? CATALOG[0].id : "");
+        setForm(prev => ({ ...prev, service: defaultService }));
       });
-  }, []);
+  }, [initialService]);
 
   const handle = (e) => {
     e.preventDefault();
@@ -1766,11 +1890,11 @@ function ContactView({ isMobile }) {
           gap: "24px", alignItems: "start"
         }}>
 
-          {/* ── Panel izquierdo — oscuro ─────────────────────── */}
+          {/* ── Panel izquierdo — degradado oscuro ──────────── */}
           <div style={{
-            background: INK2,
+            background: `linear-gradient(150deg, ${INK2} 0%, ${INK} 55%, #0A1520 100%)`,
             padding: "44px 36px",
-            borderRadius: "12px",
+            borderRadius: "16px",
             display: "flex", flexDirection: "column",
             justifyContent: "space-between",
             position: "relative", overflow: "hidden",
@@ -1901,9 +2025,10 @@ function ContactView({ isMobile }) {
           <form onSubmit={handle} style={{
             background: SURFACE,
             padding: isMobile ? "36px 24px" : "48px 44px",
-            borderRadius: "12px",
+            borderRadius: "16px",
             border: `1px solid ${BORDER}`,
             display: "flex", flexDirection: "column", gap: 22,
+            boxShadow: "0 8px 40px rgba(0,0,0,0.04)"
           }}>
 
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 20 }}>
@@ -1983,26 +2108,26 @@ function ContactView({ isMobile }) {
 
             <button type="submit" disabled={loading}
               style={{
-                background: loading ? INK3 : ACCENT,
+                background: loading ? INK3 : `linear-gradient(135deg, ${ACCENT} 0%, #E8930F 100%)`,
                 color: loading ? "#fff" : INK,
                 border: "none", padding: "18px",
-                borderRadius: "8px", fontWeight: 900,
+                borderRadius: "10px", fontWeight: 900,
                 cursor: loading ? "wait" : "pointer",
                 textTransform: "uppercase",
                 letterSpacing: "0.1em", fontSize: 14,
-                boxShadow: loading ? "none" : `0 8px 24px ${ACCENT}40`,
+                boxShadow: loading ? "none" : `0 8px 28px ${ACCENT}40`,
                 transition: "all 0.25s"
               }}
               onMouseEnter={e => {
                 if (!loading) {
                   e.currentTarget.style.transform  = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow  = `0 12px 32px ${ACCENT}60`;
+                  e.currentTarget.style.boxShadow  = `0 14px 40px ${ACCENT}55`;
                 }
               }}
               onMouseLeave={e => {
                 if (!loading) {
                   e.currentTarget.style.transform  = "translateY(0)";
-                  e.currentTarget.style.boxShadow  = `0 8px 24px ${ACCENT}40`;
+                  e.currentTarget.style.boxShadow  = `0 8px 28px ${ACCENT}40`;
                 }
               }}
             >
@@ -2131,14 +2256,16 @@ export default function App() {
   const [page, setPage] = useState("inicio");
   const [marketStats, setMarketStats] = useState([]);
   const [casesList, setCasesList] = useState(CASES || []);
-  
+  const [preselectedService, setPreselectedService] = useState(null);
+
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
-  
-  const nav = (p) => { 
-    setPage(p); 
-    setMenuOpen(false); 
-    window.scrollTo({ top: 0, behavior: "smooth" }); 
+
+  const nav = (p, serviceId = null) => {
+    setPage(p);
+    setPreselectedService(serviceId);
+    setMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
  useEffect(() => {
@@ -2235,12 +2362,12 @@ export default function App() {
 
       <SocialFloat isMobile={isMobile} />
 
-      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: `${BG}ee`, backdropFilter: "blur(12px)", borderBottom: `1px solid ${BORDER}`, height: "80px", display: "flex", alignItems: "center", padding: "0 5vw", justifyContent: "space-between" }}>
+      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: `rgba(255,255,255,0.85)`, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderBottom: `1px solid ${BORDER}`, height: "80px", display: "flex", alignItems: "center", padding: "0 5vw", justifyContent: "space-between" }}>
         <div onClick={() => nav("inicio")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 3.5 }}>
           <LogoIcon size={32} />
           <span style={{ fontWeight: 900, fontSize: "20px", letterSpacing: "0.01em" }}>IDERS MEDIA</span>
         </div>
-        
+
         {!isMobile ? (
           <>
             <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
@@ -2250,7 +2377,12 @@ export default function App() {
                 </button>
               ))}
             </div>
-            <button onClick={() => nav("contacto")} style={{ background: INK, color: "#fff", border: "none", padding: "12px 28px", borderRadius: "4px", fontWeight: 800, cursor: "pointer", textTransform: "uppercase", fontSize: 12, letterSpacing: "0.05em" }}>
+            <button
+              onClick={() => nav("contacto")}
+              style={{ background: `linear-gradient(135deg, ${ACCENT} 0%, #E8930F 100%)`, color: INK, border: "none", padding: "12px 28px", borderRadius: "8px", fontWeight: 800, cursor: "pointer", textTransform: "uppercase", fontSize: 12, letterSpacing: "0.05em", boxShadow: `0 4px 16px ${ACCENT}30`, transition: "all 0.2s" }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = `0 8px 24px ${ACCENT}45`; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = `0 4px 16px ${ACCENT}30`; }}
+            >
               Cotizar
             </button>
           </>
@@ -2280,10 +2412,10 @@ export default function App() {
         {page === "valor" && <ValorView stats={marketStats} />}
         {page === "casos" && <CasesView casesData={casesList} />}
         {page === "agencia" && <AboutView />}
-        {page === "contacto" && <ContactView isMobile={isMobile} />}
+        {page === "contacto" && <ContactView isMobile={isMobile} initialService={preselectedService} />}
       </main>
 
-      <footer style={{ padding: "20px 5vw", borderTop: `1px solid ${BORDER}`, background: BG2 }}>
+      <footer style={{ padding: "20px 5vw", borderTop: `3px solid transparent`, borderImage: `linear-gradient(90deg, ${ACCENT}, #E8930F, ${INK2}) 1`, background: `linear-gradient(180deg, ${BG2} 0%, #ECE7DC 100%)` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
              <LogoIcon size={24} />
