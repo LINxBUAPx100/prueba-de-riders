@@ -150,8 +150,9 @@ function Chip({ children, outline, accent }) {
 }
 
 // Logo bicolor: `square` = color del cuadro, `mark` = color de la "R" (combinaciones aprobadas).
-// Por defecto: cuadro navy + "R" cream (blanca) → se ve blanca sobre oscuro y visible sobre cream.
-function LogoIcon({ size = 32, square = INK2, mark = BG }) {
+// Por defecto: cuadro navy + "R" ÁMBAR → logo amarillo; sobre oscuro el cuadro se funde y
+// queda la flecha ámbar flotando (como el lockup del EPS).
+function LogoIcon({ size = 32, square = RIDERS, mark = ACCENT }) {
   return (
     <svg width={size} height={size} viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="0" y="0" width="1080" height="1080" rx="292.89" ry="292.89" fill={mark} />
@@ -1643,7 +1644,7 @@ export default function App() {
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: `rgba(255,255,255,0.85)`, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderBottom: `1px solid ${BORDER}`, height: "80px", display: "flex", alignItems: "center", padding: "0 5vw", justifyContent: "space-between" }}>
         <div onClick={() => nav("inicio")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 3.5 }}>
           <LogoIcon size={32} />
-          <span className="font-display" style={{ fontWeight: 700, fontSize: "22px", letterSpacing: "0.03em" }}>IDERS MEDIA</span>
+          <span className="font-display" style={{ fontWeight: 700, fontSize: "22px", letterSpacing: "0.03em", color: BG2 }}>IDERS MEDIA</span>
         </div>
 
         {!isMobile ? (
@@ -1690,7 +1691,7 @@ export default function App() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
              <LogoIcon size={24} />
-             <span className="font-display" style={{ fontWeight: 700, color: INK, letterSpacing: "0.05em", fontSize: 18 }}>IDERS MEDIA</span>
+             <span className="font-display" style={{ fontWeight: 700, color: BG2, letterSpacing: "0.05em", fontSize: 18 }}>IDERS MEDIA</span>
           </div>
 
           <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
