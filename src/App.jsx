@@ -175,6 +175,22 @@ function ScrollProgress() {
   return <div ref={ref} className="scroll-progress" />;
 }
 
+// ── IN-VIEW: true cuando el elemento entra en viewport (para animar gráficas)
+function useInView(threshold = 0.2) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setInView(true); io.disconnect(); }
+    }, { threshold });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [threshold]);
+  return [ref, inView];
+}
+
 // ── ÍCONOS SVG (trazo consistente, heredan color) ────────────────────────
 const svgBase = { fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" };
 function IconBolt({ size = 22 })   { return <svg width={size} height={size} viewBox="0 0 24 24" {...svgBase}><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" /></svg>; }
@@ -970,9 +986,10 @@ function ValorView({ stats }) {
       { name: "Agencia", val: stat.agencias,  color: C_AGENCY },
       { name: "Riders",  val: stat.riders,    color: C_RIDERS },
     ];
+    const [ref, inView] = useInView();
 
     return (
-      <div className="glass-card-dark"
+      <div ref={ref} className="glass-card-dark"
         style={{
           border: `1px solid ${highlight ? ACCENT + "70" : D_BORDER}`,
           borderRadius: 14, padding: "22px",
@@ -991,11 +1008,11 @@ function ValorView({ stats }) {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-          {entries.map(entry => (
+          {entries.map((entry, i) => (
             <div key={entry.name} style={{ display: "flex", alignItems: "center", gap: 7 }}>
               <span style={{ fontSize: 8, fontWeight: 800, color: entry.color === ACCENT ? ACCENT : D_TXT3, textTransform: "uppercase", letterSpacing: "0.04em", width: 40, flexShrink: 0 }}>{entry.name}</span>
               <div style={{ flex: 1, height: 5, background: D_TRACK, borderRadius: 3, overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${(entry.val / safeMax) * 100}%`, background: entry.color, borderRadius: 3, boxShadow: entry.color === ACCENT ? `0 0 6px ${ACCENT}60` : "none" }} />
+                <div style={{ height: "100%", width: inView ? `${(entry.val / safeMax) * 100}%` : "0%", background: entry.color, borderRadius: 3, transition: "width 1.1s cubic-bezier(0.4,0,0.2,1)", transitionDelay: `${i * 0.12}s`, boxShadow: entry.color === ACCENT ? `0 0 6px ${ACCENT}60` : "none" }} />
               </div>
               <span style={{ fontSize: 10, fontWeight: 800, color: entry.color === ACCENT ? ACCENT : D_TXT3, width: 30, textAlign: "right", flexShrink: 0 }}>{entry.val}{stat.unidad}</span>
             </div>
@@ -1012,9 +1029,10 @@ function ValorView({ stats }) {
       { r: 37, val: stat.agencias,  color: C_AGENCY, label: "Agencias"  },
       { r: 24, val: stat.riders,    color: C_RIDERS, label: "Riders"    },
     ];
+    const [ref, inView] = useInView();
 
     return (
-      <div className="glass-card-dark"
+      <div ref={ref} className="glass-card-dark"
         style={{ border: `1px solid ${D_BORDER}`, borderRadius: 14, padding: "36px 32px", display: "flex", flexDirection: "column", alignItems: "center", transition: "box-shadow 0.25s, transform 0.25s" }}
         onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 14px 44px rgba(0,0,0,0.4)`; e.currentTarget.style.transform = "translateY(-3px)"; }}
         onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "translateY(0)"; }}
@@ -1022,15 +1040,15 @@ function ValorView({ stats }) {
         <h3 style={{ fontSize: 11, fontWeight: 900, color: D_TXT, textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 32, textAlign: "center" }}>{stat.label}</h3>
 
         <svg width="180" height="180" viewBox="0 0 120 120">
-          {rings.map(ring => {
+          {rings.map((ring, i) => {
             const circ = 2 * Math.PI * ring.r;
-            const fill = Math.min(ring.val, 100) / 100 * circ;
+            const fill = inView ? Math.min(ring.val, 100) / 100 * circ : 0;
             return (
               <g key={ring.r}>
                 <circle cx="60" cy="60" r={ring.r} fill="none" stroke={D_TRACK} strokeWidth="7" />
                 <circle cx="60" cy="60" r={ring.r} fill="none" stroke={ring.color} strokeWidth="7"
                   strokeDasharray={`${fill} ${circ}`} strokeLinecap="round" transform="rotate(-90 60 60)"
-                  style={{ filter: ring.color === ACCENT ? `drop-shadow(0 0 4px ${ACCENT}90)` : "none", transition: "stroke-dasharray 1.2s cubic-bezier(0.4,0,0.2,1)" }}
+                  style={{ filter: ring.color === ACCENT ? `drop-shadow(0 0 4px ${ACCENT}90)` : "none", transition: "stroke-dasharray 1.3s cubic-bezier(0.4,0,0.2,1)", transitionDelay: `${i * 0.15}s` }}
                 />
               </g>
             );
@@ -1063,9 +1081,10 @@ function ValorView({ stats }) {
       { name: "Agencias",  val: stat.agencias,  color: C_AGENCY, textColor: D_TXT2 },
       { name: "Riders",    val: stat.riders,    color: C_RIDERS, textColor: ACCENT },
     ];
+    const [ref, inView] = useInView();
 
     return (
-      <div className="glass-card-dark"
+      <div ref={ref} className="glass-card-dark"
         style={{ border: `1px solid ${D_BORDER}`, borderRadius: 14, padding: "32px", display: "flex", flexDirection: "column", justifyContent: "space-between", transition: "box-shadow 0.25s, transform 0.25s" }}
         onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 14px 44px rgba(0,0,0,0.4)`; e.currentTarget.style.transform = "translateY(-3px)"; }}
         onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "translateY(0)"; }}
@@ -1073,14 +1092,14 @@ function ValorView({ stats }) {
         <div>
           <h3 style={{ fontSize: 11, fontWeight: 900, color: D_TXT, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 28 }}>{stat.label}</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-            {bars.map(bar => (
+            {bars.map((bar, i) => (
               <div key={bar.name}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, alignItems: "baseline" }}>
                   <span style={{ fontSize: 10, fontWeight: 800, color: bar.textColor, textTransform: "uppercase", letterSpacing: "0.06em" }}>{bar.name}</span>
                   <span className="font-num" style={{ fontSize: 14, fontWeight: 900, color: bar.textColor }}>{bar.val}<span style={{ fontWeight: 600, fontSize: 10, marginLeft: 2 }}>{stat.unidad}</span></span>
                 </div>
                 <div style={{ height: 8, background: D_TRACK, borderRadius: 4, overflow: "hidden" }}>
-                  <div style={{ height: "100%", width: `${(bar.val / safeMax) * 100}%`, background: bar.color, borderRadius: 4, transition: "width 1.2s cubic-bezier(0.4,0,0.2,1)", boxShadow: bar.color === ACCENT ? `0 0 10px ${ACCENT}60` : "none" }} />
+                  <div style={{ height: "100%", width: inView ? `${(bar.val / safeMax) * 100}%` : "0%", background: bar.color, borderRadius: 4, transition: "width 1.2s cubic-bezier(0.4,0,0.2,1)", transitionDelay: `${i * 0.12}s`, boxShadow: bar.color === ACCENT ? `0 0 10px ${ACCENT}60` : "none" }} />
                 </div>
               </div>
             ))}
@@ -1105,9 +1124,10 @@ function ValorView({ stats }) {
       { name: "Agencias",  h: aH, val: stat.agencias,  color: C_AGENCY, textColor: D_TXT2 },
       { name: "Riders",    h: rH, val: stat.riders,    color: C_RIDERS, textColor: ACCENT },
     ];
+    const [ref, inView] = useInView();
 
     return (
-      <div className="glass-card-dark"
+      <div ref={ref} className="glass-card-dark"
         style={{ border: `1px solid ${D_BORDER}`, borderRadius: 14, padding: "32px", display: "flex", flexDirection: "column", justifyContent: "space-between", transition: "box-shadow 0.25s, transform 0.25s" }}
         onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 14px 44px rgba(0,0,0,0.4)`; e.currentTarget.style.transform = "translateY(-3px)"; }}
         onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "translateY(0)"; }}
@@ -1119,10 +1139,10 @@ function ValorView({ stats }) {
               <div key={pct} style={{ position: "absolute", left: 0, right: 0, bottom: `${pct * 1.6}px`, borderTop: `1px dashed ${D_BORDER}`, zIndex: 0, pointerEvents: "none" }} />
             ))}
             <div style={{ display: "flex", alignItems: "flex-end", height: "160px", gap: "12px", borderBottom: `2px solid rgba(255,255,255,0.2)`, position: "relative", zIndex: 1 }}>
-              {bars.map(bar => (
+              {bars.map((bar, i) => (
                 <div key={bar.name} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%" }}>
                   <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
-                    <div style={{ height: `${bar.h}%`, width: "100%", background: bar.color, borderRadius: "4px 4px 0 0", boxShadow: bar.color === ACCENT ? `0 -6px 18px ${ACCENT}40` : "none", transition: "height 1.1s cubic-bezier(0.4,0,0.2,1)" }} />
+                    <div style={{ height: inView ? `${bar.h}%` : "0%", width: "100%", background: bar.color, borderRadius: "4px 4px 0 0", boxShadow: bar.color === ACCENT ? `0 -6px 18px ${ACCENT}40` : "none", transition: "height 1.1s cubic-bezier(0.4,0,0.2,1)", transitionDelay: `${i * 0.12}s` }} />
                   </div>
                   <span className="font-num" style={{ fontSize: 12, fontWeight: 900, marginTop: 9, color: bar.textColor }}>{fmt(bar.val)}</span>
                   <span style={{ fontSize: 8, fontWeight: 700, marginTop: 3, color: bar.textColor, textTransform: "uppercase", letterSpacing: "0.04em" }}>{bar.name}</span>
