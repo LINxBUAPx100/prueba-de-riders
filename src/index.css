@@ -95,24 +95,25 @@ nav button, footer button, .mobile-menu button {
 .mesh-warm {
   background-color: #f2efe6;
   background-image:
-    radial-gradient(at 16% 20%, rgba(245, 163, 19, 0.20) 0px, transparent 50%),
-    radial-gradient(at 84% 10%, rgba(248, 180, 44, 0.16) 0px, transparent 55%),
-    radial-gradient(at 78% 76%, rgba(24, 52, 87, 0.10) 0px, transparent 50%),
-    radial-gradient(at 28% 88%, rgba(88, 6, 64, 0.07) 0px, transparent 46%);
+    radial-gradient(at 16% 20%, rgba(245, 163, 19, 0.38) 0px, transparent 50%),
+    radial-gradient(at 84% 10%, rgba(248, 180, 44, 0.32) 0px, transparent 55%),
+    radial-gradient(at 78% 76%, rgba(24, 52, 87, 0.20) 0px, transparent 50%),
+    radial-gradient(at 28% 88%, rgba(88, 6, 64, 0.16) 0px, transparent 46%);
   background-size: 200% 200%;
 }
-.mesh-warm-animated { animation: gradientShift 20s ease infinite; }
+.mesh-warm-animated { animation: gradientShift 14s ease infinite; }
 
 /* --- MESH GRADIENTS "CENTRO DE MANDO" (oscuro navy) --- */
 .mesh-dark {
   background-color: #122c49;
   background-image:
-    radial-gradient(at 14% 18%, rgba(245, 163, 19, 0.16) 0px, transparent 46%),
-    radial-gradient(at 86% 24%, rgba(24, 52, 87, 0.65) 0px, transparent 52%),
-    radial-gradient(at 70% 92%, rgba(88, 6, 64, 0.18) 0px, transparent 48%);
+    radial-gradient(at 12% 16%, rgba(245, 163, 19, 0.30) 0px, transparent 46%),
+    radial-gradient(at 88% 22%, rgba(36, 96, 158, 0.55) 0px, transparent 52%),
+    radial-gradient(at 68% 94%, rgba(88, 6, 64, 0.40) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(248, 180, 44, 0.12) 0px, transparent 55%);
   background-size: 200% 200%;
 }
-.mesh-dark-animated { animation: gradientShift 24s ease infinite; }
+.mesh-dark-animated { animation: gradientShift 16s ease infinite; }
 
 /* --- GRANO / NOISE SUTIL (textura premium) --- */
 .grain::after {
@@ -145,13 +146,13 @@ nav button, footer button, .mobile-menu button {
 .cta-flow {
   background-color: #f2efe6;
   background-image:
-    radial-gradient(circle at 18% 28%, rgba(245, 163, 19, 0.30) 0px, transparent 42%),
-    radial-gradient(circle at 82% 38%, rgba(24, 52, 87, 0.22) 0px, transparent 44%),
-    radial-gradient(circle at 50% 84%, rgba(88, 6, 64, 0.18) 0px, transparent 46%),
-    radial-gradient(circle at 70% 12%, rgba(248, 180, 44, 0.22) 0px, transparent 40%);
-  background-size: 200% 200%, 220% 220%, 200% 200%, 180% 180%;
+    radial-gradient(circle at 14% 26%, rgba(245, 163, 19, 0.55) 0px, transparent 46%),
+    radial-gradient(circle at 86% 36%, rgba(24, 52, 87, 0.42) 0px, transparent 48%),
+    radial-gradient(circle at 50% 88%, rgba(88, 6, 64, 0.40) 0px, transparent 50%),
+    radial-gradient(circle at 74% 10%, rgba(248, 180, 44, 0.50) 0px, transparent 44%);
+  background-size: 210% 210%, 230% 230%, 210% 210%, 190% 190%;
   background-repeat: no-repeat;
-  animation: ctaFlow 18s ease-in-out infinite;
+  animation: ctaFlow 13s ease-in-out infinite;
 }
 @keyframes ctaFlow {
   0%   { background-position:   0% 0%, 100% 0%,  50% 100%, 100% 50%; }
