@@ -1542,7 +1542,7 @@ function ContactView({ isMobile, initialService }) {
             </div>
 
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start", background: `${ACCENT}1f`, border: `1px solid ${ACCENT}45`, padding: "14px 16px", borderRadius: 8 }}>
-              <span style={{ fontSize: 16, flexShrink: 0 }}>💬</span>
+              <span style={{ fontSize: 16, flexShrink: 0 }}>☁</span>
               <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 12, lineHeight: 1.65, margin: 0 }}>
                 Al enviar se abrirá un chat de WhatsApp con tu información prellenada para continuar la conversación directamente con el equipo.
               </p>
