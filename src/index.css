@@ -159,6 +159,36 @@ nav button, footer button, .mobile-menu button {
   100% { background-position:   0% 0%, 100% 0%,  50% 100%, 100% 50%; }
 }
 
+/* --- BARRA DE PROGRESO DE SCROLL (top) --- */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  z-index: 1100;
+  background: linear-gradient(90deg, #f8b42c, #f5a313);
+  box-shadow: 0 0 10px rgba(245, 163, 19, 0.6);
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+/* --- SHINE EN BOTONES (barre al hover) --- */
+.rm-btn { position: relative; overflow: hidden; }
+.rm-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.rm-btn:hover::after { animation: btnShine 0.8s ease; }
+@keyframes btnShine { from { left: -150%; } to { left: 160%; } }
+
 /* --- REVEAL AL SCROLL (bloque único) --- */
 .reveal {
   opacity: 0;

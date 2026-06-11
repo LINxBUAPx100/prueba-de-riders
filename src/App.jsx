@@ -121,6 +121,60 @@ function Counter({ value, duration = 1400, style, className }) {
   return <span ref={ref} className={className} style={style}>{display}</span>;
 }
 
+// ── PARALLAX: desplaza un elemento al hacer scroll (vía CSS var --py) ──────
+function useParallax(speed = 0.25) {
+  const ref = useRef(null);
+  const reduced = usePrefersReducedMotion();
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || reduced) return;
+    let raf = null;
+    const update = () => {
+      raf = null;
+      const rect = el.getBoundingClientRect();
+      const winH = window.innerHeight || 1;
+      const progress = (rect.top + rect.height / 2 - winH / 2) / winH; // ~-1..1 al cruzar el viewport
+      el.style.setProperty("--py", `${(-progress * speed * 100).toFixed(1)}px`);
+    };
+    const onScroll = () => { if (raf == null) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [speed, reduced]);
+  return ref;
+}
+
+// ── BARRA DE PROGRESO DE SCROLL (top) ────────────────────────────────────
+function ScrollProgress() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let raf = null;
+    const update = () => {
+      raf = null;
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      el.style.width = `${max > 0 ? (h.scrollTop / max) * 100 : 0}%`;
+    };
+    const onScroll = () => { if (raf == null) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+  return <div ref={ref} className="scroll-progress" />;
+}
+
 // ── ÍCONOS SVG (trazo consistente, heredan color) ────────────────────────
 const svgBase = { fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" };
 function IconBolt({ size = 22 })   { return <svg width={size} height={size} viewBox="0 0 24 24" {...svgBase}><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" /></svg>; }
@@ -277,6 +331,7 @@ function Btn({ variant = "primary", children, onClick, type = "button", full = f
   return (
     <button
       type={type} onClick={onClick} disabled={disabled}
+      className="rm-btn"
       onMouseEnter={() => !disabled && setH(true)} onMouseLeave={() => !disabled && setH(false)}
       style={{ ...base, ...v }}
     >
@@ -287,6 +342,12 @@ function Btn({ variant = "primary", children, onClick, type = "button", full = f
 
 function HomeView({ nav, casesList = [] }) {
   const [tickerData, setTickerData] = useState(CATALOG);
+
+  // ── Parallax refs (se desplazan al hacer scroll) ──
+  const heroBlobA = useParallax(0.22);
+  const heroBlobB = useParallax(-0.16);
+  const filoGlow  = useParallax(0.40);
+  const ctaGlow   = useParallax(0.50);
 
   useEffect(() => {
     if (!window.Papa || !CATALOGO_CSV_URL) return;
@@ -365,6 +426,10 @@ function HomeView({ nav, casesList = [] }) {
         display: "flex", flexDirection: "column", justifyContent: "center",
         borderBottom: `1px solid ${BORDER}`
       }}>
+        {/* ── Parallax: blobs decorativos que se desplazan al hacer scroll ── */}
+        <div ref={heroBlobA} style={{ position: "absolute", top: "-8%", right: "-6%", width: 540, height: 540, borderRadius: "50%", background: `radial-gradient(circle, ${ACCENT}22 0%, transparent 68%)`, filter: "blur(64px)", transform: "translateY(var(--py,0px))", willChange: "transform", pointerEvents: "none", zIndex: 1 }} />
+        <div ref={heroBlobB} style={{ position: "absolute", bottom: "2%", left: "-10%", width: 460, height: 460, borderRadius: "50%", background: `radial-gradient(circle, ${INK2}1f 0%, transparent 66%)`, filter: "blur(72px)", transform: "translateY(var(--py,0px))", willChange: "transform", pointerEvents: "none", zIndex: 1 }} />
+
         <div style={{ position: "relative", zIndex: 2, maxWidth: 1400, margin: "0 auto", width: "100%" }}>
           <div className="hero-bento" style={{
             display: "grid",
@@ -600,8 +665,9 @@ function HomeView({ nav, casesList = [] }) {
 
       {/* ── FILOSOFÍA — centro de mando (oscuro) ─────────────── */}
       <section className="mesh-dark mesh-dark-animated grain" style={{ padding: "100px 6vw", position: "relative", overflow: "hidden" }}>
-        <div style={{
-          position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+        <div ref={filoGlow} style={{
+          position: "absolute", top: "50%", left: "50%",
+          transform: "translate(-50%, -50%) translateY(var(--py,0px))", willChange: "transform",
           width: 600, height: 400, borderRadius: "50%",
           background: `radial-gradient(ellipse, ${ACCENT}14 0%, transparent 65%)`,
           filter: "blur(50px)", pointerEvents: "none"
@@ -630,8 +696,9 @@ function HomeView({ nav, casesList = [] }) {
         padding: "130px 6vw",
         textAlign: "center", position: "relative", overflow: "hidden"
       }}>
-        <div style={{
-          position: "absolute", top: "-30%", left: "50%", transform: "translateX(-50%)",
+        <div ref={ctaGlow} style={{
+          position: "absolute", top: "-30%", left: "50%",
+          transform: "translateX(-50%) translateY(var(--py,0px))", willChange: "transform",
           width: 800, height: 400, borderRadius: "50%",
           background: `radial-gradient(ellipse, ${ACCENT}10 0%, transparent 65%)`,
           filter: "blur(60px)", pointerEvents: "none"
@@ -1634,6 +1701,8 @@ export default function App() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: BG, color: INK, fontFamily: "'Sentient', Georgia, serif" }}>
+
+      <ScrollProgress />
 
       {PATRON.global && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", backgroundImage: "url('/patron.svg')", backgroundRepeat: "repeat", backgroundSize: "150px", opacity: 0.04, pointerEvents: "none", zIndex: 9999 }} />
