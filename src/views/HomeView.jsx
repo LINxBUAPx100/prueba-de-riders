@@ -67,13 +67,6 @@ export default function HomeView({ nav, casesList = [] }) {
 
         <div style={{ position: "relative", zIndex: 2, maxWidth: 1400, margin: "0 auto", width: "100%" }}>
           <div style={{ maxWidth: 780 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 28 }}>
-              <div className="status-indicator" style={{ width: 10, height: 10, borderRadius: "50%", background: ACCENT }} />
-              <span className="font-display" style={{ fontSize: 12, fontWeight: 600, color: INK3, letterSpacing: "0.15em", textTransform: "uppercase" }}>
-                Unidad de Respuesta Rápida · Puebla, MX
-              </span>
-            </div>
-
             <h1 className="font-display" style={{
               fontSize: "clamp(52px, 8vw, 112px)",
               color: INK, fontWeight: 800, lineHeight: 0.96,
