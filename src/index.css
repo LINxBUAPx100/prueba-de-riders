@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap');
-@import url('https://api.fontshare.com/v2/css?f[]=sentient@400,500,700&display=swap');
+/* Las fuentes se cargan desde index.html con <link rel="preconnect"> + <link rel="stylesheet">
+   (el @import en CSS encadena descargas en serie y retrasa el primer render). */
 
 * {
   margin: 0;

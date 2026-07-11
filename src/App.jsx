@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import emailjs from '@emailjs/browser';
 import { COLORS, CATALOG, CASES, PILLARS, CASES_CSV_URL, SHEET_CSV_URL, CATALOGO_CSV_URL, GRAD } from "./data";
+import { useSheetData } from "./hooks/useSheetData";
 import "./index.css";
 
 const { BG, BG2, SURFACE, INK, INK2, INK3, ACCENT, AMBER2, ACCENT2, PURPLE, BORDER, RIDERS, SUCCESS, WARNING, INFO, MUTED_RED, MUTED_TEAL, TERRA } = COLORS;
@@ -25,6 +26,66 @@ const normalize = (str) =>
     .toLowerCase()
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "");
+
+// ── MAPPERS DE GOOGLE SHEETS (usados por useSheetData) ───────────────────
+// Ticker del hero y select del formulario: nombre + precio
+const mapServiceRows = (rows) => rows
+  .filter(row => row["Servicio"] && row["Servicio"].trim() !== "")
+  .map((row, index) => ({
+    id: `sheet-item-${index}`,
+    name: row["Servicio"].trim(),
+    price: row["Inversión (Desde)"] ? row["Inversión (Desde)"].toString().trim() : "",
+  }));
+
+// Catálogo completo: incluye tipo de pago, descripción y destacado
+const mapCatalogRows = (rows) => rows
+  .filter(row => row["Servicio"] && row["Servicio"].trim() !== "")
+  .map((row, index) => ({
+    id: `sheet-item-${index}`,
+    name:      row["Servicio"]?.trim() || "",
+    tag:       row["Tipo de Pago"]?.trim() || "",
+    realPrice: row["Precio real"] ? row["Precio real"].toString().trim() : "",
+    price:     row["Inversión (Desde)"] ? row["Inversión (Desde)"].toString().trim() : "",
+    desc:      row["Descripción"]?.trim() || "",
+    highlight: row["¿hightlight?"]?.trim().toUpperCase() === "TRUE",
+  }));
+
+// Estadísticas de mercado (ValorView) — vía PapaParse
+const mapStatRows = (rows) => rows
+  .map(row => ({
+    label:       row["Etiqueta"]?.trim()   || "",
+    freelance:   parseFloat(row["Freelance"]) || 0,
+    agencias:    parseFloat(row["Agencias"])  || 0,
+    riders:      parseFloat(row["Riders"])    || 0,
+    description: row["Descripcion"]?.trim()  || "",
+    tipo:       (row["Tipo"]?.trim()          || "barra").toLowerCase(),
+    unidad:      row["Unidad"]?.trim()        || "",
+    mejor:      (row["Mejor"]?.trim()         || "mayor").toLowerCase(),
+  }))
+  .filter(item => item.label && !isNaN(item.freelance));
+
+// Estadísticas de mercado — parseo manual si PapaParse no cargó
+const mapStatCols = (cols) => {
+  if (cols.length < 4) return null;
+  const freelanceVal = parseFloat(cols[1]);
+  if (isNaN(freelanceVal)) return null;
+  return {
+    label:       cols[0]?.trim() || "",
+    freelance:   freelanceVal    || 0,
+    agencias:    parseFloat(cols[2]) || 0,
+    riders:      parseFloat(cols[3]) || 0,
+    description: cols[4]?.trim() || "",
+    tipo:        cols[5]?.trim().toLowerCase() || "barra",
+    unidad:      cols[6]?.trim() || "",
+    mejor:       cols[7]?.trim().toLowerCase() || "mayor",
+  };
+};
+
+// Casos de éxito — parseo manual por columnas
+const mapCaseCols = (cols) => {
+  if (cols.length < 4 || !cols[1]) return null;
+  return { cat: cols[0], client: cols[1], result: cols[2], color: cols[3] || COLORS.ACCENT, link: cols[4] || "#" };
+};
 
 // ── HOOK RESPONSIVE (DETECTOR DE CELULARES) ──────────────────────────────
 function useIsMobile() {
@@ -197,6 +258,12 @@ function IconBolt({ size = 22 })   { return <svg width={size} height={size} view
 function IconTarget({ size = 22 }) { return <svg width={size} height={size} viewBox="0 0 24 24" {...svgBase}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" /></svg>; }
 function IconShield({ size = 22 }) { return <svg width={size} height={size} viewBox="0 0 24 24" {...svgBase}><path d="M12 3l7 3v5c0 4.6-3 7.8-7 9-4-1.2-7-4.4-7-9V6l7-3z" /><path d="M9 12l2 2 4-4" /></svg>; }
 function IconSpark({ size = 24 })  { return <svg width={size} height={size} viewBox="0 0 24 24" {...svgBase}><path d="M12 2l2.3 6.9L21 11l-6.7 2.1L12 20l-2.3-6.9L3 11l6.7-2.1L12 2z" /></svg>; }
+function IconMenu({ size = 26 })   { return <svg width={size} height={size} viewBox="0 0 24 24" {...svgBase} aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>; }
+function IconClose({ size = 26 })  { return <svg width={size} height={size} viewBox="0 0 24 24" {...svgBase} aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>; }
+function IconPlus({ size = 26 })   { return <svg width={size} height={size} viewBox="0 0 24 24" {...svgBase} aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>; }
+function IconCheck({ size = 18 })  { return <svg width={size} height={size} viewBox="0 0 24 24" {...svgBase} aria-hidden="true"><path d="M4 12.5l5 5L20 7" /></svg>; }
+function IconAlert({ size = 18 })  { return <svg width={size} height={size} viewBox="0 0 24 24" {...svgBase} aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5" /><path d="M12 16.5h.01" /></svg>; }
+function IconInfo({ size = 18 })   { return <svg width={size} height={size} viewBox="0 0 24 24" {...svgBase} aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v5" /><path d="M12 7.5h.01" /></svg>; }
 
 // ── COMPONENTES UI ───────────────────────────────────────────────────────
 function Chip({ children, outline, accent }) {
@@ -361,36 +428,13 @@ function Btn({ variant = "primary", children, onClick, type = "button", full = f
 }
 
 function HomeView({ nav, casesList = [] }) {
-  const [tickerData, setTickerData] = useState(CATALOG);
+  const { data: tickerData } = useSheetData(CATALOGO_CSV_URL, { mapRows: mapServiceRows, fallback: CATALOG });
 
   // ── Parallax refs (se desplazan al hacer scroll) ──
   const heroBlobA = useParallax(0.22);
   const heroBlobB = useParallax(-0.16);
   const filoGlow  = useParallax(0.40);
   const ctaGlow   = useParallax(0.50);
-
-  useEffect(() => {
-    if (!window.Papa || !CATALOGO_CSV_URL) return;
-    fetch(`${CATALOGO_CSV_URL}&t=${Date.now()}`)
-      .then(res => res.text())
-      .then(csvText => {
-        if (csvText.trim().startsWith('<')) return;
-        window.Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          transformHeader: h => h.trim(),
-          complete: (results) => {
-            const sheetServices = results.data
-              .filter(row => row["Servicio"] && row["Servicio"].trim() !== "")
-              .map(row => ({
-                name: row["Servicio"].trim(),
-                price: row["Inversión (Desde)"] ? row["Inversión (Desde)"].toString().trim() : ""
-              }));
-            if (sheetServices.length > 0) setTickerData(sheetServices);
-          }
-        });
-      }).catch(err => console.error("Error cargando listón:", err));
-  }, []);
 
   const clients = casesList.map(c => c.client);
   const shouldAnimate = clients.length >= 3;
@@ -777,57 +821,17 @@ function HomeView({ nav, casesList = [] }) {
   );
 }
 
+const CATALOG_ERROR_MESSAGES = {
+  "fallback-papa":    "⚠️ Error: El script de PapaParse no se ha cargado en el index.html.",
+  "fallback-private": "⚠️ El Google Sheet está privado. Cambia a 'Cualquier persona con el enlace'.",
+  "fallback-empty":   "⚠️ El Excel conectó, pero las columnas no se llaman exactamente 'Servicio', 'Tipo de Pago', etc.",
+  "fallback-network": "⚠️ Error de red al intentar descargar el Excel.",
+};
+
 function CatalogView({ nav }) {
-  const [catalog, setCatalog] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState("");
-
-  useEffect(() => {
-    if (!window.Papa) {
-      setErrorMsg("⚠️ Error: El script de PapaParse no se ha cargado en el index.html.");
-      setIsLoading(false);
-      return;
-    }
-
-    fetch(`${CATALOGO_CSV_URL}&t=${Date.now()}`)
-      .then(res => res.text())
-      .then(csvText => {
-        if (csvText.trim().startsWith('<')) {
-          setErrorMsg("⚠️ El Google Sheet está privado. Cambia a 'Cualquier persona con el enlace'.");
-          setIsLoading(false);
-          return;
-        }
-        window.Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          transformHeader: h => h.trim(),
-          complete: (results) => {
-            const fetchedData = results.data
-              .filter(row => row["Servicio"] && row["Servicio"].trim() !== "")
-              .map((row, index) => ({
-                id: `sheet-item-${index}`,
-                name:      row["Servicio"]?.trim() || "",
-                tag:       row["Tipo de Pago"]?.trim() || "",
-                realPrice: row["Precio real"] ? row["Precio real"].toString().trim() : "",
-                price:     row["Inversión (Desde)"] ? row["Inversión (Desde)"].toString().trim() : "",
-                desc:      row["Descripción"]?.trim() || "",
-                highlight: row["¿hightlight?"]?.trim().toUpperCase() === "TRUE"
-              }));
-
-            if (fetchedData.length === 0) {
-              setErrorMsg("⚠️ El Excel conectó, pero las columnas no se llaman exactamente 'Servicio', 'Tipo de Pago', etc.");
-            }
-            setCatalog(fetchedData);
-            setIsLoading(false);
-          }
-        });
-      })
-      .catch(err => {
-        console.error(err);
-        setErrorMsg("⚠️ Error de red al intentar descargar el Excel.");
-        setIsLoading(false);
-      });
-  }, []);
+  const { data: catalog, status } = useSheetData(CATALOGO_CSV_URL, { mapRows: mapCatalogRows, fallback: [] });
+  const isLoading = status === "loading";
+  const errorMsg = CATALOG_ERROR_MESSAGES[status] || "";
 
   const monthly  = catalog.filter(s => s.tag && s.tag.toLowerCase().includes("mensual"));
   const oneTime  = catalog.filter(s => s.tag && (s.tag.toLowerCase().includes("único") || s.tag.toLowerCase().includes("unico")));
@@ -1345,47 +1349,26 @@ function ContactView({ isMobile, initialService }) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [servicesList, setServicesList] = useState([]);
+  const [honeypot, setHoneypot] = useState("");
+  const { data: servicesList } = useSheetData(CATALOGO_CSV_URL, { mapRows: mapServiceRows, fallback: CATALOG });
 
   useEffect(() => {
     // Resuelve el id a preseleccionar emparejando initialService (un NOMBRE) por nombre normalizado.
-    const resolveServiceId = (list) => {
+    if (!servicesList || servicesList.length === 0) return;
+    setForm(prev => {
+      let id = servicesList[0].id;
       if (initialService) {
-        const match = list.find(s => normalize(s.name) === normalize(initialService));
-        if (match) return match.id;
+        const match = servicesList.find(s => normalize(s.name) === normalize(initialService));
+        if (match) id = match.id;
       }
-      return list.length > 0 ? list[0].id : "";
-    };
-    const applyList = (list) => {
-      setServicesList(list);
-      setForm(prev => ({ ...prev, service: resolveServiceId(list) }));
-    };
-
-    if (!window.Papa || !CATALOGO_CSV_URL) { applyList(CATALOG); return; }
-    fetch(`${CATALOGO_CSV_URL}&t=${Date.now()}`)
-      .then(res => res.text())
-      .then(csvText => {
-        if (csvText.trim().startsWith('<')) { applyList(CATALOG); return; }
-        window.Papa.parse(csvText, {
-          header: true, skipEmptyLines: true,
-          transformHeader: h => h.trim(),
-          complete: (results) => {
-            const fetchedData = results.data
-              .filter(row => row["Servicio"] && row["Servicio"].trim() !== "")
-              .map((row, index) => ({
-                id: `sheet-item-${index}`,
-                name: row["Servicio"]?.trim() || "",
-                price: row["Inversión (Desde)"] ? row["Inversión (Desde)"].toString().trim() : "",
-              }));
-            applyList(fetchedData.length > 0 ? fetchedData : CATALOG);
-          }
-        });
-      })
-      .catch(() => applyList(CATALOG));
-  }, [initialService]);
+      return { ...prev, service: id };
+    });
+  }, [servicesList, initialService]);
 
   const handle = (e) => {
     e.preventDefault();
+    // Honeypot antispam: los bots rellenan el campo oculto; un humano nunca lo ve
+    if (honeypot) return;
     setLoading(true);
     setError(false);
     const selectedService = servicesList.find(s => s.id === form.service);
@@ -1545,8 +1528,15 @@ function ContactView({ isMobile, initialService }) {
               <textarea required rows={4} style={{ ...inputStyle, resize: "vertical" }} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="Cuéntame sobre tu proyecto, ¿qué necesitas?" onFocus={onFocusInput} onBlur={onBlurInput} />
             </div>
 
+            {/* Honeypot antispam: invisible para humanos, los bots lo rellenan */}
+            <input
+              type="text" name="empresa_sitio_web" tabIndex={-1} autoComplete="off" aria-hidden="true"
+              value={honeypot} onChange={e => setHoneypot(e.target.value)}
+              style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+            />
+
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start", background: `${ACCENT}1f`, border: `1px solid ${ACCENT}45`, padding: "14px 16px", borderRadius: 8 }}>
-              <span style={{ fontSize: 16, flexShrink: 0 }}>☁</span>
+              <span style={{ flexShrink: 0, color: ACCENT, display: "flex", marginTop: 1 }}><IconInfo /></span>
               <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 12, lineHeight: 1.65, margin: 0 }}>
                 Al enviar se abrirá un chat de WhatsApp con tu información prellenada para continuar la conversación directamente con el equipo.
               </p>
@@ -1558,12 +1548,12 @@ function ContactView({ isMobile, initialService }) {
 
             {sent && (
               <div role="alert" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: "#f8b42c", fontWeight: 800, textAlign: "center", padding: 12, background: "rgba(245,163,19,0.16)", border: "1px solid rgba(245,163,19,0.40)", borderRadius: 8 }}>
-                ✓ Solicitud enviada correctamente.
+                <IconCheck /> Solicitud enviada correctamente.
               </div>
             )}
             {error && (
-              <div role="alert" style={{ color: "#ff8d8f", fontWeight: 800, textAlign: "center", padding: 12, background: "rgba(255,77,79,0.14)", border: "1px solid rgba(255,141,143,0.4)", borderRadius: 8 }}>
-                ❌ Hubo un error al enviar el correo, pero el chat debería abrirse.
+              <div role="alert" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: "#ff8d8f", fontWeight: 800, textAlign: "center", padding: 12, background: "rgba(255,77,79,0.14)", border: "1px solid rgba(255,141,143,0.4)", borderRadius: 8 }}>
+                <IconAlert /> Hubo un error al enviar el correo, pero el chat debería abrirse.
               </div>
             )}
           </form>
@@ -1603,7 +1593,7 @@ function SocialFloat({ isMobile }) {
           transform: isOpen ? "rotate(135deg)" : "rotate(0deg)"
         }}
       >
-        +
+        <IconPlus />
       </button>
 
       {socialLinks.map((link, index) => (
@@ -1631,9 +1621,10 @@ function SocialFloat({ isMobile }) {
 
 export default function App() {
   const [page, setPage] = useState("inicio");
-  const [marketStats, setMarketStats] = useState([]);
-  const [casesList, setCasesList] = useState(CASES || []);
   const [preselectedService, setPreselectedService] = useState(null);
+
+  const { data: marketStats } = useSheetData(SHEET_CSV_URL, { mapRows: mapStatRows, mapCols: mapStatCols, fallback: [] });
+  const { data: casesList }   = useSheetData(CASES_CSV_URL, { mapCols: mapCaseCols, fallback: CASES || [] });
 
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -1644,75 +1635,6 @@ export default function App() {
     setMenuOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
- useEffect(() => {
-  if (!SHEET_CSV_URL || SHEET_CSV_URL === "" || SHEET_CSV_URL.includes("sharing")) return;
-  fetch(`${SHEET_CSV_URL}&t=${Date.now()}`)
-    .then(res => res.text())
-    .then(csvText => {
-      if (csvText.trim().startsWith('<')) return;
-
-      if (window.Papa) {
-        window.Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          transformHeader: h => h.trim(),
-          complete: (results) => {
-            const parsed = results.data
-              .map(row => ({
-                label:       row["Etiqueta"]?.trim()   || "",
-                freelance:   parseFloat(row["Freelance"]) || 0,
-                agencias:    parseFloat(row["Agencias"])  || 0,
-                riders:      parseFloat(row["Riders"])    || 0,
-                description: row["Descripcion"]?.trim()  || "",
-                tipo:       (row["Tipo"]?.trim()          || "barra").toLowerCase(),
-                unidad:      row["Unidad"]?.trim()        || "",
-                mejor:      (row["Mejor"]?.trim()         || "mayor").toLowerCase(),
-              }))
-              .filter(item => item.label && !isNaN(item.freelance));
-            if (parsed.length > 0) setMarketStats(parsed);
-          }
-        });
-      } else {
-        const rows = csvText.split('\n').slice(1);
-        const parsed = rows.map(row => {
-          const cols = row.replace(/\r/g, '').split(',');
-          if (cols.length < 4) return null;
-          const freelanceVal = parseFloat(cols[1]);
-          if (isNaN(freelanceVal)) return null;
-          return {
-            label:       cols[0]?.trim() || "",
-            freelance:   freelanceVal    || 0,
-            agencias:    parseFloat(cols[2]) || 0,
-            riders:      parseFloat(cols[3]) || 0,
-            description: cols[4]?.trim() || "",
-            tipo:        cols[5]?.trim().toLowerCase() || "barra",
-            unidad:      cols[6]?.trim() || "",
-            mejor:       cols[7]?.trim().toLowerCase() || "mayor",
-          };
-        }).filter(item => item && item.label);
-        if (parsed.length > 0) setMarketStats(parsed);
-      }
-    }).catch(err => console.error(err));
-}, []);
-
-  useEffect(() => {
-    if (!CASES_CSV_URL || CASES_CSV_URL === "" || CASES_CSV_URL.includes("sharing")) return;
-    fetch(`${CASES_CSV_URL}&t=${Date.now()}`)
-      .then(res => res.text())
-      .then(csvText => {
-        if (csvText.trim().startsWith('<')) return;
-        const rows = csvText.split('\n').slice(1);
-        const parsed = rows.map(row => {
-          const cols = row.replace(/\r/g, '').split(',');
-          if (cols.length >= 4) {
-             return { cat: cols[0], client: cols[1], result: cols[2], color: cols[3] || ACCENT, link: cols[4] || "#" };
-          }
-          return null;
-        }).filter(item => item && item.client);
-        if(parsed.length > 0) setCasesList(parsed);
-      }).catch(err => console.error(err));
-  }, []);
 
   const PAGES = [
     { id: "inicio", label: "Inicio" },
@@ -1753,8 +1675,8 @@ export default function App() {
             <Btn variant="primary" onClick={() => nav("contacto")} style={{ padding: "11px 26px", fontSize: 12, minHeight: 44 }}>Cotizar</Btn>
           </>
         ) : (
-          <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Menú" style={{ background: "none", border: "none", fontSize: "28px", color: INK, cursor: "pointer" }}>
-            {menuOpen ? "✕" : "☰"}
+          <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Menú" aria-expanded={menuOpen} style={{ background: "none", border: "none", color: INK, cursor: "pointer", display: "flex", alignItems: "center", padding: 8 }}>
+            {menuOpen ? <IconClose /> : <IconMenu />}
           </button>
         )}
       </nav>
