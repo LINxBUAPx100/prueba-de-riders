@@ -265,7 +265,7 @@ export default function HomeView({ nav, casesList = [] }) {
               {displayClients.map((clientName, i) => (
                 <span key={i} className="font-num" style={{
                   fontSize: "clamp(18px, 3vw, 24px)", fontWeight: 900,
-                  color: "rgba(255,255,255,0.5)", whiteSpace: "nowrap",
+                  color: "rgba(255,255,255,0.58)", whiteSpace: "nowrap",
                   paddingRight: "clamp(40px, 8vw, 100px)"
                 }}>
                   {clientName}
