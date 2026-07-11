@@ -48,6 +48,20 @@ export const GRAD = {
   blue:      "linear-gradient(135deg, #2c5e9e 0%, #183457 100%)",
 };
 
+// ── TOKENS DE SISTEMA (la paleta COLORS de arriba NO se toca) ────────────
+// Radios: composición editorial sin radio, controles/tarjetas 8px, chips píldora.
+export const RADIUS = { none: 0, control: 8, pill: 999 };
+
+// Una sola sombra de elevación para tarjetas; el glow ámbar es exclusivo
+// del CTA primario (definido dentro de Btn).
+export const SHADOW = {
+  lift:      "0 4px 16px rgba(13,27,42,0.06)",
+  liftHover: "0 12px 32px rgba(13,27,42,0.10)",
+};
+
+// Fondo navy sólido de las secciones oscuras (sustituye al mesh animado).
+export const NAVY_BG = "#122c49";
+
 // ── CATÁLOGO DE SERVICIOS ────────────────────────────────────────────────
 export const CATALOG = [
   
