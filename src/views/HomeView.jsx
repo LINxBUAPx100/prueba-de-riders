@@ -5,7 +5,8 @@ import { mapServiceRows } from "../sheetMappers";
 import { Reveal, Counter } from "../components/Reveal";
 import { Btn } from "../components/Btn";
 import { SectionLabel, PatternBg, BrandWatermark } from "../components/ui";
-import { IconBolt, IconTarget, IconShield, IconSpark } from "../components/icons";
+import { LogoIcon } from "../components/LogoIcon";
+import { IconBolt, IconTarget, IconShield } from "../components/icons";
 
 const { BG, INK, INK2, INK3, ACCENT, BORDER } = COLORS;
 
@@ -227,11 +228,9 @@ export default function HomeView({ nav, casesList = [] }) {
           filter: "blur(60px)", pointerEvents: "none"
         }} />
         <Reveal style={{ position: "relative", maxWidth: 720, margin: "0 auto" }}>
-          <div style={{
-            width: 64, height: 64, border: `2px solid ${ACCENT}`,
-            borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-            margin: "0 auto 32px", color: ACCENT
-          }}><IconSpark size={26} /></div>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 32, filter: `drop-shadow(0 10px 28px ${ACCENT}55)` }}>
+            <LogoIcon size={64} />
+          </div>
           <h2 className="font-display" style={{
             fontSize: "clamp(40px, 6vw, 64px)", color: "#ffffff", fontWeight: 800,
             lineHeight: 1.02, marginBottom: 24, letterSpacing: "-0.02em"
