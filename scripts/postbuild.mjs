@@ -22,7 +22,8 @@ const replaceOrThrow = (html, regex, replacement, name, path) => {
 };
 
 for (const r of ROUTES_META) {
-  const url = `${ORIGIN}${r.path === "/" ? "/" : r.path}`;
+  // GitHub Pages redirige /ruta → /ruta/ (301): el canonical usa la URL final
+  const url = r.path === "/" ? `${ORIGIN}/` : `${ORIGIN}${r.path}/`;
   let html = base;
   html = replaceOrThrow(html, /<title>[\s\S]*?<\/title>/, `<title>${esc(r.title)}</title>`, "<title>", r.path);
   html = replaceOrThrow(html, /(<meta name="description" content=")[^"]*(")/, `$1${esc(r.description)}$2`, "meta description", r.path);
