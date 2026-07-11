@@ -106,7 +106,7 @@ export default function ContactView({ isMobile, initialService }) {
                 <span style={{ fontSize: 10, fontWeight: 800, color: "rgba(255,255,255,0.65)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Respuesta en menos de 24h</span>
               </div>
 
-              <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, lineHeight: 1.75, marginBottom: 44 }}>
+              <p style={{ color: "rgba(255,255,255,0.66)", fontSize: 15, lineHeight: 1.75, marginBottom: 44 }}>
                 Sin filtros, sin juntas innecesarias.<br />
                 Directo al punto y a la estrategia de tu negocio.
               </p>
@@ -130,7 +130,7 @@ export default function ContactView({ isMobile, initialService }) {
             </div>
 
             <div style={{ position: "relative", zIndex: 1, marginTop: 44, paddingTop: 28, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-              <div style={{ fontSize: 9, fontWeight: 800, color: "rgba(255,255,255,0.28)", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 14 }}>Síguenos</div>
+              <div style={{ fontSize: 9, fontWeight: 800, color: "rgba(255,255,255,0.58)", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 14 }}>Síguenos</div>
               <div style={{ display: "flex", gap: 10 }}>
                 {[
                   { name: "IG", label: "Instagram", color: "#E4405F", url: "https://www.instagram.com/riders_media.mk/" },

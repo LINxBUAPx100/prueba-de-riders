@@ -252,11 +252,11 @@ export default function HomeView({ nav, casesList = [] }) {
 
       {/* ── SOCIAL PROOF ──────────────────────────────────────── */}
       <section style={{ padding: "20px 0 30px", background: INK2, borderTop: `3px solid ${ACCENT}`, textAlign: "center", overflow: "hidden" }}>
-        <p style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.38)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 16 }}>
+        <p style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.62)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 16 }}>
           — Marcas que confían en nosotros —
         </p>
         {clients.length === 0 ? (
-          <div className="font-num" style={{ fontSize: "clamp(18px, 3vw, 24px)", fontWeight: 900, color: "rgba(255,255,255,0.25)" }}>
+          <div className="font-num" style={{ fontSize: "clamp(18px, 3vw, 24px)", fontWeight: 900, color: "rgba(255,255,255,0.5)" }}>
             Podrías ser el primero
           </div>
         ) : (
@@ -265,7 +265,7 @@ export default function HomeView({ nav, casesList = [] }) {
               {displayClients.map((clientName, i) => (
                 <span key={i} className="font-num" style={{
                   fontSize: "clamp(18px, 3vw, 24px)", fontWeight: 900,
-                  color: "rgba(255,255,255,0.32)", whiteSpace: "nowrap",
+                  color: "rgba(255,255,255,0.5)", whiteSpace: "nowrap",
                   paddingRight: "clamp(40px, 8vw, 100px)"
                 }}>
                   {clientName}

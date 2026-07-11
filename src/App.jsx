@@ -145,7 +145,7 @@ function Shell() {
             ))}
           </div>
 
-          <span style={{ color: INK3, fontSize: 13, fontWeight: 600 }}>© {new Date().getFullYear()} Puebla, MX.</span>
+          <span style={{ color: INK2, fontSize: 13, fontWeight: 600 }}>© {new Date().getFullYear()} Puebla, MX.</span>
         </div>
       </footer>
     </div>
