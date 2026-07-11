@@ -66,12 +66,21 @@ nav button, footer button, .mobile-menu button {
   100% { background-position: 0% 50%; }
 }
 
-/* --- TEXTO CON GRADIENTE DE MARCA --- */
+/* --- TEXTO CON GRADIENTE DE MARCA (solo sobre fondos oscuros: sobre crema no pasa contraste) --- */
 .gradient-text {
   background: linear-gradient(135deg, #f8b42c 0%, #f5a313 55%, #d98709 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* --- TITULAR SOBRE FONDO CLARO: tinta + subrayado ámbar (el acento es gráfico, no texto) --- */
+.accent-underline {
+  text-decoration: underline;
+  text-decoration-color: #f5a313;
+  text-decoration-thickness: 0.13em;
+  text-underline-offset: 0.07em;
+  text-decoration-skip-ink: none;
 }
 
 .float-orb-a { animation: floatOrb 9s ease-in-out infinite; }

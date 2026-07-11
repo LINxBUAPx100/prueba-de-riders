@@ -205,7 +205,7 @@ function Chip({ children, outline, accent }) {
     <span className="font-display" style={{
       display: "inline-block",
       background: isAccent ? ACCENT : "transparent",
-      color: isAccent ? INK : ACCENT,
+      color: isAccent ? INK : INK2,
       border: `1px solid ${ACCENT}`,
       padding: "5px 13px",
       borderRadius: "20px",
@@ -231,10 +231,13 @@ function LogoIcon({ size = 32, square = RIDERS, mark = BG }) {
   );
 }
 
+// Sobre fondo claro el texto va en navy (el ámbar no pasa contraste WCAG sobre crema);
+// el acento ámbar se conserva como guion gráfico. Sobre fondo oscuro el ámbar sí pasa.
 function SectionLabel({ children, dark = false }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-      <span className="font-display" style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: ACCENT }}>
+      <span aria-hidden="true" style={{ width: 22, height: 3, background: ACCENT, borderRadius: 2, flexShrink: 0 }} />
+      <span className="font-display" style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: dark ? ACCENT : INK2 }}>
         {children}
       </span>
       <span style={{ flex: 1, height: 1, background: dark ? "rgba(255,255,255,0.14)" : BORDER }} />
@@ -287,7 +290,8 @@ function Btn({ variant = "primary", children, onClick, type = "button", full = f
         style={{
           background: "none", border: "none", padding: 0,
           cursor: disabled ? "not-allowed" : "pointer",
-          color: ACCENT, fontWeight: 800, fontSize: 13,
+          color: INK2, fontWeight: 800, fontSize: 13,
+          boxShadow: `inset 0 -2px 0 ${ACCENT}`,
           letterSpacing: "0.06em", textTransform: "uppercase",
           fontFamily: "'Oswald', sans-serif",
           display: "inline-flex", alignItems: "center", gap: 6,
@@ -475,7 +479,7 @@ function HomeView({ nav, casesList = [] }) {
                 color: INK, fontWeight: 800, lineHeight: 0.98,
                 letterSpacing: "-0.02em", marginBottom: 22
               }}>
-                De la idea<br />a la <span className="gradient-text">realidad.</span>
+                De la idea<br />a la <span className="accent-underline">realidad.</span>
               </h1>
 
               <p style={{
@@ -489,7 +493,7 @@ function HomeView({ nav, casesList = [] }) {
               <p style={{ fontSize: "clamp(15px, 1.2vw, 18px)", color: INK2, maxWidth: 540, lineHeight: 1.7, marginBottom: 36 }}>
                 En Riders Media no improvisamos. Somos una unidad estratégica especializada
                 en <strong style={{ color: INK }}>motion graphics y desarrollo avanzado</strong> con
-                React y Next.js. Aceleramos tu crecimiento con ejecuciones quirúrgicas,
+                React. Aceleramos tu crecimiento con ejecuciones quirúrgicas,
                 transparencia absoluta en los costos y entregables que dominan la atención.
               </p>
 
@@ -570,7 +574,7 @@ function HomeView({ nav, casesList = [] }) {
                     }}>
                       <span style={{ fontSize: 13, fontWeight: 700, color: INK }}>{s.name}</span>
                       {s.price && (
-                        <span className="font-num gradient-text" style={{ fontSize: 16, fontWeight: 800 }}>
+                        <span className="font-num" style={{ fontSize: 16, fontWeight: 800, color: INK }}>
                           {s.price.toString().includes('$') ? s.price : `$${s.price}`} MXN
                         </span>
                       )}
@@ -597,7 +601,7 @@ function HomeView({ nav, casesList = [] }) {
           <div className="ticker-track" style={{ animation: `scrollTicker ${Math.max(50, tickerData.length * 5)}s linear infinite` }}>
             {[...tickerData, ...tickerData].map((s, i) => (
               <span key={i} style={{
-                color: i % 2 === 0 ? ACCENT : INK3, fontWeight: 800, fontSize: 13,
+                color: i % 2 === 0 ? INK2 : INK3, fontWeight: 800, fontSize: 13,
                 textTransform: "uppercase", letterSpacing: "0.12em",
                 whiteSpace: "nowrap", paddingRight: "48px"
               }}>
@@ -944,7 +948,7 @@ function CatalogView({ nav }) {
             fontWeight: 800, textTransform: "uppercase", lineHeight: 0.95, letterSpacing: "-0.02em"
           }}>
             Servicios &<br />
-            <span className="gradient-text">Precios.</span>
+            <span className="accent-underline">Precios.</span>
           </h1>
           <p style={{ color: INK2, fontSize: 18, lineHeight: 1.7 }}>
             Sin letra chica. Sin sorpresas. Todos los precios son desde —
@@ -1309,7 +1313,7 @@ function AboutView() {
               Riders Media fusiona la <strong style={{ color: INK }}>precisión técnica con la creatividad disruptiva.</strong> No somos una agencia de marketing convencional, no hacemos planes a 6 meses para cambiar el color de un botón.
             </p>
             <p style={{ marginBottom: 40 }}>
-              Resolvemos el problema de la lentitud digital y la falta de transparencia en la industria. Somos eficaces en la entrega, rigurosos en el código (React/Next.js) y 100% transparentes en el proceso.
+              Resolvemos el problema de la lentitud digital y la falta de transparencia en la industria. Somos eficaces en la entrega, rigurosos en el código (React) y 100% transparentes en el proceso.
             </p>
             <blockquote style={{ borderLeft: `4px solid ${ACCENT}`, paddingLeft: 32, fontStyle: "italic", color: INK, background: SURFACE, padding: "32px", borderRadius: "0 12px 12px 0", fontSize: "clamp(18px, 1.8vw, 24px)", fontWeight: 600, boxShadow: "0 10px 30px rgba(0,0,0,0.1)" }}>
               "Construimos los activos digitales más rápidos de la región. Combinamos infraestructura web de alto nivel con producción visual premium para que tu negocio domine la atención."
@@ -1442,9 +1446,9 @@ function ContactView({ isMobile, initialService }) {
             <div style={{ position: "absolute", top: -40, left: -40, width: 120, height: 120, borderRadius: "50%", background: `${ACCENT}08`, pointerEvents: "none" }} />
 
             <div style={{ position: "relative", zIndex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 36 }}>
+              <div role="img" aria-label="Riders Media" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 36 }}>
                 <LogoIcon size={26} />
-                <span className="font-display" style={{ fontWeight: 700, fontSize: 17, color: "#ffffff", letterSpacing: "0.05em" }}>IDERS MEDIA</span>
+                <span aria-hidden="true" className="font-display" style={{ fontWeight: 700, fontSize: 17, color: "#ffffff", letterSpacing: "0.05em" }}>IDERS MEDIA</span>
               </div>
 
               <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", padding: "8px 14px", borderRadius: 20, marginBottom: 28 }}>
@@ -1713,7 +1717,7 @@ export default function App() {
   const PAGES = [
     { id: "inicio", label: "Inicio" },
     { id: "catalogo", label: "Catálogo" },
-    { id: "valor", label: "Accesibilidad" },
+    { id: "valor", label: "Comparativa" },
     { id: "casos", label: "Casos" },
     { id: "agencia", label: "Agencia" },
     { id: "contacto", label: "Contacto" },
@@ -1731,10 +1735,11 @@ export default function App() {
       <SocialFloat isMobile={isMobile} />
 
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: `rgba(255,255,255,0.85)`, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderBottom: `1px solid ${BORDER}`, height: "80px", display: "flex", alignItems: "center", padding: "0 5vw", justifyContent: "space-between" }}>
-        <div onClick={() => nav("inicio")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 3.5 }}>
+        {/* El isotipo es la "R": visualmente el lockup se lee RIDERS MEDIA */}
+        <button onClick={() => nav("inicio")} aria-label="Riders Media — Ir al inicio" style={{ background: "none", border: "none", padding: 0, cursor: "pointer", display: "flex", alignItems: "center", gap: 3.5 }}>
           <LogoIcon size={32} />
-          <span className="font-display" style={{ fontWeight: 700, fontSize: "22px", letterSpacing: "0.03em", color: INK2 }}>IDERS MEDIA</span>
-        </div>
+          <span aria-hidden="true" className="font-display" style={{ fontWeight: 700, fontSize: "22px", letterSpacing: "0.03em", color: INK2 }}>IDERS MEDIA</span>
+        </button>
 
         {!isMobile ? (
           <>
@@ -1778,9 +1783,9 @@ export default function App() {
 
       <footer style={{ padding: "20px 5vw", borderTop: `3px solid transparent`, borderImage: `linear-gradient(90deg, ${ACCENT}, ${AMBER2}, ${INK2}) 1`, background: `linear-gradient(180deg, ${BG2} 0%, #e3dac7 100%)` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+          <div role="img" aria-label="Riders Media" style={{ display: "flex", alignItems: "center", gap: 3 }}>
              <LogoIcon size={24} />
-             <span className="font-display" style={{ fontWeight: 700, color: INK2, letterSpacing: "0.05em", fontSize: 18 }}>IDERS MEDIA</span>
+             <span aria-hidden="true" className="font-display" style={{ fontWeight: 700, color: INK2, letterSpacing: "0.05em", fontSize: 18 }}>IDERS MEDIA</span>
           </div>
 
           <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
